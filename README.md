@@ -1,4 +1,4 @@
-net.adamcin.crx.recap
+net.adamcin.recap
 =====================
 
 Port of Capone to Scala

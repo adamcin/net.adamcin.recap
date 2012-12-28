@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>net.adamcin.recap</groupId>
+    	<artifactId>net.adamcin.recap.parent</artifactId>
+		<version>1.0-SNAPSHOT</version>
+		<relativePath>../parent</relativePath>
+	</parent>
+
+    <artifactId>net.adamcin.recap.ui</artifactId>
+    <packaging>vltpack</packaging>
+
+    <build>
+
+		<resources>
+			<resource>
+				<directory>src/main/content</directory>
+			</resource>
+		</resources>
+
+        <plugins>
+         	<plugin>
+				<groupId>net.adamcin</groupId>
+				<artifactId>vltpack-maven-plugin</artifactId>
+				<extensions>true</extensions>
+				<configuration>
+					<embedBundles>
+						<bundle>net.adamcin.recap.core</bundle>
+					</embedBundles>
+                    <jcrPath>/apps/recap</jcrPath>
+					<properties>
+						<name>recap</name>
+					</properties>
+				</configuration>
+			</plugin>
+        </plugins>
+    </build>
+
+	<dependencies>
+		<dependency>
+			<groupId>net.adamcin.recap</groupId>
+			<artifactId>net.adamcin.recap.core</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+
+        <dependency>
+            <groupId>org.apache.sling</groupId>
+            <artifactId>org.apache.sling.api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.sling</groupId>
+            <artifactId>org.apache.sling.scripting.jsp.taglib</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.day.commons</groupId>
+            <artifactId>day-commons-jstl</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.day.cq</groupId>
+            <artifactId>cq-commons</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.day.cq.wcm</groupId>
+            <artifactId>cq-wcm-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.day.cq.wcm</groupId>
+            <artifactId>cq-wcm-commons</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.day.cq.wcm</groupId>
+            <artifactId>cq-wcm-taglib</artifactId>
+        </dependency>
+    </dependencies>
+</project>

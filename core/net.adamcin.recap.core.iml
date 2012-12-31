@@ -4,7 +4,6 @@
     <facet type="Osmorc" name="OSGi">
       <configuration manifestGenerationMode="OsmorcControlled" manifestLocation="" jarfileLocation="net.adamcin.recap.core-1.0-SNAPSHOT.jar" outputPathType="CompilerOutputPath" bndFileLocation="" bundlorFileLocation="" bundleActivator="" bundleSymbolicName="net.adamcin.recap.net.adamcin.recap.core" bundleVersion="1.0.0.SNAPSHOT" ignoreFilePattern="" useProjectDefaultManifestFileLocation="true" alwaysRebuildBundleJAR="false" doNotSynchronizeWithMaven="false">
         <additionalProperties>
-          <property key="Bundle-Description" value="Parent POM for Recap project" />
           <property key="Export-Package" value="net.adamcin.recap;version=1.0-SNAPSHOT" />
           <property key="Private-Package" value="net.adamcin.recap.impl.*" />
           <property key="Embed-Dependency" value="vault-davex,jackrabbit-jcr-client,jackrabbit-spi2dav,jackrabbit-jcr2spi" />

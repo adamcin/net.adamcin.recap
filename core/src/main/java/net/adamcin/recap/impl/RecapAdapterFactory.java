@@ -175,6 +175,10 @@ public class RecapAdapterFactory implements AdapterFactory {
                 }
             }
 
+            if ("true".equals(request.getParameter(RecapConstants.RP_REMOTE_IS_HTTPS))) {
+                context.setHttps(true);
+            }
+
             context.setRemoteUsername(request.getParameter(RecapConstants.RP_REMOTE_USER));
             context.setRemotePassword(request.getParameter(RecapConstants.RP_REMOTE_PASS));
             context.setStrategy(request.getParameter(RecapConstants.RP_REMOTE_STRATEGY));

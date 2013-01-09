@@ -17,11 +17,6 @@ public class RecapConstants {
     }
 
     /**
-     * This scheme is used to map a RepositoryAddress to a local ResourceResolver
-     */
-    public static final String SCHEME = "recap";
-
-    /**
      * Paths to the core Recap servlets
      */
     public static final String SERVLET_COPY_PATH = "/bin/recap/copy";

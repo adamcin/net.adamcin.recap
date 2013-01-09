@@ -99,6 +99,33 @@ public class RecapAdapterFactory implements AdapterFactory {
             if (context != null) {
                 try {
                     RecapSession session = recap.initSession(adaptable.getResourceResolver(), context);
+
+                    if ("true".equals(adaptable.getParameter(RecapConstants.RP_UPDATE))) {
+                        session.setUpdate(true);
+                    }
+
+                    if ("true".equals(adaptable.getParameter(RecapConstants.RP_ONLY_NEWER))) {
+                        session.setOnlyNewer(true);
+                    }
+
+                    String rpBatchSize = adaptable.getParameter(RecapConstants.RP_BATCH_SIZE);
+                    if (rpBatchSize != null) {
+                        try {
+                            session.setBatchSize(Integer.valueOf(rpBatchSize));
+                        } catch (Exception e) {
+                            LOGGER.error("failed to parse batch_size parameter: " + rpBatchSize, e);
+                        }
+                    }
+
+                    String rpThrottle = adaptable.getParameter(RecapConstants.RP_THROTTLE);
+                    if (rpThrottle != null) {
+                        try {
+                            session.setThrottle(Integer.valueOf(rpThrottle));
+                        } catch (Exception e) {
+                            LOGGER.error("failed to parse batch_size parameter: " + rpBatchSize, e);
+                        }
+                    }
+
                     return (AdapterType) session;
                 } catch (RecapSessionException e) {
                     LOGGER.error("failed to open recap session", e);

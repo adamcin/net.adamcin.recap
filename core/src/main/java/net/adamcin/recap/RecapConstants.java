@@ -50,7 +50,7 @@ public class RecapConstants {
     public static final String RP_ONLY_NEWER = ":only_newer";
     public static final String RP_SELECTORS = ":selectors";
     public static final String RP_SUFFIX = ":suffix";
-    public static final String RP_BATCH_SIZE = ":batchSize";
+    public static final String RP_BATCH_SIZE = ":batch_size";
     public static final String RP_THROTTLE = ":throttle";
 
     public static final Set<String> RESERVED_PARAMS = Collections.unmodifiableSet(

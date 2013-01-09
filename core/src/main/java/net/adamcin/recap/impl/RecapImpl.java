@@ -80,7 +80,7 @@ public class RecapImpl implements Recap {
         defaultRemotePort = PropertiesUtil.toInteger(props.get(OSGI_DEFAULT_REMOTE_PORT), RecapConstants.DEFAULT_DEFAULT_REMOTE_PORT);
         defaultRemoteUser = PropertiesUtil.toString(props.get(OSGI_DEFAULT_REMOTE_USER), RecapConstants.DEFAULT_DEFAULT_REMOTE_USER);
         defaultRemotePass = PropertiesUtil.toString(props.get(OSGI_DEFAULT_REMOTE_PASS), RecapConstants.DEFAULT_DEFAULT_REMOTE_PASS);
-        defaultRemoteStrategy = PropertiesUtil.toString(props.get(OSGI_DEFAULT_REMOTE_PASS), RecapConstants.DEFAULT_DEFAULT_REMOTE_STRATEGY);
+        defaultRemoteStrategy = PropertiesUtil.toString(props.get(OSGI_DEFAULT_REMOTE_STRATEGY), RecapConstants.DEFAULT_DEFAULT_REMOTE_STRATEGY);
         strategyManager = new RecapStrategyManager(ctx.getBundleContext());
     }
 
@@ -115,7 +115,8 @@ public class RecapImpl implements Recap {
             Thread.currentThread().setContextClassLoader(orig);
         }
 
-        return new RecapSessionImpl(this, remoteContext, localSession, srcSession);
+        RecapSessionImpl recapSession = new RecapSessionImpl(this, remoteContext, localSession, srcSession);
+        return recapSession;
     }
 
     private Repository getRepository(RepositoryAddress address) throws RepositoryException, URISyntaxException {
@@ -188,13 +189,16 @@ public class RecapImpl implements Recap {
             reader = executeRequest(contextWithDefaults, pathBuilder.toString());
             List<RecapPath> paths = new ArrayList<RecapPath>();
 
-            BufferedReader breader = new BufferedReader(reader);
+            if (reader != null) {
 
-            String line;
-            while ((line = breader.readLine()) != null) {
-                RecapPath path = RecapPath.parse(line);
-                if (path != null) {
-                    paths.add(path);
+                BufferedReader breader = new BufferedReader(reader);
+
+                String line;
+                while ((line = breader.readLine()) != null) {
+                    RecapPath path = RecapPath.parse(line);
+                    if (path != null) {
+                        paths.add(path);
+                    }
                 }
             }
 

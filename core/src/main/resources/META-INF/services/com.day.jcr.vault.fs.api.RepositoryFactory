@@ -1,8 +1,4 @@
 #
-# registers the DAV Ex Repository Factory
+# registers the Recap Repository Factory
 #
-com.day.jcr.vault.davex.DAVExRepositoryFactory
-#
-# registers the Local Recap service as a repository factory
-#
-net.adamcin.recap.impl.RecapImpl
+net.adamcin.recap.impl.RecapRepositoryFactory

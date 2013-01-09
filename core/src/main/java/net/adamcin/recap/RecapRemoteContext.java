@@ -1,6 +1,7 @@
 package net.adamcin.recap;
 
-import org.apache.http.NameValuePair;
+
+import org.apache.commons.httpclient.NameValuePair;
 
 import java.util.List;
 
@@ -11,9 +12,11 @@ import java.util.List;
 public interface RecapRemoteContext {
     String getRemoteHost();
     int getRemotePort();
+    boolean isHttps();
     String getRemoteUsername();
     String getRemotePassword();
 
+    String getContextPath();
     String getStrategy();
     String[] getSelectors();
     String getSuffix();

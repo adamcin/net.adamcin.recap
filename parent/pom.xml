@@ -3,17 +3,17 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>net.adamcin</groupId>
-        <artifactId>net.adamcin.parent</artifactId>
-        <version>1.0-SNAPSHOT</version>
+        <groupId>org.sonatype.oss</groupId>
+        <artifactId>oss-parent</artifactId>
+        <version>7</version>
     </parent>
 
     <groupId>net.adamcin.recap</groupId>
     <artifactId>net.adamcin.recap.parent</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>0.5.0-SNAPSHOT</version>
     <packaging>pom</packaging>
 
-    <url>http://adamcin.github.com/${project.artifactId}</url>
+    <url>http://adamcin.github.com/net.adamcin.recap</url>
     <inceptionYear>2012</inceptionYear>
     <name>Recap (Parent)</name>
     <description>Parent POM for Recap project</description>
@@ -26,7 +26,7 @@
         <maven.bundle.plugin.version>2.3.7</maven.bundle.plugin.version>
         <maven.scr.plugin.version>1.9.0</maven.scr.plugin.version>
         <scr.annotations.version>1.7.0</scr.annotations.version>
-        <scr.generator.version>1.2.0</scr.generator.version>
+        <scr.generator.version>1.3.0</scr.generator.version>
     </properties>
 
     <scm>

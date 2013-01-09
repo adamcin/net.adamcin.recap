@@ -36,6 +36,8 @@ public class RecapListServlet extends SlingSafeMethodsServlet {
                          SlingHttpServletResponse response)
             throws ServletException, IOException {
 
+        response.setContentType("text/plain");
+        response.setCharacterEncoding("utf-8");
 
         String strategyType = getStrategyType(request);
         RecapStrategy strategy = checkStrategy(strategyType);
@@ -70,7 +72,7 @@ public class RecapListServlet extends SlingSafeMethodsServlet {
      * @throws ServletException
      */
     private RecapStrategy checkStrategy(String strategyType) throws ServletException {
-        RecapStrategy strategy = recap.getStrategy(strategyType != null ? strategyType : RecapConstants.DEFAULT_STRATEGY);
+        RecapStrategy strategy = recap.getStrategy(strategyType);
         if (strategy == null) {
             throw new ServletException("Failed to get RecapStrategy for type: " + strategyType);
         } else {
@@ -79,8 +81,7 @@ public class RecapListServlet extends SlingSafeMethodsServlet {
     }
 
     private String getStrategyType(SlingHttpServletRequest request) throws ServletException {
-        String strategyType = request.getParameter(RecapConstants.RP_REMOTE_STRATEGY);
-        return strategyType != null ? strategyType : RecapConstants.DEFAULT_STRATEGY;
+        return request.getParameter(RecapConstants.RP_REMOTE_STRATEGY);
     }
 
 }

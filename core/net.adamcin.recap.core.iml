@@ -2,15 +2,16 @@
 <module org.jetbrains.idea.maven.project.MavenProjectsManager.isMavenModule="true" type="JAVA_MODULE" version="4">
   <component name="FacetManager">
     <facet type="Osmorc" name="OSGi">
-      <configuration manifestGenerationMode="OsmorcControlled" manifestLocation="" jarfileLocation="net.adamcin.recap.core-1.0-SNAPSHOT.jar" outputPathType="CompilerOutputPath" bndFileLocation="" bundlorFileLocation="" bundleActivator="" bundleSymbolicName="net.adamcin.recap.net.adamcin.recap.core" bundleVersion="1.0.0.SNAPSHOT" ignoreFilePattern="" useProjectDefaultManifestFileLocation="true" alwaysRebuildBundleJAR="false" doNotSynchronizeWithMaven="false">
+      <configuration manifestGenerationMode="OsmorcControlled" manifestLocation="" jarfileLocation="net.adamcin.recap.core-0.5.0-SNAPSHOT.jar" outputPathType="CompilerOutputPath" bndFileLocation="" bundlorFileLocation="" bundleActivator="" bundleSymbolicName="net.adamcin.recap.net.adamcin.recap.core" bundleVersion="0.5.0.SNAPSHOT" ignoreFilePattern="" useProjectDefaultManifestFileLocation="true" alwaysRebuildBundleJAR="false" doNotSynchronizeWithMaven="false">
         <additionalProperties>
-          <property key="Export-Package" value="net.adamcin.recap;version=1.0-SNAPSHOT" />
+          <property key="Bundle-Description" value="Parent POM for Recap project" />
+          <property key="Export-Package" value="net.adamcin.recap;version=0.5.0-SNAPSHOT" />
           <property key="Private-Package" value="net.adamcin.recap.impl.*" />
-          <property key="Embed-Dependency" value="vault-davex,jackrabbit-jcr-client,jackrabbit-spi2dav,jackrabbit-jcr2spi" />
+          <property key="Embed-Dependency" value="jackrabbit-jcr-client,jackrabbit-spi2dav,jackrabbit-jcr2spi" />
           <property key="Bundle-Name" value="net.adamcin.recap.net.adamcin.recap.core" />
-          <property key="Bundle-ClassPath" value=".,vault-davex-2.3.20.jar,jackrabbit-jcr-client-2.4.0.jar,jackrabbit-spi2dav-2.4.0.jar,jackrabbit-jcr2spi-2.4.0.jar" />
-          <property key="Include-Resource" value="vault-davex-2.3.20.jar=$MAVEN_REPOSITORY$/com/day/jcr/vault/vault-davex/2.3.20/vault-davex-2.3.20.jar,jackrabbit-jcr-client-2.4.0.jar=$MAVEN_REPOSITORY$/org/apache/jackrabbit/jackrabbit-jcr-client/2.4.0/jackrabbit-jcr-client-2.4.0.jar,jackrabbit-spi2dav-2.4.0.jar=$MAVEN_REPOSITORY$/org/apache/jackrabbit/jackrabbit-spi2dav/2.4.0/jackrabbit-spi2dav-2.4.0.jar,jackrabbit-jcr2spi-2.4.0.jar=$MAVEN_REPOSITORY$/org/apache/jackrabbit/jackrabbit-jcr2spi/2.4.0/jackrabbit-jcr2spi-2.4.0.jar" />
-          <property key="Embedded-Artifacts" value="vault-davex-2.3.20.jar;g=&quot;com.day.jcr.vault&quot;;a=&quot;vault-davex&quot;;v=&quot;2.3.20&quot;,jackrabbit-jcr-client-2.4.0.jar;g=&quot;org.apache.jackrabbit&quot;;a=&quot;jackrabbit-jcr-client&quot;;v=&quot;2.4.0&quot;,jackrabbit-spi2dav-2.4.0.jar;g=&quot;org.apache.jackrabbit&quot;;a=&quot;jackrabbit-spi2dav&quot;;v=&quot;2.4.0&quot;,jackrabbit-jcr2spi-2.4.0.jar;g=&quot;org.apache.jackrabbit&quot;;a=&quot;jackrabbit-jcr2spi&quot;;v=&quot;2.4.0&quot;" />
+          <property key="Bundle-ClassPath" value=".,jackrabbit-jcr-client-2.4.0.jar,jackrabbit-spi2dav-2.4.0.jar,jackrabbit-jcr2spi-2.4.0.jar" />
+          <property key="Include-Resource" value="jackrabbit-jcr-client-2.4.0.jar=$MAVEN_REPOSITORY$/org/apache/jackrabbit/jackrabbit-jcr-client/2.4.0/jackrabbit-jcr-client-2.4.0.jar,jackrabbit-spi2dav-2.4.0.jar=$MAVEN_REPOSITORY$/org/apache/jackrabbit/jackrabbit-spi2dav/2.4.0/jackrabbit-spi2dav-2.4.0.jar,jackrabbit-jcr2spi-2.4.0.jar=$MAVEN_REPOSITORY$/org/apache/jackrabbit/jackrabbit-jcr2spi/2.4.0/jackrabbit-jcr2spi-2.4.0.jar" />
+          <property key="Embedded-Artifacts" value="jackrabbit-jcr-client-2.4.0.jar;g=&quot;org.apache.jackrabbit&quot;;a=&quot;jackrabbit-jcr-client&quot;;v=&quot;2.4.0&quot;,jackrabbit-spi2dav-2.4.0.jar;g=&quot;org.apache.jackrabbit&quot;;a=&quot;jackrabbit-spi2dav&quot;;v=&quot;2.4.0&quot;,jackrabbit-jcr2spi-2.4.0.jar;g=&quot;org.apache.jackrabbit&quot;;a=&quot;jackrabbit-jcr2spi&quot;;v=&quot;2.4.0&quot;" />
         </additionalProperties>
         <additionalJARContents />
       </configuration>
@@ -42,11 +43,8 @@
     <orderEntry type="library" scope="PROVIDED" name="Maven: com.day.commons:day-commons-text:1.1.8" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: com.day.cq:cq-commons:5.5.0" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: com.day.cq.wcm:cq-wcm-api:5.5.0" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Maven: org.apache.httpcomponents:httpclient:4.0.1" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Maven: org.apache.httpcomponents:httpcore:4.1" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Maven: commons-logging:commons-logging:1.1.1" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Maven: commons-codec:commons-codec:1.5" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: com.day.jcr.vault:com.day.jcr.vault:2.4.18" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: com.day.commons.osgi.wrapper:com.day.commons.osgi.wrapper.commons-httpclient:3.1.0.018" level="project" />
     <orderEntry type="library" name="Maven: org.apache.jackrabbit:jackrabbit-jcr-client:2.4.0" level="project" />
     <orderEntry type="library" name="Maven: org.apache.jackrabbit:jackrabbit-spi2dav:2.4.0" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.apache.jackrabbit:jackrabbit-spi:2.4.0" level="project" />
@@ -55,10 +53,10 @@
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.apache.jackrabbit:jackrabbit-webdav:2.4.0" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: commons-httpclient:commons-httpclient:3.0" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: junit:junit:4.8.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: commons-codec:commons-codec:1.5" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.slf4j:jcl-over-slf4j:1.6.4" level="project" />
     <orderEntry type="library" name="Maven: org.apache.jackrabbit:jackrabbit-jcr2spi:2.4.0" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.apache.jackrabbit:jackrabbit-api:2.4.0" level="project" />
-    <orderEntry type="library" name="Maven: com.day.jcr.vault:vault-davex:2.3.20" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.slf4j:slf4j-simple:1.6.4" level="project" />
   </component>
 </module>

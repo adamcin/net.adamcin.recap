@@ -1,9 +1,10 @@
 package net.adamcin.recap.impl.servlet;
 
+import com.day.jcr.vault.fs.api.ProgressTrackerListener;
 import net.adamcin.recap.RecapConstants;
 import net.adamcin.recap.RecapSession;
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.methods.GetMethod;
+import net.adamcin.recap.RecapSessionException;
+import net.adamcin.recap.RecapStrategyException;
 import org.apache.felix.scr.annotations.sling.SlingServlet;
 import org.apache.sling.api.SlingHttpServletRequest;
 import org.apache.sling.api.SlingHttpServletResponse;
@@ -22,28 +23,25 @@ import java.io.IOException;
 public class RecapCopyServlet extends SlingAllMethodsServlet {
     private static final Logger LOGGER = LoggerFactory.getLogger(RecapCopyServlet.class);
 
-    private static final String RP_INTERRUPT = ":interrupt";
-
-    private volatile boolean interrupt = true;
-
     @Override
     protected void doPost(SlingHttpServletRequest request,
                           SlingHttpServletResponse response)
             throws ServletException, IOException {
 
-        if(request.getParameter(RP_INTERRUPT) != null) {
-            this.interrupt = "true".equals(request.getParameter(RP_INTERRUPT));
-
-        } else {
-
-            RecapSession recapSession = request.adaptTo(RecapSession.class);
-            if (recapSession != null) {
-
-                try {
-                    final HttpClient client = this.getClient(rpHost, rpUser, rpPass, rpPort);
-                    final GetMethod getMethod = this.getListMethod(request, strategyType);
-                    Thread requesterThread = null;
+        RecapSession recapSession = request.adaptTo(RecapSession.class);
+        if (recapSession != null) {
+            recapSession.setTracker(response.adaptTo(ProgressTrackerListener.class));
+            try {
+                recapSession.doCopy();
+            } catch (RecapSessionException e) {
+                LOGGER.error("[doPost] Failed to copy paths");
+                response.sendError(SlingHttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            } catch (RecapStrategyException e) {
+                LOGGER.error("[doPost] Failed to list paths on remote server");
+                response.sendError(SlingHttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             }
+        } else {
+            LOGGER.error("[doPost] Failed to adapt request to RecapSession");
         }
 
     }

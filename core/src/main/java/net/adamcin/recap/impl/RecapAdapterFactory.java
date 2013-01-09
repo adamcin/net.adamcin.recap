@@ -6,8 +6,11 @@ import com.day.jcr.vault.util.HtmlProgressListener;
 import net.adamcin.recap.Recap;
 import net.adamcin.recap.RecapConstants;
 import net.adamcin.recap.RecapPath;
+import net.adamcin.recap.RecapRemoteContext;
 import net.adamcin.recap.RecapSession;
 import net.adamcin.recap.RecapSessionException;
+import net.adamcin.recap.RecapUtil;
+import org.apache.commons.httpclient.NameValuePair;
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Properties;
 import org.apache.felix.scr.annotations.Property;
@@ -17,6 +20,7 @@ import org.apache.sling.api.SlingConstants;
 import org.apache.sling.api.SlingHttpServletRequest;
 import org.apache.sling.api.SlingHttpServletResponse;
 import org.apache.sling.api.adapter.AdapterFactory;
+import org.apache.sling.api.request.RequestParameter;
 import org.apache.sling.api.resource.Resource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,6 +28,13 @@ import org.slf4j.LoggerFactory;
 import javax.jcr.Node;
 import javax.jcr.RepositoryException;
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * @author madamcin
@@ -43,6 +54,7 @@ import java.io.IOException;
                 classValue = {
                         RecapPath.class,
                         RecapSession.class,
+                        RecapRemoteContext.class,
                         ProgressTrackerListener.class
                 }
         )
@@ -83,53 +95,19 @@ public class RecapAdapterFactory implements AdapterFactory {
     public <AdapterType> AdapterType getAdapter(SlingHttpServletRequest adaptable, Class<AdapterType> type) {
         if (type == RecapSession.class) {
 
-            String rpPort = adaptable.getParameter(RecapConstants.RP_REMOTE_PORT);
-            int remotePort = RecapConstants.DEFAULT_DEFAULT_REMOTE_PORT;
-
-            if (rpPort != null) {
+            RecapRemoteContext context = getRemoteContext(adaptable);
+            if (context != null) {
                 try {
-                    remotePort = Integer.valueOf(rpPort);
-                } catch (Exception e) {
-                    LOGGER.error("failed to parse remote port parameter: " + rpPort, e);
-                }
-            }
-
-            String rpUser = adaptable.getParameter(RecapConstants.RP_REMOTE_USER);
-            String remoteUser = RecapConstants.DEFAULT_DEFAULT_REMOTE_USER;
-
-            if (rpUser != null) {
-                remoteUser = rpUser;
-            }
-
-            String rpPass = adaptable.getParameter(RecapConstants.RP_REMOTE_PASS);
-            String remotePass = RecapConstants.DEFAULT_DEFAULT_REMOTE_PASS;
-
-            if (rpPass != null) {
-                remotePass = rpPass;
-            }
-
-            String rpHost = adaptable.getParameter(RecapConstants.RP_REMOTE_HOST);
-            String remoteHost = null;
-
-            if (rpHost != null) {
-                remoteHost = rpHost;
-
-                try {
-
-                    RecapSession session = recap.initSession(
-                            adaptable.getResourceResolver(),
-                            remoteHost, remotePort,
-                            remoteUser, remotePass);
-
-
+                    RecapSession session = recap.initSession(adaptable.getResourceResolver(), context);
                     return (AdapterType) session;
-
                 } catch (RecapSessionException e) {
                     LOGGER.error("failed to open recap session", e);
                 }
             } else {
                 LOGGER.error("remote host parameter not specified");
             }
+        } else if (type == RecapRemoteContext.class) {
+            return (AdapterType) getRemoteContext(adaptable);
         }
         return null;
     }
@@ -151,6 +129,83 @@ public class RecapAdapterFactory implements AdapterFactory {
                 }
             }
         }
+        return null;
+    }
+
+    public RecapRemoteContext getRemoteContext(SlingHttpServletRequest request) {
+        String rpHost = request.getParameter(RecapConstants.RP_REMOTE_HOST);
+        if (rpHost != null) {
+            RecapRemoteContextImpl context = new RecapRemoteContextImpl();
+            context.setRemoteHost(rpHost);
+
+            String rpPort = request.getParameter(RecapConstants.RP_REMOTE_PORT);
+
+            if (rpPort != null) {
+                try {
+                    context.setRemotePort(Integer.valueOf(rpPort));
+                } catch (Exception e) {
+                    LOGGER.error("failed to parse remote port parameter: " + rpPort, e);
+                }
+            }
+
+            context.setRemoteUsername(request.getParameter(RecapConstants.RP_REMOTE_USER));
+            context.setRemotePassword(request.getParameter(RecapConstants.RP_REMOTE_PASS));
+            context.setStrategy(request.getParameter(RecapConstants.RP_REMOTE_STRATEGY));
+
+            context.setSuffix(request.getRequestPathInfo().getSuffix());
+            String rpSuffix = request.getParameter(RecapConstants.RP_SUFFIX);
+
+            if (rpSuffix != null) {
+                context.setSuffix(rpSuffix);
+            }
+
+            context.setSelectors(request.getRequestPathInfo().getSelectors());
+            String[] rpSelectors = request.getParameterValues(RecapConstants.RP_SELECTORS);
+
+            if (rpSelectors != null) {
+                context.setSelectors(rpSelectors);
+            }
+
+            List<NameValuePair> pairs = new ArrayList<NameValuePair>();
+            List<NameValuePair> qsPairs;
+
+            try {
+                qsPairs = RecapUtil.parse(new URI(request.getRequestURI()), request.getCharacterEncoding());
+                for (NameValuePair pair : qsPairs) {
+                    if (!RecapConstants.RESERVED_PARAMS.contains(pair.getName())) {
+                        pairs.add(pair);
+                    }
+                }
+            } catch (URISyntaxException e) {
+                LOGGER.error("[getRemoteContext] failed to parse request URI", e);
+                qsPairs = Collections.emptyList();
+            }
+
+            Set<Map.Entry<String, RequestParameter[]>> entries = request.getRequestParameterMap().entrySet();
+            if (entries != null) {
+                for (Map.Entry<String, RequestParameter[]> entry : entries) {
+                    String name = entry.getKey();
+                    if (!RecapConstants.RESERVED_PARAMS.contains(name)) {
+                        RequestParameter[] rpValues = entry.getValue();
+                        if (rpValues != null) {
+                            for (RequestParameter rpValue : rpValues) {
+                                if (rpValue.isFormField()) {
+                                    NameValuePair pair = new NameValuePair(name, rpValue.getString());
+                                    if (!qsPairs.contains(pair)) {
+                                        pairs.add(pair);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            context.setParameters(Collections.unmodifiableList(pairs));
+
+            return context;
+        }
+
         return null;
     }
 }

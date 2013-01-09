@@ -4,7 +4,7 @@ import com.day.jcr.vault.fs.api.ProgressTrackerListener;
 import net.adamcin.recap.RecapConstants;
 import net.adamcin.recap.RecapSession;
 import net.adamcin.recap.RecapSessionException;
-import net.adamcin.recap.RecapStrategyException;
+import net.adamcin.recap.RecapSourceException;
 import org.apache.felix.scr.annotations.sling.SlingServlet;
 import org.apache.sling.api.SlingHttpServletRequest;
 import org.apache.sling.api.SlingHttpServletResponse;
@@ -36,7 +36,7 @@ public class RecapCopyServlet extends SlingAllMethodsServlet {
             } catch (RecapSessionException e) {
                 LOGGER.error("[doPost] Failed to copy paths");
                 response.sendError(SlingHttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            } catch (RecapStrategyException e) {
+            } catch (RecapSourceException e) {
                 LOGGER.error("[doPost] Failed to list paths on remote server");
                 response.sendError(SlingHttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             }

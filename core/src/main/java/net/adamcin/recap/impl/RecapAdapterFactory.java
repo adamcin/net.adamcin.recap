@@ -6,9 +6,10 @@ import com.day.jcr.vault.util.HtmlProgressListener;
 import net.adamcin.recap.Recap;
 import net.adamcin.recap.RecapConstants;
 import net.adamcin.recap.RecapPath;
-import net.adamcin.recap.RecapRemoteContext;
+import net.adamcin.recap.RecapSessionContext;
 import net.adamcin.recap.RecapSession;
 import net.adamcin.recap.RecapSessionException;
+import net.adamcin.recap.RecapSourceContext;
 import net.adamcin.recap.RecapUtil;
 import org.apache.commons.httpclient.NameValuePair;
 import org.apache.felix.scr.annotations.Component;
@@ -53,8 +54,9 @@ import java.util.Set;
         @Property(name = SlingConstants.PROPERTY_ADAPTER_CLASSES,
                 classValue = {
                         RecapPath.class,
+                        RecapSourceContext.class,
                         RecapSession.class,
-                        RecapRemoteContext.class,
+                        RecapSessionContext.class,
                         ProgressTrackerListener.class
                 }
         )
@@ -95,7 +97,7 @@ public class RecapAdapterFactory implements AdapterFactory {
     public <AdapterType> AdapterType getAdapter(SlingHttpServletRequest adaptable, Class<AdapterType> type) {
         if (type == RecapSession.class) {
 
-            RecapRemoteContext context = getRemoteContext(adaptable);
+            RecapSessionContext context = getSessionContext(adaptable);
             if (context != null) {
                 try {
                     RecapSession session = recap.initSession(adaptable.getResourceResolver(), context);
@@ -133,8 +135,8 @@ public class RecapAdapterFactory implements AdapterFactory {
             } else {
                 LOGGER.error("remote host parameter not specified");
             }
-        } else if (type == RecapRemoteContext.class) {
-            return (AdapterType) getRemoteContext(adaptable);
+        } else if (type == RecapSessionContext.class) {
+            return (AdapterType) getSessionContext(adaptable);
         }
         return null;
     }
@@ -159,10 +161,10 @@ public class RecapAdapterFactory implements AdapterFactory {
         return null;
     }
 
-    public RecapRemoteContext getRemoteContext(SlingHttpServletRequest request) {
+    public RecapSourceContext getSourceContext(SlingHttpServletRequest request) {
         String rpHost = request.getParameter(RecapConstants.RP_REMOTE_HOST);
         if (rpHost != null) {
-            RecapRemoteContextImpl context = new RecapRemoteContextImpl();
+            RecapSourceContextImpl context = new RecapSourceContextImpl();
             context.setRemoteHost(rpHost);
 
             String rpPort = request.getParameter(RecapConstants.RP_REMOTE_PORT);
@@ -171,7 +173,7 @@ public class RecapAdapterFactory implements AdapterFactory {
                 try {
                     context.setRemotePort(Integer.valueOf(rpPort));
                 } catch (Exception e) {
-                    LOGGER.error("failed to parse remote port parameter: " + rpPort, e);
+                    LOGGER.error("[getSourceContext] failed to parse remote port parameter: " + rpPort, e);
                 }
             }
 
@@ -181,6 +183,19 @@ public class RecapAdapterFactory implements AdapterFactory {
 
             context.setRemoteUsername(request.getParameter(RecapConstants.RP_REMOTE_USER));
             context.setRemotePassword(request.getParameter(RecapConstants.RP_REMOTE_PASS));
+            context.setContextPath(request.getParameter(RecapConstants.RP_REMOTE_CONTEXT_PATH));
+
+            return context;
+        }
+
+        return null;
+    }
+
+    public RecapSessionContext getSessionContext(SlingHttpServletRequest request) {
+        RecapSourceContext sourceContext = getSourceContext(request);
+        if (sourceContext != null) {
+            RecapSessionContextImpl context = new RecapSessionContextImpl(sourceContext);
+
             context.setStrategy(request.getParameter(RecapConstants.RP_REMOTE_STRATEGY));
 
             context.setSuffix(request.getRequestPathInfo().getSuffix());
@@ -208,7 +223,7 @@ public class RecapAdapterFactory implements AdapterFactory {
                     }
                 }
             } catch (URISyntaxException e) {
-                LOGGER.error("[getRemoteContext] failed to parse request URI", e);
+                LOGGER.error("[getSessionContext] failed to parse request URI", e);
                 qsPairs = Collections.emptyList();
             }
 

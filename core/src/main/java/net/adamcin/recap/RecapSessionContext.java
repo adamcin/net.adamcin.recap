@@ -7,16 +7,10 @@ import java.util.List;
 
 /**
  * @author madamcin
- * @version $Id: RecapRemoteContext.java$
+ * @version $Id: RecapSessionContext.java$
  */
-public interface RecapRemoteContext {
-    String getRemoteHost();
-    int getRemotePort();
-    boolean isHttps();
-    String getRemoteUsername();
-    String getRemotePassword();
-
-    String getContextPath();
+public interface RecapSessionContext {
+    RecapSourceContext  getSourceContext();
     String getStrategy();
     String[] getSelectors();
     String getSuffix();

@@ -2,23 +2,22 @@ package net.adamcin.recap.impl.servlet;
 
 import net.adamcin.recap.Recap;
 import net.adamcin.recap.RecapConstants;
-import net.adamcin.recap.RecapPath;
-import net.adamcin.recap.RecapStrategy;
-import net.adamcin.recap.RecapStrategyException;
+import net.adamcin.recap.RecapSourceContext;
+import net.adamcin.recap.RecapSourceException;
+import net.adamcin.recap.RecapStrategyDescriptor;
+import org.apache.commons.lang.StringUtils;
 import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.sling.SlingServlet;
 import org.apache.sling.api.SlingHttpServletRequest;
 import org.apache.sling.api.SlingHttpServletResponse;
 import org.apache.sling.api.servlets.SlingSafeMethodsServlet;
+import org.json.JSONException;
+import org.json.JSONWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.jcr.Node;
-import javax.jcr.RepositoryException;
 import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -37,13 +36,43 @@ public class RecapStrategiesServlet extends SlingSafeMethodsServlet {
                          SlingHttpServletResponse response)
             throws ServletException, IOException {
 
-        response.setContentType("text/plain");
+        response.setContentType("application/json");
         response.setCharacterEncoding("utf-8");
 
-        List<String> strategies = recap.listLocalStrategies();
+        try {
+            RecapSourceContext sourceContext = request.adaptTo(RecapSourceContext.class);
+            List<RecapStrategyDescriptor> strategies;
 
-        for (String strategy : strategies) {
-            response.getWriter().println(strategy);
+            if (sourceContext != null) {
+                strategies = recap.listRemoteStrategies(sourceContext);
+            } else {
+                strategies = recap.listLocalStrategies();
+            }
+
+            JSONWriter jsonWriter = new JSONWriter(response.getWriter());
+            jsonWriter.array();
+            for (RecapStrategyDescriptor strategy : strategies) {
+                if (StringUtils.isNotEmpty(strategy.getType())) {
+                    jsonWriter.object();
+
+                    jsonWriter.key(RecapConstants.KEY_STRATEGY_TYPE).value(strategy.getType());
+
+                    if (StringUtils.isNotEmpty(strategy.getLabel())) {
+                        jsonWriter.key(RecapConstants.KEY_STRATEGY_LABEL).value(strategy.getLabel());
+                    }
+
+                    if (StringUtils.isNotEmpty(strategy.getDescription())) {
+                        jsonWriter.key(RecapConstants.KEY_STRATEGY_DESCRIPTION).value(strategy.getDescription());
+                    }
+
+                    jsonWriter.endObject();
+                }
+            }
+            jsonWriter.endArray();
+        } catch (RecapSourceException e) {
+            throw new ServletException(e);
+        } catch (JSONException e) {
+            throw new ServletException(e);
         }
     }
 }

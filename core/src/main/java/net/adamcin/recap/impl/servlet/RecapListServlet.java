@@ -4,7 +4,7 @@ import net.adamcin.recap.Recap;
 import net.adamcin.recap.RecapConstants;
 import net.adamcin.recap.RecapPath;
 import net.adamcin.recap.RecapStrategy;
-import net.adamcin.recap.RecapStrategyException;
+import net.adamcin.recap.RecapSourceException;
 import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.sling.SlingServlet;
 import org.apache.sling.api.SlingHttpServletRequest;
@@ -58,7 +58,7 @@ public class RecapListServlet extends SlingSafeMethodsServlet {
             }
         } catch (IOException e) {
             LOGGER.error("Caught IO exception. Stopping silently.", e);
-        } catch (RecapStrategyException e) {
+        } catch (RecapSourceException e) {
             response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
         } finally {
             recap.ungetStrategy(strategy);

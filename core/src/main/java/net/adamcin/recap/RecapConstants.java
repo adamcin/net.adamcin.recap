@@ -27,6 +27,11 @@ public class RecapConstants {
      * ComponentFactory interface
      */
     public static final String STRATEGY_FACTORY = "net.adamcin.recap.RecapStrategy";
+
+    public static final String KEY_STRATEGY_TYPE = "type";
+    public static final String KEY_STRATEGY_LABEL = "label";
+    public static final String KEY_STRATEGY_DESCRIPTION = "description";
+
     public static final String DEFAULT_DEFAULT_REMOTE_STRATEGY = "single";
 
     public static final int DEFAULT_DEFAULT_REMOTE_PORT = 4502;

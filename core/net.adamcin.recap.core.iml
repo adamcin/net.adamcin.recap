@@ -32,6 +32,7 @@
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.slf4j:slf4j-api:1.6.4" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.osgi:org.osgi.core:4.2.0" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.osgi:org.osgi.compendium:4.2.0" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: com.adobe.granite.bundles:json:20090211_1" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: commons-lang:commons-lang:2.5" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: commons-io:commons-io:1.4" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: commons-collections:commons-collections:3.2.1" level="project" />
@@ -40,9 +41,6 @@
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.apache.sling:org.apache.sling.commons.osgi:2.1.0" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.apache.sling:org.apache.sling.api:2.2.4" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.apache.sling:org.apache.sling.settings:1.1.0" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Maven: com.day.commons:day-commons-text:1.1.8" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Maven: com.day.cq:cq-commons:5.5.0" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Maven: com.day.cq.wcm:cq-wcm-api:5.5.0" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: com.day.jcr.vault:com.day.jcr.vault:2.4.18" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: com.day.commons.osgi.wrapper:com.day.commons.osgi.wrapper.commons-httpclient:3.1.0.018" level="project" />
     <orderEntry type="library" name="Maven: org.apache.jackrabbit:jackrabbit-jcr-client:2.4.0" level="project" />

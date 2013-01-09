@@ -1,18 +1,27 @@
 package net.adamcin.recap.impl;
 
 import net.adamcin.recap.RecapStrategy;
+import net.adamcin.recap.RecapStrategyDescriptor;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.Constants;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.component.ComponentFactory;
 import org.osgi.service.component.ComponentInstance;
+import org.osgi.service.metatype.MetaTypeInformation;
+import org.osgi.service.metatype.MetaTypeService;
+import org.osgi.service.metatype.ObjectClassDefinition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Dictionary;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 
 /**
  *
@@ -22,15 +31,18 @@ public class RecapStrategyManager {
     private static final Logger log = LoggerFactory.getLogger(RecapStrategyManager.class);
 
     private final BundleContext bundleContext;
+    private final MetaTypeService metaTypeService;
 
     private final Map<Object, ServiceReference> refMap = new HashMap<Object, ServiceReference>();
     private final Map<Object, ComponentInstance> instanceMap = new HashMap<Object, ComponentInstance>();
 
     private static final String FACTORY_PROPERTY = "component.factory";
+    private static final String PROP_OCD_NAME = "ocd.name";
+    private static final String PROP_OCD_DESC = "ocd.description";
 
-
-    public RecapStrategyManager(BundleContext bundleContext) {
+    public RecapStrategyManager(BundleContext bundleContext, MetaTypeService metaTypeService) {
         this.bundleContext = bundleContext;
+        this.metaTypeService = metaTypeService;
     }
 
     public RecapStrategy newInstance(String factoryName) {
@@ -129,6 +141,22 @@ public class RecapStrategyManager {
             for(String key : ref.getPropertyKeys()){
                 props.put(key, ref.getProperty(key));
             }
+            if (this.metaTypeService != null) {
+                MetaTypeInformation bundleInfo = this.metaTypeService.getMetaTypeInformation(ref.getBundle());
+                if (bundleInfo != null) {
+                    ObjectClassDefinition ocd = bundleInfo.getObjectClassDefinition((String) ref.getProperty(Constants.SERVICE_PID), null);
+                    if (ocd != null) {
+                        String ocdName = ocd.getName();
+                        if (ocdName != null) {
+                            props.put(PROP_OCD_NAME, ocdName);
+                        }
+                        String ocdDesc = ocd.getDescription();
+                        if (ocdDesc != null) {
+                            props.put(PROP_OCD_DESC, ocdDesc);
+                        }
+                    }
+                }
+            }
             String factoryName = ((String)ref.getProperty(FACTORY_PROPERTY)).substring(RecapStrategy.class.getName().length() + 1);
             factories.put(factoryName, props);
             this.bundleContext.ungetService(ref);
@@ -151,5 +179,19 @@ public class RecapStrategyManager {
             log.error("Somehow the query syntax was invalid: " + serviceReferenceQuery, e);
             return null;
         }
+    }
+
+    public List<RecapStrategyDescriptor> listStrategyDescriptors() {
+        List<RecapStrategyDescriptor> strategies = new ArrayList<RecapStrategyDescriptor>();
+        Set<Map.Entry<String, Map<String, Object>>> entries = this.getAllFactoryProperties(null).entrySet();
+        for (Map.Entry<String, Map<String, Object>> entry : entries) {
+            RecapStrategyDescriptorImpl descriptor = new RecapStrategyDescriptorImpl();
+            descriptor.setType(entry.getKey());
+            descriptor.setLabel((String) entry.getValue().get(PROP_OCD_NAME));
+            descriptor.setDescription((String) entry.getValue().get(PROP_OCD_DESC));
+            strategies.add(descriptor);
+        }
+        return Collections.unmodifiableList(strategies);
+
     }
 }

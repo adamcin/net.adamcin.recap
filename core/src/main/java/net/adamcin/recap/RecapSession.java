@@ -11,13 +11,13 @@ import java.io.Closeable;
  */
 public interface RecapSession extends Closeable {
 
-    void doCopy() throws RecapSessionException, RecapStrategyException;
+    void doCopy() throws RecapSessionException, RecapSourceException;
 
     void setTracker(ProgressTrackerListener tracker);
 
     ProgressTrackerListener getTracker();
 
-    RecapRemoteContext getContext();
+    RecapSessionContext getContext();
 
     int getBatchSize();
 

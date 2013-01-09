@@ -5,10 +5,10 @@ import com.day.jcr.vault.fs.api.WorkspaceFilter;
 import com.day.jcr.vault.util.JcrConstants;
 import net.adamcin.recap.Recap;
 import net.adamcin.recap.RecapPath;
-import net.adamcin.recap.RecapRemoteContext;
+import net.adamcin.recap.RecapSessionContext;
 import net.adamcin.recap.RecapSession;
 import net.adamcin.recap.RecapSessionException;
-import net.adamcin.recap.RecapStrategyException;
+import net.adamcin.recap.RecapSourceException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.ContentHandler;
@@ -45,7 +45,7 @@ public class RecapSessionImpl implements RecapSession {
     private static final String TRACK_NO_ACTION = "%08d -";
 
     private final Recap recap;
-    private final RecapRemoteContext context;
+    private final RecapSessionContext context;
     private final Session localSession;
     private final Session sourceSession;
 
@@ -71,7 +71,7 @@ public class RecapSessionImpl implements RecapSession {
     private boolean interruptedByException = false;
 
     public RecapSessionImpl(Recap recap,
-                            RecapRemoteContext context,
+                            RecapSessionContext context,
                             Session localSession,
                             Session sourceSession)
             throws RecapSessionException {
@@ -82,7 +82,7 @@ public class RecapSessionImpl implements RecapSession {
         this.sourceSession = sourceSession;
     }
 
-    public RecapRemoteContext getContext() {
+    public RecapSessionContext getContext() {
         return context;
     }
 
@@ -99,7 +99,7 @@ public class RecapSessionImpl implements RecapSession {
     }
 
     public void copy(RecapPath path) throws RecapSessionException {
-        track("", "# Copy %s from http://%s:%d/", path.getLeaf().getJcrPath(), this.context.getRemoteHost(), this.context.getRemotePort());
+        track("", "# Copy %s from http://%s:%d/", path.getLeaf().getJcrPath(), this.context.getSourceContext().getRemoteHost(), this.context.getSourceContext().getRemotePort());
 
         try {
             int result = path.getLeaf().establishPath(getLocalSession());
@@ -123,7 +123,7 @@ public class RecapSessionImpl implements RecapSession {
         }
     }
 
-    public void doCopy() throws RecapSessionException, RecapStrategyException {
+    public void doCopy() throws RecapSessionException, RecapSourceException {
         Iterator<RecapPath> paths = recap.listRemotePaths(getContext());
 
         if (paths != null) {

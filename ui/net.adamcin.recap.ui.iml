@@ -46,10 +46,7 @@
     <orderEntry type="library" scope="PROVIDED" name="Maven: javax.servlet:jsp-api:2.0" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: javax.servlet:servlet-api:2.4" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: com.day.commons:day-commons-jstl:1.1.4" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Maven: com.day.cq:cq-commons:5.5.0" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Maven: com.day.cq.wcm:cq-wcm-api:5.5.0" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Maven: com.day.cq.wcm:cq-wcm-commons:5.5.2" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Maven: com.day.cq.wcm:cq-wcm-taglib:5.5.0" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: com.adobe.granite:com.adobe.granite.ui.commons:5.5.14" level="project" />
   </component>
 </module>
 

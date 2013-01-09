@@ -12,16 +12,16 @@ import java.util.List;
 public interface Recap {
 
     RecapSession initSession(ResourceResolver resourceResolver,
-                             RecapRemoteContext context)
+                             RecapSessionContext context)
             throws RecapSessionException;
 
-    Iterator<RecapPath> listRemotePaths(RecapRemoteContext context)
-            throws RecapStrategyException;
+    Iterator<RecapPath> listRemotePaths(RecapSessionContext context)
+            throws RecapSourceException;
 
-    List<String> listRemoteStrategies(RecapRemoteContext context)
-            throws RecapStrategyException;
+    List<RecapStrategyDescriptor> listRemoteStrategies(RecapSourceContext context)
+            throws RecapSourceException;
 
-    List<String> listLocalStrategies();
+    List<RecapStrategyDescriptor> listLocalStrategies();
 
     RecapStrategy getStrategy(String strategyType);
 
@@ -30,4 +30,9 @@ public interface Recap {
     void interruptSessions();
 
     void clearSessionInterrupt();
+
+    int getDefaultRemotePort();
+    String getDefaultRemoteUser();
+    String getDefaultRemoteStrategy();
+
 }

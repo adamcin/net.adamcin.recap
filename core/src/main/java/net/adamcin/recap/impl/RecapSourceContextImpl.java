@@ -1,15 +1,16 @@
 package net.adamcin.recap.impl;
 
-import net.adamcin.recap.RecapRemoteContext;
+import net.adamcin.recap.RecapSessionContext;
+import net.adamcin.recap.RecapSourceContext;
 import org.apache.commons.httpclient.NameValuePair;
 
 import java.util.List;
 
 /**
  * @author madamcin
- * @version $Id: RecapRemoteContextImpl.java$
+ * @version $Id: RecapSessionContextImpl.java$
  */
-public class RecapRemoteContextImpl implements RecapRemoteContext {
+public class RecapSourceContextImpl implements RecapSourceContext {
 
     String remoteHost;
     int remotePort;
@@ -17,10 +18,6 @@ public class RecapRemoteContextImpl implements RecapRemoteContext {
     String remoteUsername;
     String remotePassword;
     String contextPath;
-    String strategy;
-    String[] selectors;
-    String suffix;
-    List<NameValuePair> parameters;
 
     public String getRemoteHost() {
         return remoteHost;
@@ -68,37 +65,5 @@ public class RecapRemoteContextImpl implements RecapRemoteContext {
 
     public void setContextPath(String contextPath) {
         this.contextPath = contextPath;
-    }
-
-    public String getStrategy() {
-        return strategy;
-    }
-
-    public void setStrategy(String strategy) {
-        this.strategy = strategy;
-    }
-
-    public String[] getSelectors() {
-        return selectors;
-    }
-
-    public void setSelectors(String[] selectors) {
-        this.selectors = selectors;
-    }
-
-    public String getSuffix() {
-        return suffix;
-    }
-
-    public void setSuffix(String suffix) {
-        this.suffix = suffix;
-    }
-
-    public List<NameValuePair> getParameters() {
-        return parameters;
-    }
-
-    public void setParameters(List<NameValuePair> parameters) {
-        this.parameters = parameters;
     }
 }

@@ -32,18 +32,27 @@ public class RecapConstants {
     public static final String KEY_STRATEGY_LABEL = "label";
     public static final String KEY_STRATEGY_DESCRIPTION = "description";
 
-    public static final String DEFAULT_DEFAULT_REMOTE_STRATEGY = "single";
+    public static final String DIRECT_STRATEGY = "direct";
 
     public static final int DEFAULT_DEFAULT_REMOTE_PORT = 4502;
     public static final String DEFAULT_DEFAULT_REMOTE_USER = "recap";
     public static final String DEFAULT_DEFAULT_REMOTE_PASS = "recap";
 
+    public static final String RP_REMOTE_CONFIG = ":config";
     public static final String RP_REMOTE_HOST = ":host";
     public static final String RP_REMOTE_PORT = ":port";
     public static final String RP_REMOTE_IS_HTTPS = ":is_https";
     public static final String RP_REMOTE_USER = ":user";
     public static final String RP_REMOTE_PASS = ":pass";
     public static final String RP_REMOTE_CONTEXT_PATH = ":context_path";
+
+    public static final String PROP_REMOTE_HOST = "host";
+    public static final String PROP_REMOTE_PORT = "port";
+    public static final String PROP_REMOTE_IS_HTTPS = "isHttps";
+    public static final String PROP_REMOTE_USER = "user";
+    public static final String PROP_REMOTE_PASS = "pass";
+    public static final String PROP_REMOTE_CONTEXT_PATH = "contextPath";
+
     public static final String RP_REMOTE_STRATEGY = ":strategy";
     public static final String RP_INTERRUPT = ":interrupt";
     public static final String RP_UPDATE = ":update";
@@ -57,11 +66,13 @@ public class RecapConstants {
             new HashSet<String>(
                     Arrays.asList(
                             RP_INTERRUPT,
+                            RP_REMOTE_CONFIG,
                             RP_REMOTE_HOST,
                             RP_REMOTE_PORT,
                             RP_REMOTE_IS_HTTPS,
                             RP_REMOTE_USER,
                             RP_REMOTE_PASS,
+                            RP_REMOTE_CONTEXT_PATH,
                             RP_REMOTE_CONTEXT_PATH,
                             RP_REMOTE_STRATEGY,
                             RP_SUFFIX,

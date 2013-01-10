@@ -2,8 +2,6 @@ package net.adamcin.recap.impl.servlet;
 
 import net.adamcin.recap.Recap;
 import net.adamcin.recap.RecapConstants;
-import net.adamcin.recap.RecapSourceContext;
-import net.adamcin.recap.RecapSourceException;
 import net.adamcin.recap.RecapStrategyDescriptor;
 import org.apache.commons.lang.StringUtils;
 import org.apache.felix.scr.annotations.Reference;
@@ -40,14 +38,7 @@ public class RecapStrategiesServlet extends SlingSafeMethodsServlet {
         response.setCharacterEncoding("utf-8");
 
         try {
-            RecapSourceContext sourceContext = request.adaptTo(RecapSourceContext.class);
-            List<RecapStrategyDescriptor> strategies;
-
-            if (sourceContext != null) {
-                strategies = recap.listRemoteStrategies(sourceContext);
-            } else {
-                strategies = recap.listLocalStrategies();
-            }
+            List<RecapStrategyDescriptor> strategies = recap.listLocalStrategies();
 
             JSONWriter jsonWriter = new JSONWriter(response.getWriter());
             jsonWriter.array();
@@ -69,8 +60,6 @@ public class RecapStrategiesServlet extends SlingSafeMethodsServlet {
                 }
             }
             jsonWriter.endArray();
-        } catch (RecapSourceException e) {
-            throw new ServletException(e);
         } catch (JSONException e) {
             throw new ServletException(e);
         }

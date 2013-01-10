@@ -11,8 +11,7 @@ import java.util.List;
  */
 public interface Recap {
 
-    RecapSession initSession(ResourceResolver resourceResolver,
-                             RecapSessionContext context)
+    RecapSession initSession(ResourceResolver resourceResolver, RecapSessionContext context)
             throws RecapSessionException;
 
     Iterator<RecapPath> listRemotePaths(RecapSessionContext context)
@@ -32,7 +31,7 @@ public interface Recap {
     void clearSessionInterrupt();
 
     int getDefaultRemotePort();
+
     String getDefaultRemoteUser();
-    String getDefaultRemoteStrategy();
 
 }

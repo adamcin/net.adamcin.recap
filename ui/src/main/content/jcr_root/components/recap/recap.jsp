@@ -1,6 +1,7 @@
-<%@ page session="false" import="com.day.cq.widget.HtmlLibraryManager" %><%--
+<%@ page import="com.day.cq.widget.HtmlLibraryManager" %><%--
   Recap Console component.
 --%><%
+%><%@page session="false" %><%
 %><%@taglib prefix="sling" uri="http://sling.apache.org/taglibs/sling/1.0" %><%
 %><sling:defineObjects /><%
 %><%
@@ -8,7 +9,7 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>CQ Recap</title>
+    <title>Recap for Adobe CRX</title>
     <meta name="viewport" content="width=device-width, minimum-scale=1, maximum-scale=1">
     <%
         HtmlLibraryManager htmlMgr = sling.getService(HtmlLibraryManager.class);

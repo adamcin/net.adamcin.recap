@@ -4,11 +4,14 @@ import com.day.jcr.vault.fs.api.ProgressTrackerListener;
 import com.day.jcr.vault.fs.api.WorkspaceFilter;
 import com.day.jcr.vault.util.JcrConstants;
 import net.adamcin.recap.Recap;
+import net.adamcin.recap.RecapConstants;
+import net.adamcin.recap.RecapException;
 import net.adamcin.recap.RecapPath;
 import net.adamcin.recap.RecapSessionContext;
 import net.adamcin.recap.RecapSession;
 import net.adamcin.recap.RecapSessionException;
 import net.adamcin.recap.RecapSourceException;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.ContentHandler;
@@ -25,6 +28,7 @@ import javax.jcr.Session;
 import javax.jcr.Value;
 import javax.jcr.nodetype.NodeType;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -44,7 +48,7 @@ public class RecapSessionImpl implements RecapSession {
     private static final String TRACK_DELETE = "%08d D";
     private static final String TRACK_NO_ACTION = "%08d -";
 
-    private final Recap recap;
+    private final RecapImpl recap;
     private final RecapSessionContext context;
     private final Session localSession;
     private final Session sourceSession;
@@ -68,9 +72,10 @@ public class RecapSessionImpl implements RecapSession {
     private boolean update;
 
     private Map<String, String> prefixMapping = new HashMap<String, String>();
-    private boolean interruptedByException = false;
+    private boolean interrupted = false;
+    private boolean finished = false;
 
-    public RecapSessionImpl(Recap recap,
+    public RecapSessionImpl(RecapImpl recap,
                             RecapSessionContext context,
                             Session localSession,
                             Session sourceSession)
@@ -86,7 +91,7 @@ public class RecapSessionImpl implements RecapSession {
         return context;
     }
 
-    public void close() throws IOException {
+    public void logout() {
         if (this.sourceSession != null) {
             this.sourceSession.logout();
         }
@@ -98,7 +103,52 @@ public class RecapSessionImpl implements RecapSession {
         }
     }
 
+    private boolean isDirect() {
+        return StringUtils.isEmpty(getContext().getStrategy()) ||
+               RecapConstants.DIRECT_STRATEGY.equals(getContext().getStrategy());
+    }
+
+    public void doCopy() throws RecapException {
+        if (this.finished) {
+            throw new RecapSessionException("RecapSession already finished.");
+        }
+
+        RecapException exception = null;
+        try {
+            Iterator<RecapPath> paths;
+            if (isDirect()) {
+                try {
+                    Node directNode = sourceSession.getNode(getContext().getSuffix());
+                    paths = Arrays.asList( RecapPath.build(directNode) ).iterator();
+                } catch (RepositoryException e) {
+                    throw new RecapSourceException(e);
+                }
+            } else {
+                paths = recap.listRemotePaths(getContext());
+            }
+
+            if (paths != null) {
+                while (paths.hasNext()) {
+                    copy(paths.next());
+                }
+            }
+        } catch (RecapException e) {
+            exception = e;
+            this.interrupted = true;
+        }
+
+        finish();
+
+        if (exception != null) {
+            throw exception;
+        }
+    }
+
     public void copy(RecapPath path) throws RecapSessionException {
+        if (recap.sessionsInterrupted) {
+            throw new RecapSessionException("RecapSession interrupted.");
+        }
+
         track("", "# Copy %s from http://%s:%d/", path.getLeaf().getJcrPath(), this.context.getSourceContext().getRemoteHost(), this.context.getSourceContext().getRemotePort());
 
         try {
@@ -123,13 +173,42 @@ public class RecapSessionImpl implements RecapSession {
         }
     }
 
-    public void doCopy() throws RecapSessionException, RecapSourceException {
-        Iterator<RecapPath> paths = recap.listRemotePaths(getContext());
-
-        if (paths != null) {
-            while (paths.hasNext()) {
-                copy(paths.next());
+    private void finish() throws RecapSessionException {
+        this.finished = true;
+        RecapSessionException exception = null;
+        if (!this.interrupted && this.numNodes > 0) {
+            track("", "# Saving %d nodes...", new Object[] { Integer.valueOf(this.numNodes) });
+            try {
+                this.getLocalSession().save();
+                track("", "# Done.", new Object[0]);
+            } catch (RepositoryException e) {
+                LOGGER.error("[finish] Failed to save remaining changes.", e);
+                track("", "# Failed to save remaining changes. %s", e.getMessage());
+                this.interrupted = true;
+                exception = new RecapSessionException("Failed to save remaining changes.", e);
             }
+        }
+
+        this.end = System.currentTimeMillis();
+        this.logout();
+
+        if (this.getTotalNodes() > 0) {
+
+            track("", "# Copy %s. %d nodes in %dms. %d bytes",
+                    new Object[] {
+                            (this.interrupted ? "interrupted" : "completed"),
+                            Integer.valueOf(this.getTotalNodes()),
+                            Long.valueOf(this.getTotalTimeMillis()),
+                            Long.valueOf(this.getTotalSize())
+                    });
+
+            track("", "# %d root paths added or updated successfully. Last successful path: %s",
+                    new Object[] { Integer.valueOf(this.getTotalRecapPaths()),
+                            this.getLastSuccessfulRecapPath() });
+        }
+
+        if (exception != null) {
+            throw exception;
         }
     }
 
@@ -189,11 +268,11 @@ public class RecapSessionImpl implements RecapSession {
         this.update = update;
     }
 
-    public Session getSourceSession() throws RecapSessionException {
+    public Session getSourceSession() {
         return this.sourceSession;
     }
 
-    public Session getLocalSession() throws RecapSessionException {
+    public Session getLocalSession() {
         return this.localSession;
     }
 
@@ -216,60 +295,6 @@ public class RecapSessionImpl implements RecapSession {
     public long getTotalTimeMillis() {
         return this.end - this.start;
     }
-
-    /*
-    private GetMethod getListMethod(SlingHttpServletRequest request, final String strategyType) {
-
-        StringBuilder pathBuilder = new StringBuilder(RecapConstants.SERVLET_LIST_PATH);
-        ResourceMetadata rm = CEMRequestPathInfo.toResourceMetadata(request.getRequestPathInfo());
-        if (StringUtils.isNotEmpty(rm.getResolutionPathInfo())) {
-            pathBuilder.append(rm.getResolutionPathInfo());
-        }
-
-        LOGGER.debug("[getListMethod] local URI: {}, QueryString: {}",
-                request.getRequestURI(), request.getQueryString());
-
-        QueryStringBuilder qsb = new QueryStringBuilder();
-        qsb.addValue(RP_STRATEGY, strategyType);
-
-        Enumeration<String> names = (Enumeration<String>) request.getParameterNames();
-        if (names != null) {
-            while (names.hasMoreElements()) {
-                String name = names.nextElement();
-                if (!RESERVED_PARAMS.contains(name)) {
-                    RequestParameter[] rpValues = request.getRequestParameters(name);
-                    if (rpValues != null) {
-                        for (RequestParameter rpValue : rpValues) {
-                            if (rpValue.isFormField()) {
-                                qsb.addRawValue(name, rpValue.getString());
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        pathBuilder.append(qsb.toString());
-        LOGGER.debug("[getListMethod] remote URI: {}", pathBuilder.toString());
-
-        final GetMethod getMethod = new GetMethod(pathBuilder.toString());
-        return getMethod;
-    }
-
-
-    private HttpClient getClient(String rhost, String ruser, String rpass, int rport) throws URIException {
-        HttpClient client = new HttpClient();
-
-        client.getHostConfiguration().setHost(rhost, rport);
-        client.getParams().setAuthenticationPreemptive(true);
-        client.getState().setCredentials(
-                new AuthScope(rhost, rport),
-                new UsernamePasswordCredentials(ruser, rpass)
-        );
-
-        return client;
-    }
-    */
 
     private void copy(Node src, Node dstParent, String dstName, boolean recursive) throws RepositoryException {
         String path = src.getPath();

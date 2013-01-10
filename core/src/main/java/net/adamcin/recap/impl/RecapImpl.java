@@ -73,17 +73,15 @@ public class RecapImpl implements Recap {
     @Property(label = "Default Remote Password", value = RecapConstants.DEFAULT_DEFAULT_REMOTE_PASS)
     private static final String OSGI_DEFAULT_REMOTE_PASS = "default.pass";
 
-    @Property(label = "Default Remote Strategy", value = RecapConstants.DEFAULT_DEFAULT_REMOTE_STRATEGY)
-    private static final String OSGI_DEFAULT_REMOTE_STRATEGY = "default.strategy";
-
     @Reference
     private MetaTypeService metaTypeService;
 
     private int defaultRemotePort;
     private String defaultRemoteUser;
     private String defaultRemotePass;
-    private String defaultRemoteStrategy;
     private RecapStrategyManager strategyManager;
+
+    volatile boolean sessionsInterrupted = false;
 
     @Activate
     protected void activate(ComponentContext ctx) {
@@ -91,16 +89,16 @@ public class RecapImpl implements Recap {
         defaultRemotePort = PropertiesUtil.toInteger(props.get(OSGI_DEFAULT_REMOTE_PORT), RecapConstants.DEFAULT_DEFAULT_REMOTE_PORT);
         defaultRemoteUser = PropertiesUtil.toString(props.get(OSGI_DEFAULT_REMOTE_USER), RecapConstants.DEFAULT_DEFAULT_REMOTE_USER);
         defaultRemotePass = PropertiesUtil.toString(props.get(OSGI_DEFAULT_REMOTE_PASS), RecapConstants.DEFAULT_DEFAULT_REMOTE_PASS);
-        defaultRemoteStrategy = PropertiesUtil.toString(props.get(OSGI_DEFAULT_REMOTE_STRATEGY), RecapConstants.DEFAULT_DEFAULT_REMOTE_STRATEGY);
         strategyManager = new RecapStrategyManager(ctx.getBundleContext(), metaTypeService);
+        this.sessionsInterrupted = false;
     }
 
     @Deactivate
     protected void deactivate(ComponentContext ctx) {
+        this.sessionsInterrupted = true;
         defaultRemotePort = 0;
         defaultRemoteUser = null;
         defaultRemotePass = null;
-        defaultRemoteStrategy = null;
         strategyManager = null;
     }
 
@@ -110,10 +108,6 @@ public class RecapImpl implements Recap {
 
     public String getDefaultRemoteUser() {
         return defaultRemoteUser;
-    }
-
-    public String getDefaultRemoteStrategy() {
-        return defaultRemoteStrategy;
     }
 
     public RecapSession initSession(ResourceResolver resourceResolver,
@@ -281,9 +275,11 @@ public class RecapImpl implements Recap {
     }
 
     public void interruptSessions() {
+        this.sessionsInterrupted = true;
     }
 
     public void clearSessionInterrupt() {
+        this.sessionsInterrupted = false;
     }
 
     private RepositoryAddress getRemoteAddress(RecapSourceContext context) throws URISyntaxException {
@@ -321,8 +317,6 @@ public class RecapImpl implements Recap {
     }
 
     private RecapSessionContext applySessionContextDefaults(final RecapSessionContext context) {
-        final String strategy = context.getStrategy() != null ?
-                context.getStrategy() : defaultRemoteStrategy;
         final String[] selectors = context.getSelectors() != null ?
                 context.getSelectors() : new String[0];
         final String suffix = context.getSuffix() != null ?
@@ -332,7 +326,7 @@ public class RecapImpl implements Recap {
 
         RecapSourceContext sourceContext = applySourceContextDefaults(context.getSourceContext());
         RecapSessionContextImpl contextWithDefaults = new RecapSessionContextImpl(sourceContext);
-        contextWithDefaults.setStrategy(strategy);
+        contextWithDefaults.setStrategy(context.getStrategy());
         contextWithDefaults.setSelectors(selectors);
         contextWithDefaults.setSuffix(suffix);
         contextWithDefaults.setParameters(parameters);

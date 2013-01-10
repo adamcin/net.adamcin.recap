@@ -3,15 +3,16 @@ package net.adamcin.recap;
 import com.day.jcr.vault.fs.api.ProgressTrackerListener;
 
 import javax.jcr.Session;
-import java.io.Closeable;
 
 /**
  * @author madamcin
  * @version $Id: RecapSession.java$
  */
-public interface RecapSession extends Closeable {
+public interface RecapSession {
 
-    void doCopy() throws RecapSessionException, RecapSourceException;
+    void doCopy() throws RecapException;
+
+    void logout();
 
     void setTracker(ProgressTrackerListener tracker);
 
@@ -35,9 +36,7 @@ public interface RecapSession extends Closeable {
 
     void setUpdate(boolean update);
 
-    Session getSourceSession() throws RecapSessionException;
-
-    Session getLocalSession() throws RecapSessionException;
+    Session getLocalSession();
 
     //-----------------------------------------------------------------
     // Getters for Session Statistics

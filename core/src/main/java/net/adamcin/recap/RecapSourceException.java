@@ -4,7 +4,7 @@ package net.adamcin.recap;
  * @author madamcin
  * @version $Id: RecapSourceException.java$
  */
-public class RecapSourceException extends Exception {
+public class RecapSourceException extends RecapException {
 
     public RecapSourceException() {
     }

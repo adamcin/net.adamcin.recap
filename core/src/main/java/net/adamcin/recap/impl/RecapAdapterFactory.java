@@ -23,6 +23,7 @@ import org.apache.sling.api.SlingHttpServletResponse;
 import org.apache.sling.api.adapter.AdapterFactory;
 import org.apache.sling.api.request.RequestParameter;
 import org.apache.sling.api.resource.Resource;
+import org.apache.sling.api.resource.ValueMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -89,6 +90,8 @@ public class RecapAdapterFactory implements AdapterFactory {
                     LOGGER.error("failed to adapt Resource to RecapPath", e);
                 }
             }
+        } else if (type == RecapSourceContext.class) {
+            return (AdapterType) getSourceContext(adaptable);
         }
         return null;
     }
@@ -161,7 +164,36 @@ public class RecapAdapterFactory implements AdapterFactory {
         return null;
     }
 
+    public RecapSourceContext getSourceContext(Resource resource) {
+        ValueMap props = resource.adaptTo(ValueMap.class);
+        String rpHost = props.get(RecapConstants.PROP_REMOTE_HOST, String.class);
+        if (rpHost != null) {
+            RecapSourceContextImpl context = new RecapSourceContextImpl();
+
+            context.setRemoteHost(rpHost);
+            context.setRemotePort(props.get(RecapConstants.PROP_REMOTE_PORT, 0));
+            context.setRemoteUsername(props.get(RecapConstants.PROP_REMOTE_USER, String.class));
+            context.setRemotePassword(props.get(RecapConstants.PROP_REMOTE_PASS, String.class));
+            context.setContextPath(props.get(RecapConstants.PROP_REMOTE_CONTEXT_PATH, String.class));
+            context.setHttps(props.get(RecapConstants.PROP_REMOTE_IS_HTTPS, false));
+
+            return context;
+        }
+        return null;
+    }
+
     public RecapSourceContext getSourceContext(SlingHttpServletRequest request) {
+        String config = request.getParameter(RecapConstants.RP_REMOTE_CONFIG);
+        if (config != null) {
+            Resource resource = request.getResourceResolver().getResource(config);
+            if (resource != null) {
+                RecapSourceContext configContext = getSourceContext(resource);
+                if (configContext != null) {
+                    return configContext;
+                }
+            }
+        }
+
         String rpHost = request.getParameter(RecapConstants.RP_REMOTE_HOST);
         if (rpHost != null) {
             RecapSourceContextImpl context = new RecapSourceContextImpl();

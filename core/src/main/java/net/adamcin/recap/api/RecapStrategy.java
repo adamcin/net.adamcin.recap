@@ -1,4 +1,4 @@
-package net.adamcin.recap;
+package net.adamcin.recap.api;
 
 import org.apache.sling.api.SlingHttpServletRequest;
 
@@ -12,5 +12,5 @@ import java.util.Iterator;
 public interface RecapStrategy {
 
     Iterator<Node> listNodes(SlingHttpServletRequest recapRequest)
-            throws RecapSourceException;
+            throws RecapRemoteException;
 }

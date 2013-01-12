@@ -1,4 +1,4 @@
-package net.adamcin.recap;
+package net.adamcin.recap.api;
 
 /**
  * @author madamcin

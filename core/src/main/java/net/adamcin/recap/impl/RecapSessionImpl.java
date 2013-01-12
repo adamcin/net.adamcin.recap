@@ -3,14 +3,15 @@ package net.adamcin.recap.impl;
 import com.day.jcr.vault.fs.api.ProgressTrackerListener;
 import com.day.jcr.vault.fs.api.WorkspaceFilter;
 import com.day.jcr.vault.util.JcrConstants;
-import net.adamcin.recap.Recap;
-import net.adamcin.recap.RecapConstants;
-import net.adamcin.recap.RecapException;
-import net.adamcin.recap.RecapPath;
-import net.adamcin.recap.RecapSessionContext;
-import net.adamcin.recap.RecapSession;
-import net.adamcin.recap.RecapSessionException;
-import net.adamcin.recap.RecapSourceException;
+import net.adamcin.recap.api.RecapAddress;
+import net.adamcin.recap.api.RecapConstants;
+import net.adamcin.recap.api.RecapException;
+import net.adamcin.recap.api.RecapOptions;
+import net.adamcin.recap.api.RecapPath;
+import net.adamcin.recap.api.RecapRequest;
+import net.adamcin.recap.api.RecapSession;
+import net.adamcin.recap.api.RecapSessionException;
+import net.adamcin.recap.api.RecapRemoteException;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,7 +28,6 @@ import javax.jcr.RepositoryException;
 import javax.jcr.Session;
 import javax.jcr.Value;
 import javax.jcr.nodetype.NodeType;
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.HashMap;
@@ -43,52 +43,76 @@ import java.util.Set;
 public class RecapSessionImpl implements RecapSession {
     private static final Logger LOGGER = LoggerFactory.getLogger(RecapSessionImpl.class);
 
-    private static final String TRACK_ADD = "%08d A";
-    private static final String TRACK_UPDATE = "%08d U";
-    private static final String TRACK_DELETE = "%08d D";
-    private static final String TRACK_NO_ACTION = "%08d -";
+    enum PathAction {
+        ADD("A"), UPDATE("U"), DELETE("D"), NO_ACTION("-");
+
+        String action;
+        PathAction(String action) {
+            this.action = action;
+        }
+
+        String getAction() {
+            return action;
+        }
+    }
 
     private final RecapImpl recap;
-    private final RecapSessionContext context;
+    private final RecapAddress address;
+    private final RecapRequest request;
+    private final RecapOptions options;
     private final Session localSession;
     private final Session sourceSession;
 
     private WorkspaceFilter filter;
-    private String lastModifiedProperty;
-
     private ProgressTrackerListener tracker;
+
     private RecapPath lastSuccessfulPath;
     private int totalRecapPaths = 0;
     private int numNodes = 0;
     private int totalNodes = 0;
     private long totalSize = 0L;
     private long currentSize = 0L;
-    private int batchSize = 1024;
-    private long throttle = 0L;
     private long start = 0L;
     private long end = 0L;
 
-    private boolean onlyNewer;
-    private boolean update;
-
     private Map<String, String> prefixMapping = new HashMap<String, String>();
+    private boolean allowLastModifiedProperty = false;
     private boolean interrupted = false;
     private boolean finished = false;
 
+
     public RecapSessionImpl(RecapImpl recap,
-                            RecapSessionContext context,
+                            RecapAddress address,
+                            RecapRequest request,
+                            RecapOptions options,
                             Session localSession,
                             Session sourceSession)
             throws RecapSessionException {
 
         this.recap = recap;
-        this.context = context;
+        this.address = address;
+        this.request = request;
+        this.options = options;
         this.localSession = localSession;
         this.sourceSession = sourceSession;
+
+        allowLastModifiedProperty = isValidNameForSession(this.options.getLastModifiedProperty());
     }
 
-    public RecapSessionContext getContext() {
-        return context;
+    public RecapAddress getAddress() {
+        return address;
+    }
+
+    public RecapRequest getRequest() {
+        return request;
+    }
+
+    public RecapOptions getOptions() {
+        return options;
+    }
+
+    public boolean isFinished() {
+        return finished;
     }
 
     public void logout() {
@@ -97,15 +121,59 @@ public class RecapSessionImpl implements RecapSession {
         }
     }
 
-    private void track(String path, String fmt, Object... args) {
-        if (this.tracker != null) {
-            this.tracker.onMessage(ProgressTrackerListener.Mode.TEXT, String.format(fmt, args), path);
+    public WorkspaceFilter getFilter() {
+        return filter;
+    }
+
+    public void setFilter(WorkspaceFilter filter) {
+        this.filter = filter;
+    }
+
+    public ProgressTrackerListener getTracker() {
+        return tracker;
+    }
+
+    public void setTracker(ProgressTrackerListener tracker) {
+        this.tracker = tracker;
+    }
+
+    private void trackFilterIgnore(String path) {
+        if (this.getTracker() != null) {
+            String formatted = String.format("-------- %s (Ignored by filter)", path);
+            this.getTracker().onMessage(ProgressTrackerListener.Mode.TEXT, "I", formatted);
+        }
+    }
+
+    private void trackPath(PathAction action, String path) {
+        if (this.getTracker() != null) {
+            String formatted = String.format("%08d %s", ++this.totalNodes, path);
+            this.getTracker().onMessage(ProgressTrackerListener.Mode.TEXT, action.getAction(), formatted);
+        }
+    }
+
+    private void trackError(String path, Exception exception) {
+        if (this.getTracker() != null) {
+            String formatted = String.format("-------- %s (%s)", path, exception.getMessage());
+            this.getTracker().onMessage(ProgressTrackerListener.Mode.TEXT, "E", formatted);
+        }
+    }
+
+    private void trackFailure(String path, Exception exception) {
+        if (this.getTracker() != null) {
+            String formatted = String.format("-------- %s (%s)", path, exception.getMessage());
+            this.getTracker().onMessage(ProgressTrackerListener.Mode.TEXT, "F", formatted);
+        }
+    }
+
+    private void trackMessage(String fmt, Object... args) {
+        if (this.getTracker() != null) {
+            this.getTracker().onMessage(ProgressTrackerListener.Mode.TEXT, "M", String.format(fmt, args));
         }
     }
 
     private boolean isDirect() {
-        return StringUtils.isEmpty(getContext().getStrategy()) ||
-               RecapConstants.DIRECT_STRATEGY.equals(getContext().getStrategy());
+        return StringUtils.isEmpty(getRequest().getStrategy()) ||
+               RecapConstants.DIRECT_STRATEGY.equals(getRequest().getStrategy());
     }
 
     public void doCopy() throws RecapException {
@@ -118,13 +186,13 @@ public class RecapSessionImpl implements RecapSession {
             Iterator<RecapPath> paths;
             if (isDirect()) {
                 try {
-                    Node directNode = sourceSession.getNode(getContext().getSuffix());
+                    Node directNode = sourceSession.getNode(getRequest().getSuffix());
                     paths = Arrays.asList( RecapPath.build(directNode) ).iterator();
                 } catch (RepositoryException e) {
-                    throw new RecapSourceException(e);
+                    throw new RecapRemoteException(e);
                 }
             } else {
-                paths = recap.listRemotePaths(getContext());
+                paths = recap.listRemotePaths(getAddress(), getRequest());
             }
 
             if (paths != null) {
@@ -149,7 +217,7 @@ public class RecapSessionImpl implements RecapSession {
             throw new RecapSessionException("RecapSession interrupted.");
         }
 
-        track("", "# Copy %s from http://%s:%d/", path.getLeaf().getJcrPath(), this.context.getSourceContext().getRemoteHost(), this.context.getSourceContext().getRemotePort());
+        trackMessage("Copy %s from http://%s:%d/", path.getLeaf().getJcrPath(), this.address.getHostname(), this.address.getPort());
 
         try {
             int result = path.getLeaf().establishPath(getLocalSession());
@@ -165,10 +233,10 @@ public class RecapSessionImpl implements RecapSession {
             this.totalRecapPaths++;
         } catch (PathNotFoundException e) {
             LOGGER.debug("PathNotFoundException while preparing path: {}. Message: {}", path, e.getMessage());
-            track(path.getLeaf().getJcrPath(), "------ E %s", e.getMessage());
+            trackError(path.getLeaf().getJcrPath(), e);
         } catch (RepositoryException e) {
             LOGGER.error("RepositoryException while copying path: {}. Message: {}", path, e.getMessage());
-            track(path.getLeaf().getJcrPath(), "------ F %s", e.getMessage());
+            trackFailure(path.getLeaf().getJcrPath(), e);
             throw new RecapSessionException("RepositoryException while preparing path: " + path, e);
         }
     }
@@ -177,13 +245,13 @@ public class RecapSessionImpl implements RecapSession {
         this.finished = true;
         RecapSessionException exception = null;
         if (!this.interrupted && this.numNodes > 0) {
-            track("", "# Saving %d nodes...", new Object[] { Integer.valueOf(this.numNodes) });
+            trackMessage("Saving %d nodes...", this.numNodes);
             try {
                 this.getLocalSession().save();
-                track("", "# Done.", new Object[0]);
+                trackMessage("Done.");
             } catch (RepositoryException e) {
                 LOGGER.error("[finish] Failed to save remaining changes.", e);
-                track("", "# Failed to save remaining changes. %s", e.getMessage());
+                trackMessage("Failed to save remaining changes. %s", e.getMessage());
                 this.interrupted = true;
                 exception = new RecapSessionException("Failed to save remaining changes.", e);
             }
@@ -194,17 +262,12 @@ public class RecapSessionImpl implements RecapSession {
 
         if (this.getTotalNodes() > 0) {
 
-            track("", "# Copy %s. %d nodes in %dms. %d bytes",
-                    new Object[] {
+            trackMessage("Copy %s. %d nodes in %dms. %d bytes",
                             (this.interrupted ? "interrupted" : "completed"),
-                            Integer.valueOf(this.getTotalNodes()),
-                            Long.valueOf(this.getTotalTimeMillis()),
-                            Long.valueOf(this.getTotalSize())
-                    });
+                            this.getTotalNodes(), this.getTotalTimeMillis(), this.getTotalSize());
 
-            track("", "# %d root paths added or updated successfully. Last successful path: %s",
-                    new Object[] { Integer.valueOf(this.getTotalRecapPaths()),
-                            this.getLastSuccessfulRecapPath() });
+            trackMessage("%d root paths added or updated successfully. Last successful path: %s",
+                    this.getTotalRecapPaths(), this.getLastSuccessfulRecapPath());
         }
 
         if (exception != null) {
@@ -212,123 +275,39 @@ public class RecapSessionImpl implements RecapSession {
         }
     }
 
-    public void setTracker(ProgressTrackerListener tracker) {
-        this.tracker = tracker;
-    }
-
-    public ProgressTrackerListener getTracker() {
-        return this.tracker;
-    }
-
-    public WorkspaceFilter getFilter() {
-        return filter;
-    }
-
-    public void setFilter(WorkspaceFilter filter) {
-        this.filter = filter;
-    }
-
-    public String getLastModifiedProperty() {
-        return lastModifiedProperty;
-    }
-
-    public void setLastModifiedProperty(String lastModifiedProperty) {
-        this.lastModifiedProperty = lastModifiedProperty;
-    }
-
-    public int getBatchSize() {
-        return this.batchSize;
-    }
-
-    public void setBatchSize(int batchSize) {
-        this.batchSize = batchSize;
-    }
-
-    public long getThrottle() {
-        return this.throttle;
-    }
-
-    public void setThrottle(long throttle) {
-        this.throttle = throttle;
-    }
-
-    public boolean getOnlyNewer() {
-        return this.onlyNewer;
-    }
-
-    public void setOnlyNewer(boolean onlyNewer) {
-        this.onlyNewer = onlyNewer;
-    }
-
-    public boolean getUpdate() {
-        return this.update;
-    }
-
-    public void setUpdate(boolean update) {
-        this.update = update;
-    }
-
-    public Session getSourceSession() {
-        return this.sourceSession;
-    }
-
-    public Session getLocalSession() {
-        return this.localSession;
-    }
-
-    public int getTotalRecapPaths() {
-        return this.totalRecapPaths;
-    }
-
-    public RecapPath getLastSuccessfulRecapPath() {
-        return this.lastSuccessfulPath;
-    }
-
-    public int getTotalNodes() {
-        return this.totalNodes;
-    }
-
-    public long getTotalSize() {
-        return this.totalSize;
-    }
-
-    public long getTotalTimeMillis() {
-        return this.end - this.start;
-    }
-
     private void copy(Node src, Node dstParent, String dstName, boolean recursive) throws RepositoryException {
         String path = src.getPath();
         String dstPath = dstParent.getPath() + "/" + dstName;
-        if ((this.filter != null) && (!this.filter.contains(path))) {
-            track(path, "------ I %s", "Ignored by filter");
+        if ((this.getFilter() != null) && (!this.getFilter().contains(path))) {
+            trackFilterIgnore(path);
             return;
         }
 
         boolean useSysView = src.getDefinition().isProtected();
 
         boolean isNew = false;
-        boolean overwrite = this.update;
+        boolean overwrite = this.options.isUpdate();
         Node dst;
         if (dstParent.hasNode(dstName)) {
             dst = dstParent.getNode(dstName);
             if (overwrite) {
-                if ((this.onlyNewer) && (dstName.equals(JcrConstants.JCR_CONTENT))) {
+                if ((this.options.isOnlyNewer()) && (dstName.equals(JcrConstants.JCR_CONTENT))) {
                     if (isNewer(src, dst)) {
-                        track(dstPath, TRACK_UPDATE, ++this.totalNodes);
+                        trackPath(PathAction.UPDATE, dstPath);
                     } else {
                         overwrite = false;
                         recursive = false;
-                        track(dstPath, TRACK_NO_ACTION, ++this.totalNodes);
+                        trackPath(PathAction.NO_ACTION, dstPath);
                     }
                 } else {
-                    track(dstPath, TRACK_UPDATE, ++this.totalNodes);
+                    trackPath(PathAction.UPDATE, dstPath);
                 }
 
                 if (useSysView) {
                     dst = sysCopy(src, dstParent, dstName);
                 }
             } else {
-                track(dstPath, TRACK_NO_ACTION, ++this.totalNodes);
+                trackPath(PathAction.NO_ACTION, dstPath);
             }
         } else {
             try {
@@ -337,7 +316,7 @@ public class RecapSessionImpl implements RecapSession {
                 } else {
                     dst = dstParent.addNode(dstName, src.getPrimaryNodeType().getName());
                 }
-                track(dstPath, TRACK_ADD, ++this.totalNodes);
+                trackPath(PathAction.ADD, dstPath);
                 isNew = true;
             } catch (RepositoryException e) {
                 LOGGER.warn("Error while adding node {} (ignored): {}", dstPath, e.toString());
@@ -432,7 +411,7 @@ public class RecapSessionImpl implements RecapSession {
                 for (String name : names) {
                     try {
                         Node cNode = dst.getNode(name);
-                        track(cNode.getPath(), TRACK_DELETE, ++this.totalNodes);
+                        trackPath(PathAction.DELETE, cNode.getPath());
                         cNode.remove();
                     } catch (RepositoryException e) {
                     }
@@ -440,20 +419,20 @@ public class RecapSessionImpl implements RecapSession {
             }
         }
 
-        if (++this.numNodes >= this.batchSize)
+        if (++this.numNodes >= this.getOptions().getBatchSize())
             try {
-                track("", "# Intermediate saving %d nodes (%d kB)...", this.numNodes, this.currentSize / 1000L);
+                trackMessage("Intermediate saving %d nodes (%d kB)...", this.numNodes, this.currentSize / 1000L);
                 long now = System.currentTimeMillis();
                 this.localSession.save();
                 long end = System.currentTimeMillis();
-                track("", "# Done in %d ms. Total time: %d, total nodes %d, %d kB", end - now, end - this.start,
+                trackMessage("Done in %d ms. Total time: %d, total nodes %d, %d kB", end - now, end - this.start,
                         this.totalNodes, this.totalSize / 1000L);
                 this.numNodes = 0;
                 this.currentSize = 0L;
-                if (this.throttle > 0L) {
-                    track("", "# Throttling enabled. Waiting %d second%s...", this.throttle, this.throttle == 1L ? "" : "s");
+                if (this.options.getThrottle() > 0L) {
+                    trackMessage("Throttling enabled. Waiting %d second%s...", this.options.getThrottle(), this.options.getThrottle() == 1L ? "" : "s");
                     try {
-                        Thread.sleep(this.throttle * 1000L);
+                        Thread.sleep(this.options.getThrottle() * 1000L);
                     } catch (InterruptedException e) {
                     }
                 }
@@ -478,9 +457,9 @@ public class RecapSessionImpl implements RecapSession {
         while (iter.hasNext()) {
             Node child = iter.nextNode();
             if (isNew) {
-                track(child.getPath(), TRACK_ADD, ++this.totalNodes);
+                trackPath(PathAction.ADD, child.getPath());
             } else {
-                track(child.getPath(), TRACK_UPDATE, ++this.totalNodes);
+                trackPath(PathAction.UPDATE, child.getPath());
             }
             trackTree(child, isNew);
         }
@@ -490,9 +469,9 @@ public class RecapSessionImpl implements RecapSession {
         try {
             Calendar srcDate = null;
             Calendar dstDate = null;
-            if ((this.lastModifiedProperty != null) && (src.hasProperty(this.lastModifiedProperty)) && (dst.hasProperty(this.lastModifiedProperty))) {
-                srcDate = src.getProperty(this.lastModifiedProperty).getDate();
-                dstDate = dst.getProperty(this.lastModifiedProperty).getDate();
+            if ((this.allowLastModifiedProperty) && (src.hasProperty(this.options.getLastModifiedProperty())) && (dst.hasProperty(this.options.getLastModifiedProperty()))) {
+                srcDate = src.getProperty(this.options.getLastModifiedProperty()).getDate();
+                dstDate = dst.getProperty(this.options.getLastModifiedProperty()).getDate();
             } else if ((src.hasProperty(JcrConstants.JCR_LASTMODIFIED)) && (dst.hasProperty(JcrConstants.JCR_LASTMODIFIED))) {
                 srcDate = src.getProperty(JcrConstants.JCR_LASTMODIFIED).getDate();
                 dstDate = dst.getProperty(JcrConstants.JCR_LASTMODIFIED).getDate();
@@ -504,41 +483,90 @@ public class RecapSessionImpl implements RecapSession {
         return true;
     }
 
+    private boolean isValidNameForSession(String name) {
+        if (StringUtils.isEmpty(name)) {
+            return false;
+        }
+
+        try {
+            mapPrefixedName(name);
+            return true;
+        } catch (RepositoryException e) {
+            LOGGER.error("Error processing namespace for {}: {}", name, e.toString());
+            return false;
+        }
+    }
+
+    private String mapPrefixedName(String name) throws RepositoryException {
+        int idx = name.indexOf(':');
+        if (idx > 0) {
+            String prefix = name.substring(0, idx);
+            String mapped = this.prefixMapping.get(prefix);
+            if (mapped == null) {
+                String uri = this.sourceSession.getNamespaceURI(prefix);
+                int i = -1;
+                try {
+                    mapped = this.localSession.getNamespacePrefix(uri);
+                } catch (NamespaceException e) {
+                    mapped = prefix;
+                    i = 0;
+                }
+
+                while (i >= 0) {
+                    try {
+                        this.localSession.getWorkspace().getNamespaceRegistry().registerNamespace(mapped, uri);
+                        i = -1;
+                    } catch (NamespaceException e1) {
+                        mapped = prefix + i++;
+                    }
+                }
+
+                this.prefixMapping.put(prefix, mapped);
+            }
+            if (mapped.equals(prefix)) {
+                return name;
+            }
+            return mapped + prefix.substring(idx);
+        }
+
+        return name;
+    }
+
     private String checkNameSpace(String name) {
         try {
-            int idx = name.indexOf(':');
-            if (idx > 0) {
-                String prefix = name.substring(0, idx);
-                String mapped = this.prefixMapping.get(prefix);
-                if (mapped == null) {
-                    String uri = this.sourceSession.getNamespaceURI(prefix);
-                    int i = -1;
-                    try {
-                        mapped = this.localSession.getNamespacePrefix(uri);
-                    } catch (NamespaceException e) {
-                        mapped = prefix;
-                        i = 0;
-                    }
-
-                    while (i >= 0) {
-                        try {
-                            this.localSession.getWorkspace().getNamespaceRegistry().registerNamespace(mapped, uri);
-                            i = -1;
-                        } catch (NamespaceException e1) {
-                            mapped = prefix + i++;
-                        }
-                    }
-
-                    this.prefixMapping.put(prefix, mapped);
-                }
-                if (mapped.equals(prefix)) {
-                    return name;
-                }
-                return mapped + prefix.substring(idx);
-            }
+            name = mapPrefixedName(name);
         } catch (RepositoryException e) {
             LOGGER.error("Error processing namespace for {}: {}", name, e.toString());
         }
         return name;
     }
+
+    public Session getSourceSession() {
+        return this.sourceSession;
+    }
+
+    public Session getLocalSession() {
+        return this.localSession;
+    }
+
+    public int getTotalRecapPaths() {
+        return this.totalRecapPaths;
+    }
+
+    public RecapPath getLastSuccessfulRecapPath() {
+        return this.lastSuccessfulPath;
+    }
+
+    public int getTotalNodes() {
+        return this.totalNodes;
+    }
+
+    public long getTotalSize() {
+        return this.totalSize;
+    }
+
+    public long getTotalTimeMillis() {
+        return this.end - this.start;
+    }
+
 }

@@ -5,7 +5,7 @@
       <configuration manifestGenerationMode="OsmorcControlled" manifestLocation="" jarfileLocation="net.adamcin.recap.core-0.5.0-SNAPSHOT.jar" outputPathType="CompilerOutputPath" bndFileLocation="" bundlorFileLocation="" bundleActivator="" bundleSymbolicName="net.adamcin.recap.net.adamcin.recap.core" bundleVersion="0.5.0.SNAPSHOT" ignoreFilePattern="" useProjectDefaultManifestFileLocation="true" alwaysRebuildBundleJAR="false" doNotSynchronizeWithMaven="false">
         <additionalProperties>
           <property key="Bundle-Description" value="Parent POM for Recap project" />
-          <property key="Export-Package" value="net.adamcin.recap;version=0.5.0-SNAPSHOT" />
+          <property key="Export-Package" value="net.adamcin.recap.api.*;version=0.5.0-SNAPSHOT" />
           <property key="Private-Package" value="net.adamcin.recap.impl.*" />
           <property key="Embed-Dependency" value="jackrabbit-jcr-client,jackrabbit-spi2dav,jackrabbit-jcr2spi" />
           <property key="Bundle-Name" value="net.adamcin.recap.net.adamcin.recap.core" />

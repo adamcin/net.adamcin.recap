@@ -1,10 +1,10 @@
-<%@ page import="net.adamcin.recap.RecapSourceException" %>
+<%@ page import="net.adamcin.recap.api.RecapRemoteException" %>
 <%@ page import="org.json.JSONException" %>
-<%@ page import="net.adamcin.recap.RecapSourceContext" %>
+<%@ page import="net.adamcin.recap.api.RecapAddress" %>
 <%@ page import="java.util.List" %>
-<%@ page import="net.adamcin.recap.RecapStrategyDescriptor" %>
-<%@ page import="net.adamcin.recap.Recap" %>
-<%@ page import="net.adamcin.recap.RecapConstants" %>
+<%@ page import="net.adamcin.recap.api.RecapStrategyDescriptor" %>
+<%@ page import="net.adamcin.recap.api.Recap" %>
+<%@ page import="net.adamcin.recap.api.RecapConstants" %>
 <%@ page import="org.apache.commons.lang.StringUtils" %>
 <%@ page import="org.json.JSONWriter" %>
 <%--
@@ -29,7 +29,7 @@
     } else {
         try {
 
-            RecapSourceContext sourceContext = slingRequest.adaptTo(RecapSourceContext.class);
+            RecapAddress sourceContext = slingRequest.adaptTo(RecapAddress.class);
             List<RecapStrategyDescriptor> strategies;
 
             JSONWriter jsonWriter = new JSONWriter(response.getWriter());
@@ -58,7 +58,7 @@
             }
 
             jsonWriter.endArray();
-        } catch (RecapSourceException e) {
+        } catch (RecapRemoteException e) {
             throw new ServletException(e);
         } catch (JSONException e) {
             throw new ServletException(e);

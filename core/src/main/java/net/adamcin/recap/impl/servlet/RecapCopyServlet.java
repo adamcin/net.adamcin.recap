@@ -1,9 +1,9 @@
 package net.adamcin.recap.impl.servlet;
 
 import com.day.jcr.vault.fs.api.ProgressTrackerListener;
-import net.adamcin.recap.RecapConstants;
-import net.adamcin.recap.RecapException;
-import net.adamcin.recap.RecapSession;
+import net.adamcin.recap.api.RecapConstants;
+import net.adamcin.recap.api.RecapException;
+import net.adamcin.recap.api.RecapSession;
 import org.apache.felix.scr.annotations.sling.SlingServlet;
 import org.apache.sling.api.SlingHttpServletRequest;
 import org.apache.sling.api.SlingHttpServletResponse;

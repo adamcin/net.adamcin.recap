@@ -1,16 +1,12 @@
 package net.adamcin.recap.impl;
 
-import net.adamcin.recap.RecapSessionContext;
-import net.adamcin.recap.RecapSourceContext;
-import org.apache.commons.httpclient.NameValuePair;
-
-import java.util.List;
+import net.adamcin.recap.api.RecapAddress;
 
 /**
  * @author madamcin
- * @version $Id: RecapSessionContextImpl.java$
+ * @version $Id: RecapRequestImpl.java$
  */
-public class RecapSourceContextImpl implements RecapSourceContext {
+public class RecapAddressImpl implements RecapAddress {
 
     String remoteHost;
     int remotePort;
@@ -19,7 +15,7 @@ public class RecapSourceContextImpl implements RecapSourceContext {
     String remotePassword;
     String contextPath;
 
-    public String getRemoteHost() {
+    public String getHostname() {
         return remoteHost;
     }
 
@@ -27,7 +23,7 @@ public class RecapSourceContextImpl implements RecapSourceContext {
         this.remoteHost = remoteHost;
     }
 
-    public int getRemotePort() {
+    public int getPort() {
         return remotePort;
     }
 
@@ -43,7 +39,7 @@ public class RecapSourceContextImpl implements RecapSourceContext {
         this.https = https;
     }
 
-    public String getRemoteUsername() {
+    public String getUsername() {
         return remoteUsername;
     }
 
@@ -51,7 +47,7 @@ public class RecapSourceContextImpl implements RecapSourceContext {
         this.remoteUsername = remoteUsername;
     }
 
-    public String getRemotePassword() {
+    public String getPassword() {
         return remotePassword;
     }
 

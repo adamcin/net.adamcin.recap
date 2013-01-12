@@ -2,17 +2,18 @@ package net.adamcin.recap.impl;
 
 import com.day.jcr.vault.fs.api.RepositoryAddress;
 import com.day.jcr.vault.util.RepositoryProvider;
-import net.adamcin.recap.Recap;
-import net.adamcin.recap.RecapConstants;
-import net.adamcin.recap.RecapPath;
-import net.adamcin.recap.RecapSessionContext;
-import net.adamcin.recap.RecapSession;
-import net.adamcin.recap.RecapSessionException;
-import net.adamcin.recap.RecapSourceContext;
-import net.adamcin.recap.RecapSourceException;
-import net.adamcin.recap.RecapStrategy;
-import net.adamcin.recap.RecapStrategyDescriptor;
-import net.adamcin.recap.RecapUtil;
+import net.adamcin.recap.api.Recap;
+import net.adamcin.recap.api.RecapAddress;
+import net.adamcin.recap.api.RecapConstants;
+import net.adamcin.recap.api.RecapOptions;
+import net.adamcin.recap.api.RecapPath;
+import net.adamcin.recap.api.RecapRemoteException;
+import net.adamcin.recap.api.RecapRequest;
+import net.adamcin.recap.api.RecapSession;
+import net.adamcin.recap.api.RecapSessionException;
+import net.adamcin.recap.api.RecapStrategy;
+import net.adamcin.recap.api.RecapStrategyDescriptor;
+import net.adamcin.recap.api.RecapUtil;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpHost;
 import org.apache.commons.httpclient.NameValuePair;
@@ -64,31 +65,46 @@ public class RecapImpl implements Recap {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RecapImpl.class);
 
-    @Property(label = "Default Remote Port", intValue = RecapConstants.DEFAULT_DEFAULT_REMOTE_PORT)
-    private static final String OSGI_DEFAULT_REMOTE_PORT = "default.port";
+    @Property(label = "Default Remote Port", intValue = RecapConstants.DEFAULT_DEFAULT_PORT)
+    private static final String OSGI_DEFAULT_PORT = "default.port";
 
-    @Property(label = "Default Remote User", value = RecapConstants.DEFAULT_DEFAULT_REMOTE_USER)
-    private static final String OSGI_DEFAULT_REMOTE_USER = "default.user";
+    @Property(label = "Default Remote Username", value = RecapConstants.DEFAULT_DEFAULT_USERNAME)
+    private static final String OSGI_DEFAULT_USERNAME = "default.username";
 
-    @Property(label = "Default Remote Password", value = RecapConstants.DEFAULT_DEFAULT_REMOTE_PASS)
-    private static final String OSGI_DEFAULT_REMOTE_PASS = "default.pass";
+    @Property(label = "Default Remote Password", value = RecapConstants.DEFAULT_DEFAULT_PASSWORD)
+    private static final String OSGI_DEFAULT_PASSWORD = "default.password";
+
+    @Property(label = "Default Remote Context Path", value = RecapConstants.DEFAULT_DEFAULT_CONTEXT_PATH)
+    private static final String OSGI_DEFAULT_CONTEXT_PATH = "default.contextPath";
+
+    @Property(label = "Default Batch Size", intValue = RecapConstants.DEFAULT_DEFAULT_BATCH_SIZE)
+    private static final String OSGI_DEFAULT_BATCH_SIZE = "default.batchSize";
+
+    @Property(label = "Default Last Modified Property", value = RecapConstants.DEFAULT_DEFAULT_LAST_MODIFIED_PROPERTY)
+    private static final String OSGI_DEFAULT_LAST_MODIFIED_PROPERTY = "default.lastModifiedProperty";
 
     @Reference
     private MetaTypeService metaTypeService;
 
-    private int defaultRemotePort;
-    private String defaultRemoteUser;
-    private String defaultRemotePass;
+    private int defaultPort;
+    private String defaultContextPath;
+    private String defaultUsername;
+    private String defaultPassword;
+    private int defaultBatchSize;
+    private String defaultLastModifiedProperty;
     private RecapStrategyManager strategyManager;
 
-    volatile boolean sessionsInterrupted = false;
+    boolean sessionsInterrupted = false;
 
     @Activate
     protected void activate(ComponentContext ctx) {
         Dictionary<?, ?> props = ctx.getProperties();
-        defaultRemotePort = PropertiesUtil.toInteger(props.get(OSGI_DEFAULT_REMOTE_PORT), RecapConstants.DEFAULT_DEFAULT_REMOTE_PORT);
-        defaultRemoteUser = PropertiesUtil.toString(props.get(OSGI_DEFAULT_REMOTE_USER), RecapConstants.DEFAULT_DEFAULT_REMOTE_USER);
-        defaultRemotePass = PropertiesUtil.toString(props.get(OSGI_DEFAULT_REMOTE_PASS), RecapConstants.DEFAULT_DEFAULT_REMOTE_PASS);
+        defaultPort = PropertiesUtil.toInteger(props.get(OSGI_DEFAULT_PORT), RecapConstants.DEFAULT_DEFAULT_PORT);
+        defaultContextPath = PropertiesUtil.toString(props.get(OSGI_DEFAULT_CONTEXT_PATH), RecapConstants.DEFAULT_DEFAULT_CONTEXT_PATH);
+        defaultUsername = PropertiesUtil.toString(props.get(OSGI_DEFAULT_USERNAME), RecapConstants.DEFAULT_DEFAULT_USERNAME);
+        defaultPassword = PropertiesUtil.toString(props.get(OSGI_DEFAULT_PASSWORD), RecapConstants.DEFAULT_DEFAULT_PASSWORD);
+        defaultBatchSize = PropertiesUtil.toInteger(props.get(OSGI_DEFAULT_BATCH_SIZE), RecapConstants.DEFAULT_DEFAULT_BATCH_SIZE);
+        defaultLastModifiedProperty = PropertiesUtil.toString(props.get(OSGI_DEFAULT_LAST_MODIFIED_PROPERTY), RecapConstants.DEFAULT_DEFAULT_LAST_MODIFIED_PROPERTY);
         strategyManager = new RecapStrategyManager(ctx.getBundleContext(), metaTypeService);
         this.sessionsInterrupted = false;
     }
@@ -96,45 +112,69 @@ public class RecapImpl implements Recap {
     @Deactivate
     protected void deactivate(ComponentContext ctx) {
         this.sessionsInterrupted = true;
-        defaultRemotePort = 0;
-        defaultRemoteUser = null;
-        defaultRemotePass = null;
+        defaultPort = 0;
+        defaultUsername = null;
+        defaultPassword = null;
+        defaultBatchSize = 0;
+        defaultLastModifiedProperty = null;
         strategyManager = null;
     }
 
-    public int getDefaultRemotePort() {
-        return defaultRemotePort;
+    public int getDefaultPort() {
+        return defaultPort;
     }
 
-    public String getDefaultRemoteUser() {
-        return defaultRemoteUser;
+    public String getDefaultUsername() {
+        return defaultUsername;
+    }
+
+    public int getDefaultBatchSize() {
+        return defaultBatchSize;
+    }
+
+    public String getDefaultLastModifiedProperty() {
+        return defaultLastModifiedProperty;
+    }
+
+    public String getDefaultContextPath() {
+        return defaultContextPath;
     }
 
     public RecapSession initSession(ResourceResolver resourceResolver,
-                                    RecapSessionContext context)
+                                    RecapAddress address,
+                                    RecapRequest request,
+                                    RecapOptions options)
             throws RecapSessionException {
 
-        RecapSessionContext remoteContext = applySessionContextDefaults(context);
-        RecapSourceContext sourceContext = remoteContext.getSourceContext();
+        if (address == null) {
+            throw new NullPointerException("address");
+        }
+
+        if (StringUtils.isEmpty(address.getHostname())) {
+            throw new IllegalArgumentException("address.getHostname() must not be empty");
+        }
+
+        RecapAddress addr = applyAddressDefaults(address);
+        RecapRequest req = applyRequestDefaults(request);
+        RecapOptions opts = applyOptionsDefaults(options);
         Session localSession = resourceResolver.adaptTo(Session.class);
         Session srcSession;
 
         ClassLoader orig = Thread.currentThread().getContextClassLoader();
         try {
             Thread.currentThread().setContextClassLoader(getClass().getClassLoader());
-            RepositoryAddress remoteAddress = getRemoteAddress(sourceContext);
-            Repository srcRepo = this.getRepository(remoteAddress);
+            RepositoryAddress repositoryAddress = getRepositoryAddress(addr);
+            Repository srcRepo = this.getRepository(repositoryAddress);
             srcSession = srcRepo.login(
-                    new SimpleCredentials(sourceContext.getRemoteUsername(),
-                            sourceContext.getRemotePassword().toCharArray()));
+                    new SimpleCredentials(addr.getUsername(),
+                            addr.getPassword().toCharArray()));
         } catch (Exception e) {
             throw new RecapSessionException("Failed to login to source repository.", e);
         } finally {
             Thread.currentThread().setContextClassLoader(orig);
         }
 
-        RecapSessionImpl recapSession = new RecapSessionImpl(this, remoteContext, localSession, srcSession);
-        return recapSession;
+        return new RecapSessionImpl(this, addr, req, opts, localSession, srcSession);
     }
 
     private Repository getRepository(RepositoryAddress address) throws RepositoryException, URISyntaxException {
@@ -143,29 +183,29 @@ public class RecapImpl implements Recap {
         return repProvider.getRepository(address);
     }
 
-    private InputStreamReader executeRequest(RecapSourceContext context, String getPath) throws IOException {
+    private InputStreamReader executeRequest(RecapAddress address, String getPath) throws IOException {
 
-        RecapSourceContext contextWithDefaults = applySourceContextDefaults(context);
+        RecapAddress addr = applyAddressDefaults(address);
 
         String uri;
-        if (StringUtils.isNotEmpty(contextWithDefaults.getContextPath())) {
-            uri = contextWithDefaults.getContextPath() + getPath;
+        if (StringUtils.isNotEmpty(addr.getContextPath())) {
+            uri = addr.getContextPath() + getPath;
         } else {
             uri = getPath;
         }
 
         GetMethod method = new GetMethod(uri);
 
-        HttpHost targetHost = new HttpHost(contextWithDefaults.getRemoteHost(),
-                contextWithDefaults.getRemotePort(), contextWithDefaults.isHttps() ? Protocol.getProtocol("https") : Protocol.getProtocol("http"));
+        HttpHost targetHost = new HttpHost(addr.getHostname(),
+                addr.getPort(), addr.isHttps() ? Protocol.getProtocol("https") : Protocol.getProtocol("http"));
 
         HttpClient client = new HttpClient();
 
-        client.getHostConfiguration().setHost(contextWithDefaults.getRemoteHost(), contextWithDefaults.getRemotePort());
+        client.getHostConfiguration().setHost(addr.getHostname(), addr.getPort());
         client.getParams().setAuthenticationPreemptive(true);
         client.getState().setCredentials(
-                new AuthScope(contextWithDefaults.getRemoteHost(), contextWithDefaults.getRemotePort()),
-                new UsernamePasswordCredentials(contextWithDefaults.getRemoteUsername(), contextWithDefaults.getRemotePassword())
+                new AuthScope(addr.getHostname(), addr.getPort()),
+                new UsernamePasswordCredentials(addr.getUsername(), addr.getPassword())
         );
 
         int result = client.executeMethod(method);
@@ -176,27 +216,28 @@ public class RecapImpl implements Recap {
         }
     }
 
-    public Iterator<RecapPath> listRemotePaths(RecapSessionContext context) throws RecapSourceException {
-        RecapSessionContext contextWithDefaults = applySessionContextDefaults(context);
+    public Iterator<RecapPath> listRemotePaths(RecapAddress address, RecapRequest request) throws RecapRemoteException {
+        RecapAddress addr = applyAddressDefaults(address);
+        RecapRequest req = applyRequestDefaults(request);
         StringBuilder pathBuilder = new StringBuilder(RecapConstants.SERVLET_LIST_PATH);
-        if (contextWithDefaults.getSelectors() != null) {
-            for (String selector : contextWithDefaults.getSelectors()) {
+        if (req.getSelectors() != null) {
+            for (String selector : req.getSelectors()) {
                 pathBuilder.append(".").append(selector);
             }
         }
         pathBuilder.append(".txt");
-        if (StringUtils.isNotEmpty(contextWithDefaults.getSuffix())) {
-            if (!contextWithDefaults.getSuffix().startsWith("/")) {
+        if (StringUtils.isNotEmpty(req.getSuffix())) {
+            if (!req.getSuffix().startsWith("/")) {
                 pathBuilder.append("/");
             }
-            pathBuilder.append(contextWithDefaults.getSuffix());
+            pathBuilder.append(req.getSuffix());
         }
 
         List<NameValuePair> pairs = new ArrayList<NameValuePair>();
-        pairs.add(new NameValuePair(RecapConstants.RP_REMOTE_STRATEGY, contextWithDefaults.getStrategy()));
+        pairs.add(new NameValuePair(RecapConstants.RP_STRATEGY, req.getStrategy()));
 
-        if (contextWithDefaults.getParameters() != null) {
-            pairs.addAll(contextWithDefaults.getParameters());
+        if (req.getParameters() != null) {
+            pairs.addAll(req.getParameters());
         }
 
         pathBuilder.append("?").append(RecapUtil.format(pairs, RecapUtil.UTF_8));
@@ -204,7 +245,7 @@ public class RecapImpl implements Recap {
         InputStreamReader reader = null;
 
         try {
-            reader = executeRequest(contextWithDefaults.getSourceContext(), pathBuilder.toString());
+            reader = executeRequest(addr, pathBuilder.toString());
             List<RecapPath> paths = new ArrayList<RecapPath>();
 
             if (reader != null) {
@@ -222,13 +263,13 @@ public class RecapImpl implements Recap {
 
             return paths.iterator();
         } catch (IOException e) {
-            throw new RecapSourceException("Failed to list remote paths.", e);
+            throw new RecapRemoteException("Failed to list remote paths.", e);
         } finally {
             IOUtils.closeQuietly(reader);
         }
     }
 
-    public List<RecapStrategyDescriptor> listRemoteStrategies(RecapSourceContext context) throws RecapSourceException {
+    public List<RecapStrategyDescriptor> listRemoteStrategies(RecapAddress context) throws RecapRemoteException {
         List<RecapStrategyDescriptor> strategies = new ArrayList<RecapStrategyDescriptor>();
         try {
             InputStreamReader reader = executeRequest(context, RecapConstants.SERVLET_STRATEGIES_PATH);
@@ -252,9 +293,9 @@ public class RecapImpl implements Recap {
                 }
             }
         } catch (JSONException e) {
-            throw new RecapSourceException(e);
+            throw new RecapRemoteException(e);
         } catch (IOException e) {
-            throw new RecapSourceException(e);
+            throw new RecapRemoteException(e);
         }
         return strategies;
     }
@@ -274,63 +315,94 @@ public class RecapImpl implements Recap {
         this.strategyManager.release(strategy);
     }
 
-    public void interruptSessions() {
-        this.sessionsInterrupted = true;
-    }
-
-    public void clearSessionInterrupt() {
-        this.sessionsInterrupted = false;
-    }
-
-    private RepositoryAddress getRemoteAddress(RecapSourceContext context) throws URISyntaxException {
-        StringBuilder addressBuilder = new StringBuilder(context.isHttps() ? "https://" : "http://");
-        addressBuilder.append(context.getRemoteUsername()).append(":").append(context.getRemotePassword()).append("@");
-        addressBuilder.append(context.getRemoteHost());
-        if (context.getRemotePort() != 80) {
-            addressBuilder.append(":").append(context.getRemotePort());
+    private RepositoryAddress getRepositoryAddress(RecapAddress recapAddress) throws URISyntaxException {
+        StringBuilder addressBuilder = new StringBuilder(recapAddress.isHttps() ? "https://" : "http://");
+        addressBuilder.append(recapAddress.getUsername()).append(":").append(recapAddress.getPassword()).append("@");
+        addressBuilder.append(recapAddress.getHostname());
+        if (recapAddress.getPort() != 80) {
+            addressBuilder.append(":").append(recapAddress.getPort());
         }
-        if (StringUtils.isNotEmpty(context.getContextPath()) && !"/".equals(context.getContextPath())) {
-            addressBuilder.append(context.getContextPath());
+        if (StringUtils.isNotEmpty(recapAddress.getContextPath()) && !"/".equals(recapAddress.getContextPath())) {
+            addressBuilder.append(recapAddress.getContextPath());
         }
         addressBuilder.append("/crx/-/jcr:root");
         return new RepositoryAddress(addressBuilder.toString());
     }
 
-    private RecapSourceContext applySourceContextDefaults(final RecapSourceContext context) {
-        final int port = context.getRemotePort() > 0 ?
-                context.getRemotePort() : defaultRemotePort;
-        final String user = context.getRemoteUsername() != null ?
-                context.getRemoteUsername() : defaultRemoteUser;
-        final String pass = context.getRemotePassword() != null ?
-                context.getRemotePassword() : defaultRemotePass;
+    private RecapAddress applyAddressDefaults(final RecapAddress address) {
+        RecapAddressImpl dAddress= new RecapAddressImpl();
 
-        RecapSourceContextImpl contextWithDefaults = new RecapSourceContextImpl();
+        dAddress.setRemotePort(defaultPort);
+        dAddress.setRemoteUsername(defaultUsername);
+        dAddress.setRemotePassword(defaultPassword);
+        dAddress.setContextPath(defaultContextPath);
 
-        contextWithDefaults.setRemoteHost(context.getRemoteHost());
-        contextWithDefaults.setHttps(context.isHttps());
-        contextWithDefaults.setContextPath(context.getContextPath());
-        contextWithDefaults.setRemotePort(port);
-        contextWithDefaults.setRemoteUsername(user);
-        contextWithDefaults.setRemotePassword(pass);
+        if (address != null) {
 
-        return contextWithDefaults;
+            dAddress.setRemoteHost(address.getHostname());
+            dAddress.setHttps(address.isHttps());
+            dAddress.setContextPath(address.getContextPath());
+
+            if (address.getPort() > 0) {
+                dAddress.setRemotePort(address.getPort());
+            }
+            if (address.getUsername() != null) {
+                dAddress.setRemoteUsername(address.getUsername());
+            }
+            if (address.getPassword() != null) {
+                dAddress.setRemotePassword(address.getPassword());
+            }
+            if (address.getContextPath() != null) {
+                dAddress.setContextPath(address.getContextPath());
+            }
+        }
+
+        return dAddress;
     }
 
-    private RecapSessionContext applySessionContextDefaults(final RecapSessionContext context) {
-        final String[] selectors = context.getSelectors() != null ?
-                context.getSelectors() : new String[0];
-        final String suffix = context.getSuffix() != null ?
-                context.getSuffix() : "";
-        final List<NameValuePair> parameters = context.getParameters() != null ?
-                context.getParameters() : Collections.<NameValuePair>emptyList();
+    private RecapRequest applyRequestDefaults(final RecapRequest request) {
+        RecapRequestImpl dRequest= new RecapRequestImpl();
 
-        RecapSourceContext sourceContext = applySourceContextDefaults(context.getSourceContext());
-        RecapSessionContextImpl contextWithDefaults = new RecapSessionContextImpl(sourceContext);
-        contextWithDefaults.setStrategy(context.getStrategy());
-        contextWithDefaults.setSelectors(selectors);
-        contextWithDefaults.setSuffix(suffix);
-        contextWithDefaults.setParameters(parameters);
+        dRequest.setStrategy(RecapConstants.DIRECT_STRATEGY);
+        dRequest.setSelectors(new String[0]);
+        dRequest.setSuffix("");
+        dRequest.setParameters(Collections.<NameValuePair>emptyList());
 
-        return contextWithDefaults;
+        if (request != null) {
+            if (request.getStrategy() != null) {
+                dRequest.setStrategy(request.getStrategy());
+            }
+            if (request.getSelectors() != null) {
+                dRequest.setSelectors(request.getSelectors());
+            }
+            if (request.getSuffix() != null) {
+                dRequest.setSuffix(request.getSuffix());
+            }
+            if (request.getParameters() != null) {
+                dRequest.setParameters(request.getParameters());
+            }
+        }
+
+        return dRequest;
+    }
+
+    private RecapOptions applyOptionsDefaults(final RecapOptions options) {
+        RecapOptionsImpl dOptions = new RecapOptionsImpl();
+        dOptions.setBatchSize(defaultBatchSize);
+        dOptions.setLastModifiedProperty(defaultLastModifiedProperty);
+
+        if (options != null) {
+            dOptions.setUpdate(options.isUpdate());
+            dOptions.setOnlyNewer(options.isOnlyNewer());
+            dOptions.setThrottle(options.getThrottle());
+            if (options.getBatchSize() > 0) {
+                dOptions.setBatchSize(options.getBatchSize());
+            }
+            if (options.getLastModifiedProperty() != null) {
+                dOptions.setLastModifiedProperty(options.getLastModifiedProperty());
+            }
+        }
+
+        return dOptions;
     }
 }

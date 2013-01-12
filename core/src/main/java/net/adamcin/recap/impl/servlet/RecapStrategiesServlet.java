@@ -1,8 +1,8 @@
 package net.adamcin.recap.impl.servlet;
 
-import net.adamcin.recap.Recap;
-import net.adamcin.recap.RecapConstants;
-import net.adamcin.recap.RecapStrategyDescriptor;
+import net.adamcin.recap.api.Recap;
+import net.adamcin.recap.api.RecapConstants;
+import net.adamcin.recap.api.RecapStrategyDescriptor;
 import org.apache.commons.lang.StringUtils;
 import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.sling.SlingServlet;

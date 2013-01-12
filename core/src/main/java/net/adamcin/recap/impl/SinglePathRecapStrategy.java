@@ -1,7 +1,7 @@
 package net.adamcin.recap.impl;
 
-import net.adamcin.recap.RecapSourceException;
-import net.adamcin.recap.RecapStrategy;
+import net.adamcin.recap.api.RecapRemoteException;
+import net.adamcin.recap.api.RecapStrategy;
 import org.apache.felix.scr.annotations.Component;
 import org.apache.sling.api.SlingHttpServletRequest;
 import org.apache.sling.api.resource.Resource;
@@ -21,7 +21,7 @@ import java.util.Iterator;
 public class SinglePathRecapStrategy implements RecapStrategy {
 
     public Iterator<Node> listNodes(SlingHttpServletRequest recapRequest)
-            throws RecapSourceException {
+            throws RecapRemoteException {
 
         Resource resource = recapRequest.getResourceResolver().
                 getResource(recapRequest.getRequestPathInfo().getSuffix());

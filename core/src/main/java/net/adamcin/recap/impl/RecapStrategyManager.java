@@ -1,7 +1,7 @@
 package net.adamcin.recap.impl;
 
-import net.adamcin.recap.RecapStrategy;
-import net.adamcin.recap.RecapStrategyDescriptor;
+import net.adamcin.recap.api.RecapStrategy;
+import net.adamcin.recap.api.RecapStrategyDescriptor;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
 import org.osgi.framework.InvalidSyntaxException;

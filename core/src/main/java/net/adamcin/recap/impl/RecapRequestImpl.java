@@ -1,30 +1,21 @@
 package net.adamcin.recap.impl;
 
-import net.adamcin.recap.RecapSessionContext;
-import net.adamcin.recap.RecapSourceContext;
+import net.adamcin.recap.api.RecapAddress;
+import net.adamcin.recap.api.RecapRequest;
 import org.apache.commons.httpclient.NameValuePair;
 
 import java.util.List;
 
 /**
  * @author madamcin
- * @version $Id: RecapSessionContextImpl.java$
+ * @version $Id: RecapRequestImpl.java$
  */
-public class RecapSessionContextImpl implements RecapSessionContext {
+public class RecapRequestImpl implements RecapRequest {
 
-    final RecapSourceContext sourceContext;
     String strategy;
     String[] selectors;
     String suffix;
     List<NameValuePair> parameters;
-
-    public RecapSessionContextImpl(RecapSourceContext sourceContext) {
-        this.sourceContext = sourceContext;
-    }
-
-    public RecapSourceContext getSourceContext() {
-        return sourceContext;
-    }
 
     public String getStrategy() {
         return strategy;

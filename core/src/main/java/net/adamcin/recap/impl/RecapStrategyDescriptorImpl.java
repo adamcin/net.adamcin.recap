@@ -1,6 +1,6 @@
 package net.adamcin.recap.impl;
 
-import net.adamcin.recap.RecapStrategyDescriptor;
+import net.adamcin.recap.api.RecapStrategyDescriptor;
 
 /**
  * @author madamcin

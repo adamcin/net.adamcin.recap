@@ -1,6 +1,7 @@
-package net.adamcin.recap;
+package net.adamcin.recap.api;
 
 import com.day.jcr.vault.fs.api.ProgressTrackerListener;
+import com.day.jcr.vault.fs.api.WorkspaceFilter;
 
 import javax.jcr.Session;
 
@@ -14,33 +15,27 @@ public interface RecapSession {
 
     void logout();
 
-    void setTracker(ProgressTrackerListener tracker);
+    Session getLocalSession();
+
+    RecapOptions getOptions();
+
+    RecapAddress getAddress();
+
+    RecapRequest getRequest();
+
+    WorkspaceFilter getFilter();
+
+    void setFilter(WorkspaceFilter filter);
 
     ProgressTrackerListener getTracker();
 
-    RecapSessionContext getContext();
-
-    int getBatchSize();
-
-    void setBatchSize(int batchSize);
-
-    long getThrottle();
-
-    void setThrottle(long throttle);
-
-    boolean getOnlyNewer();
-
-    void setOnlyNewer(boolean onlyNewer);
-
-    boolean getUpdate();
-
-    void setUpdate(boolean update);
-
-    Session getLocalSession();
+    void setTracker(ProgressTrackerListener tracker);
 
     //-----------------------------------------------------------------
     // Getters for Session Statistics
     //-----------------------------------------------------------------
+    boolean isFinished();
+
     int getTotalRecapPaths();
 
     RecapPath getLastSuccessfulRecapPath();

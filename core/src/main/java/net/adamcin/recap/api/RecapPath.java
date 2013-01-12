@@ -1,4 +1,4 @@
-package net.adamcin.recap;
+package net.adamcin.recap.api;
 
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;

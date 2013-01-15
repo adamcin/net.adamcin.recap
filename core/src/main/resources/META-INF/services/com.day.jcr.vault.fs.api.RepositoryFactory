@@ -1,4 +1,0 @@
-#
-# registers the Recap Repository Factory
-#
-net.adamcin.recap.impl.RecapRepositoryFactory

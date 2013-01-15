@@ -1,8 +1,8 @@
 package net.adamcin.recap.impl.servlet;
 
-import com.day.jcr.vault.fs.api.ProgressTrackerListener;
 import net.adamcin.recap.api.RecapConstants;
 import net.adamcin.recap.api.RecapException;
+import net.adamcin.recap.api.RecapProgressListener;
 import net.adamcin.recap.api.RecapSession;
 import org.apache.felix.scr.annotations.sling.SlingServlet;
 import org.apache.sling.api.SlingHttpServletRequest;
@@ -35,9 +35,18 @@ public class RecapCopyServlet extends SlingAllMethodsServlet {
 
         RecapSession recapSession = request.adaptTo(RecapSession.class);
         if (recapSession != null) {
-            recapSession.setTracker(response.adaptTo(ProgressTrackerListener.class));
+            recapSession.setProgressListener(response.adaptTo(RecapProgressListener.class));
             try {
-                recapSession.doCopy();
+                try {
+                    String[] paths = request.getParameterValues(":path");
+                    if (paths != null) {
+                        for (String path : paths) {
+                            recapSession.remoteCopy(path);
+                        }
+                    }
+                } finally {
+                    recapSession.finish();
+                }
             } catch (RecapException e) {
                 LOGGER.error("[doPost] Failed to copy paths", e);
                 response.sendError(SlingHttpServletResponse.SC_INTERNAL_SERVER_ERROR);

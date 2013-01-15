@@ -1,10 +1,5 @@
 package net.adamcin.recap.api;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
-
 /**
  * Class hosting several important Recap API constants
  * @author madamcin
@@ -17,22 +12,9 @@ public class RecapConstants {
     }
 
     /**
-     * Paths to the core Recap servlets
+     * Path to the basic Recap copy servlet
      */
     public static final String SERVLET_COPY_PATH = "/bin/recap/copy";
-    public static final String SERVLET_LIST_PATH = "/bin/recap/list";
-    public static final String SERVLET_STRATEGIES_PATH = "/bin/recap/strategies";
-
-    /**
-     * ComponentFactory interface
-     */
-    public static final String STRATEGY_FACTORY = "net.adamcin.recap.RecapStrategy";
-
-    public static final String KEY_STRATEGY_TYPE = "type";
-    public static final String KEY_STRATEGY_LABEL = "label";
-    public static final String KEY_STRATEGY_DESCRIPTION = "description";
-
-    public static final String DIRECT_STRATEGY = "direct";
 
     public static final int DEFAULT_DEFAULT_PORT = 4502;
     public static final String DEFAULT_DEFAULT_CONTEXT_PATH = "";
@@ -52,18 +34,12 @@ public class RecapConstants {
     public static final String RP_CONTEXT_PATH = ":context_path";
 
     // ------------------------------------------------
-    // Request Parameters related to RecapRequests
-    // ------------------------------------------------
-    public static final String RP_STRATEGY = ":strategy";
-    public static final String RP_SELECTORS = ":selectors";
-    public static final String RP_SUFFIX = ":suffix";
-
-    // ------------------------------------------------
     // Request Parameters related to RecapOptions
     // ------------------------------------------------
     public static final String RP_UPDATE = ":update";
     public static final String RP_ONLY_NEWER = ":only_newer";
     public static final String RP_BATCH_SIZE = ":batch_size";
     public static final String RP_THROTTLE = ":throttle";
+    public static final String RP_LAST_MODIFIED_PROPERTY = ":last_modified_property";
 
 }

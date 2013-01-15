@@ -6,7 +6,7 @@ package net.adamcin.recap.api;
  */
 public interface RecapAddress {
     String getHostname();
-    int getPort();
+    Integer getPort();
     boolean isHttps();
     String getUsername();
     String getPassword();

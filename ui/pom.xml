@@ -44,6 +44,11 @@
 			<artifactId>net.adamcin.recap.core</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+        <dependency>
+            <groupId>net.adamcin.recap</groupId>
+            <artifactId>net.adamcin.recap.addressbook</artifactId>
+            <version>${project.version}</version>
+        </dependency>
 
         <dependency>
             <groupId>commons-lang</groupId>

@@ -1,8 +1,5 @@
 package net.adamcin.recap.api;
 
-import com.day.jcr.vault.fs.api.ProgressTrackerListener;
-import com.day.jcr.vault.fs.api.WorkspaceFilter;
-
 import javax.jcr.Session;
 
 /**
@@ -11,7 +8,9 @@ import javax.jcr.Session;
  */
 public interface RecapSession {
 
-    void doCopy() throws RecapException;
+    void remoteCopy(String rootPath) throws RecapSessionException;
+
+    void finish() throws RecapSessionException;
 
     void logout();
 
@@ -19,17 +18,9 @@ public interface RecapSession {
 
     RecapOptions getOptions();
 
-    RecapAddress getAddress();
+    RecapProgressListener getProgressListener();
 
-    RecapRequest getRequest();
-
-    WorkspaceFilter getFilter();
-
-    void setFilter(WorkspaceFilter filter);
-
-    ProgressTrackerListener getTracker();
-
-    void setTracker(ProgressTrackerListener tracker);
+    void setProgressListener(RecapProgressListener progressListener);
 
     //-----------------------------------------------------------------
     // Getters for Session Statistics
@@ -38,7 +29,7 @@ public interface RecapSession {
 
     int getTotalRecapPaths();
 
-    RecapPath getLastSuccessfulRecapPath();
+    String getLastSuccessfulRecapPath();
 
     int getTotalNodes();
 

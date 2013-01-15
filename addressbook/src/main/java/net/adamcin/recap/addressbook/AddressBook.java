@@ -12,5 +12,5 @@ public interface AddressBook {
 
     Resource getResource();
 
-    Iterator<AddressResource> listAddresses();
+    Iterable<Address> listAddresses();
 }

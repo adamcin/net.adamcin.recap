@@ -9,8 +9,8 @@ import net.adamcin.recap.api.RecapOptions;
 public class RecapOptionsImpl implements RecapOptions {
 
     private String lastModifiedProperty;
-    private int batchSize = 0;
-    private long throttle = 0L;
+    private Integer batchSize;
+    private Long throttle;
     private boolean onlyNewer;
     private boolean update;
 
@@ -22,19 +22,19 @@ public class RecapOptionsImpl implements RecapOptions {
         this.lastModifiedProperty = lastModifiedProperty;
     }
 
-    public int getBatchSize() {
+    public Integer getBatchSize() {
         return batchSize;
     }
 
-    public void setBatchSize(int batchSize) {
+    public void setBatchSize(Integer batchSize) {
         this.batchSize = batchSize;
     }
 
-    public long getThrottle() {
+    public Long getThrottle() {
         return throttle;
     }
 
-    public void setThrottle(long throttle) {
+    public void setThrottle(Long throttle) {
         this.throttle = throttle;
     }
 

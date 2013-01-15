@@ -117,15 +117,7 @@
             <groupId>org.apache.sling</groupId>
             <artifactId>org.apache.sling.settings</artifactId>
         </dependency>
-        <dependency>
-            <groupId>com.day.jcr.vault</groupId>
-            <artifactId>com.day.jcr.vault</artifactId>
-        </dependency>
 
-        <dependency>
-            <groupId>com.day.commons.osgi.wrapper</groupId>
-            <artifactId>com.day.commons.osgi.wrapper.commons-httpclient</artifactId>
-        </dependency>
         <dependency>
             <groupId>org.apache.jackrabbit</groupId>
             <artifactId>jackrabbit-jcr-client</artifactId>

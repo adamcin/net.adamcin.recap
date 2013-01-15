@@ -21,8 +21,8 @@
     <output url="file://$MODULE_DIR$/target/classes" />
     <output-test url="file://$MODULE_DIR$/target/test-classes" />
     <content url="file://$MODULE_DIR$">
-      <sourceFolder url="file://$MODULE_DIR$/src/main/java" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/main/resources" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/main/java" isTestSource="false" />
       <excludeFolder url="file://$MODULE_DIR$/target" />
     </content>
     <orderEntry type="inheritedJdk" />
@@ -41,8 +41,6 @@
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.apache.sling:org.apache.sling.commons.osgi:2.1.0" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.apache.sling:org.apache.sling.api:2.2.4" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.apache.sling:org.apache.sling.settings:1.1.0" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Maven: com.day.jcr.vault:com.day.jcr.vault:2.4.18" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Maven: com.day.commons.osgi.wrapper:com.day.commons.osgi.wrapper.commons-httpclient:3.1.0.018" level="project" />
     <orderEntry type="library" name="Maven: org.apache.jackrabbit:jackrabbit-jcr-client:2.4.0" level="project" />
     <orderEntry type="library" name="Maven: org.apache.jackrabbit:jackrabbit-spi2dav:2.4.0" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.apache.jackrabbit:jackrabbit-spi:2.4.0" level="project" />

@@ -1,8 +1,8 @@
-<%@ page import="net.adamcin.recap.api.RecapRemoteException" %>
+<%@ page import="net.adamcin.recap.remotecontrol.RecapRemoteException" %>
 <%@ page import="org.json.JSONException" %>
 <%@ page import="net.adamcin.recap.api.RecapAddress" %>
 <%@ page import="java.util.List" %>
-<%@ page import="net.adamcin.recap.api.RecapStrategyDescriptor" %>
+<%@ page import="net.adamcin.recap.remotecontrol.RecapStrategyDescriptor" %>
 <%@ page import="net.adamcin.recap.api.Recap" %>
 <%@ page import="net.adamcin.recap.api.RecapConstants" %>
 <%@ page import="org.apache.commons.lang.StringUtils" %>
@@ -42,14 +42,14 @@
                     if (StringUtils.isNotEmpty(strategy.getType())) {
                         jsonWriter.object();
 
-                        jsonWriter.key(RecapConstants.KEY_STRATEGY_TYPE).value(strategy.getType());
+                        jsonWriter.key(RemoteControlConstants.KEY_STRATEGY_TYPE).value(strategy.getType());
 
                         if (StringUtils.isNotEmpty(strategy.getLabel())) {
-                            jsonWriter.key(RecapConstants.KEY_STRATEGY_LABEL).value(strategy.getLabel());
+                            jsonWriter.key(RemoteControlConstants.KEY_STRATEGY_LABEL).value(strategy.getLabel());
                         }
 
                         if (StringUtils.isNotEmpty(strategy.getDescription())) {
-                            jsonWriter.key(RecapConstants.KEY_STRATEGY_DESCRIPTION).value(strategy.getDescription());
+                            jsonWriter.key(RemoteControlConstants.KEY_STRATEGY_DESCRIPTION).value(strategy.getDescription());
                         }
 
                         jsonWriter.endObject();

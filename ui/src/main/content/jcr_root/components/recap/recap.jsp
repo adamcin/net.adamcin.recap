@@ -22,15 +22,35 @@
     <div data-role="globalheader" data-title="Recap" data-theme="a"></div>
 
     <div data-role="panel" data-id="menu">
-        <div id="g-recap-favorites-menu" data-role="page">
+        <div id="g-recap-addresses-menu" data-role="page">
             <div data-role="header">
-                <h1 class="g-uppercase">Sources</h1>
+                <h1 class="g-uppercase">Address Book</h1>
             </div>
 
             <div data-role="content" data-scroll="y" data-theme="c">
-                <ul id="node-list" data-role="listview" style="display:none;"></ul>
+                <ul id="address-list" data-role="listview" style="display:none;"></ul>
             </div>
+
+            <textarea id="address-list-tpl" style="display:none;">
+                {#foreach $T as a}
+                <li data-icon="false">
+                    <a x-cq-linkchecker="skip" href="<%=request.getContextPath()%>{$T.a$key}.edit.html" data-panel="main">
+                        <h3>{$T.a.isHttps ? "https" : "http"}://{$T.a.username ? $T.a.username : _g.recap.context.defaults.username}@{$T.a.hostname}:{$T.a.port ? $T.a.port : _g.recap.context.defaults.port}</h3>
+                        <p>some other text</p>
+                    </a>
+                </li>
+                {#/for}
+            </textarea>
+
+            <div data-role="footer">
+                <div class="g-buttonbar" id="addressbook-buttonbar"></div>
+            </div>
+
+            <textarea id="addressbook-buttonbar-tpl" style="display:none;">
+                <a id="g-recap-addresses-new" x-cq-linkchecker="skip" href="<%=request.getContextPath()%>{_g.recap.context.addressBookPath}/*.edit.html" data-role="button" data-panel="main">New Address</a>
+            </textarea>
         </div>
+
     </div>
 
     <div data-role="panel" data-id="main">
@@ -42,5 +62,11 @@
             </div>
         </div>
     </div>
+
+    <script type="text/javascript">
+        (function() {
+            _g.recap.initElements();
+        })();
+    </script>
 </body>
 </html>

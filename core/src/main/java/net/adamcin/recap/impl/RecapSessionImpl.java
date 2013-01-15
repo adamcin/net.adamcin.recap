@@ -1,18 +1,12 @@
 package net.adamcin.recap.impl;
 
-import com.day.jcr.vault.fs.api.ProgressTrackerListener;
-import com.day.jcr.vault.fs.api.WorkspaceFilter;
-import com.day.jcr.vault.util.JcrConstants;
 import net.adamcin.recap.api.RecapAddress;
-import net.adamcin.recap.api.RecapConstants;
-import net.adamcin.recap.api.RecapException;
 import net.adamcin.recap.api.RecapOptions;
-import net.adamcin.recap.api.RecapPath;
-import net.adamcin.recap.api.RecapRequest;
+import net.adamcin.recap.api.RecapProgressListener;
 import net.adamcin.recap.api.RecapSession;
 import net.adamcin.recap.api.RecapSessionException;
-import net.adamcin.recap.api.RecapRemoteException;
 import org.apache.commons.lang.StringUtils;
+import org.apache.jackrabbit.JcrConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.ContentHandler;
@@ -28,11 +22,9 @@ import javax.jcr.RepositoryException;
 import javax.jcr.Session;
 import javax.jcr.Value;
 import javax.jcr.nodetype.NodeType;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
@@ -43,30 +35,15 @@ import java.util.Set;
 public class RecapSessionImpl implements RecapSession {
     private static final Logger LOGGER = LoggerFactory.getLogger(RecapSessionImpl.class);
 
-    enum PathAction {
-        ADD("A"), UPDATE("U"), DELETE("D"), NO_ACTION("-");
-
-        String action;
-        PathAction(String action) {
-            this.action = action;
-        }
-
-        String getAction() {
-            return action;
-        }
-    }
-
     private final RecapImpl recap;
     private final RecapAddress address;
-    private final RecapRequest request;
     private final RecapOptions options;
     private final Session localSession;
     private final Session sourceSession;
 
-    private WorkspaceFilter filter;
-    private ProgressTrackerListener tracker;
+    private RecapProgressListener progressListener;
 
-    private RecapPath lastSuccessfulPath;
+    private String lastSuccessfulPath;
     private int totalRecapPaths = 0;
     private int numNodes = 0;
     private int totalNodes = 0;
@@ -83,7 +60,6 @@ public class RecapSessionImpl implements RecapSession {
 
     public RecapSessionImpl(RecapImpl recap,
                             RecapAddress address,
-                            RecapRequest request,
                             RecapOptions options,
                             Session localSession,
                             Session sourceSession)
@@ -91,7 +67,6 @@ public class RecapSessionImpl implements RecapSession {
 
         this.recap = recap;
         this.address = address;
-        this.request = request;
         this.options = options;
         this.localSession = localSession;
         this.sourceSession = sourceSession;
@@ -101,10 +76,6 @@ public class RecapSessionImpl implements RecapSession {
 
     public RecapAddress getAddress() {
         return address;
-    }
-
-    public RecapRequest getRequest() {
-        return request;
     }
 
     public RecapOptions getOptions() {
@@ -121,133 +92,96 @@ public class RecapSessionImpl implements RecapSession {
         }
     }
 
-    public WorkspaceFilter getFilter() {
-        return filter;
+    public RecapProgressListener getProgressListener() {
+        return progressListener;
     }
 
-    public void setFilter(WorkspaceFilter filter) {
-        this.filter = filter;
+    public void setProgressListener(RecapProgressListener progressListener) {
+        this.progressListener = progressListener;
     }
 
-    public ProgressTrackerListener getTracker() {
-        return tracker;
-    }
-
-    public void setTracker(ProgressTrackerListener tracker) {
-        this.tracker = tracker;
-    }
-
-    private void trackFilterIgnore(String path) {
-        if (this.getTracker() != null) {
-            String formatted = String.format("-------- %s (Ignored by filter)", path);
-            this.getTracker().onMessage(ProgressTrackerListener.Mode.TEXT, "I", formatted);
-        }
-    }
-
-    private void trackPath(PathAction action, String path) {
-        if (this.getTracker() != null) {
-            String formatted = String.format("%08d %s", ++this.totalNodes, path);
-            this.getTracker().onMessage(ProgressTrackerListener.Mode.TEXT, action.getAction(), formatted);
+    private void trackPath(RecapProgressListener.PathAction action, String path) {
+        if (this.getProgressListener() != null) {
+            this.getProgressListener().onPath(action, this.totalNodes, path);
         }
     }
 
     private void trackError(String path, Exception exception) {
-        if (this.getTracker() != null) {
-            String formatted = String.format("-------- %s (%s)", path, exception.getMessage());
-            this.getTracker().onMessage(ProgressTrackerListener.Mode.TEXT, "E", formatted);
+        if (this.getProgressListener() != null) {
+            this.getProgressListener().onError(path, exception);
         }
     }
 
     private void trackFailure(String path, Exception exception) {
-        if (this.getTracker() != null) {
-            String formatted = String.format("-------- %s (%s)", path, exception.getMessage());
-            this.getTracker().onMessage(ProgressTrackerListener.Mode.TEXT, "F", formatted);
+        if (this.getProgressListener() != null) {
+            this.getProgressListener().onFailure(path, exception);
         }
     }
 
     private void trackMessage(String fmt, Object... args) {
-        if (this.getTracker() != null) {
-            this.getTracker().onMessage(ProgressTrackerListener.Mode.TEXT, "M", String.format(fmt, args));
+        if (this.getProgressListener() != null) {
+            this.getProgressListener().onMessage(fmt, args);
         }
     }
 
-    private boolean isDirect() {
-        return StringUtils.isEmpty(getRequest().getStrategy()) ||
-               RecapConstants.DIRECT_STRATEGY.equals(getRequest().getStrategy());
+    public Node getOrCreateLocal(Node remoteNode) throws RepositoryException {
+        if (remoteNode.getDepth() > 0) {
+            Node parent = remoteNode.getParent();
+            Node localParent = getOrCreateLocal(parent);
+            Node local;
+            if (!localParent.hasNode(remoteNode.getName())) {
+                local = parent.addNode(remoteNode.getName(), remoteNode.getPrimaryNodeType().getName());
+                trackPath(RecapProgressListener.PathAction.ADD, local.getPath());
+            } else {
+                local = localParent.getNode(remoteNode.getName());
+            }
+            processBatch();
+            return local;
+        } else {
+            return this.localSession.getRootNode();
+        }
     }
 
-    public void doCopy() throws RecapException {
+    public void remoteCopy(String rootPath) throws RecapSessionException {
         if (this.finished) {
             throw new RecapSessionException("RecapSession already finished.");
         }
 
-        RecapException exception = null;
-        try {
-            Iterator<RecapPath> paths;
-            if (isDirect()) {
-                try {
-                    Node directNode = sourceSession.getNode(getRequest().getSuffix());
-                    paths = Arrays.asList( RecapPath.build(directNode) ).iterator();
-                } catch (RepositoryException e) {
-                    throw new RecapRemoteException(e);
-                }
-            } else {
-                paths = recap.listRemotePaths(getAddress(), getRequest());
-            }
-
-            if (paths != null) {
-                while (paths.hasNext()) {
-                    copy(paths.next());
-                }
-            }
-        } catch (RecapException e) {
-            exception = e;
-            this.interrupted = true;
-        }
-
-        finish();
-
-        if (exception != null) {
-            throw exception;
-        }
-    }
-
-    public void copy(RecapPath path) throws RecapSessionException {
-        if (recap.sessionsInterrupted) {
-            throw new RecapSessionException("RecapSession interrupted.");
-        }
-
-        trackMessage("Copy %s from http://%s:%d/", path.getLeaf().getJcrPath(), this.address.getHostname(), this.address.getPort());
+        trackMessage("Copy %s from http://%s:%d/", rootPath, this.address.getHostname(), this.address.getPort());
 
         try {
-            int result = path.getLeaf().establishPath(getLocalSession());
-            this.numNodes += result;
-            this.totalNodes += result;
+            Node srcNode = this.getSourceSession().getNode(rootPath);
+            Node srcParent = srcNode.getParent();
+            Node dstParent = getOrCreateLocal(srcParent);
 
-            Node srcNode = path.getNode(this.getSourceSession());
-            Node dstParent = path.getParentNode(this.getLocalSession());
-            String dstName = path.getName();
+            String dstName = srcNode.getName();
 
             this.copy(srcNode, dstParent, dstName, true);
-            this.lastSuccessfulPath = path;
+            this.lastSuccessfulPath = rootPath;
             this.totalRecapPaths++;
         } catch (PathNotFoundException e) {
-            LOGGER.debug("PathNotFoundException while preparing path: {}. Message: {}", path, e.getMessage());
-            trackError(path.getLeaf().getJcrPath(), e);
+            LOGGER.debug("PathNotFoundException while preparing path: {}. Message: {}", rootPath, e.getMessage());
+            trackError(rootPath, e);
         } catch (RepositoryException e) {
-            LOGGER.error("RepositoryException while copying path: {}. Message: {}", path, e.getMessage());
-            trackFailure(path.getLeaf().getJcrPath(), e);
-            throw new RecapSessionException("RepositoryException while preparing path: " + path, e);
+            LOGGER.error("RepositoryException while copying path: {}. Message: {}", rootPath, e.getMessage());
+            trackFailure(rootPath, e);
+            this.interrupted = true;
+            this.finish();
+            throw new RecapSessionException("RepositoryException while preparing path: " + rootPath, e);
+        } catch (RecapSessionException e) {
+
         }
     }
 
-    private void finish() throws RecapSessionException {
+    public void finish() throws RecapSessionException {
         this.finished = true;
         RecapSessionException exception = null;
         if (!this.interrupted && this.numNodes > 0) {
             trackMessage("Saving %d nodes...", this.numNodes);
             try {
                 this.getLocalSession().save();
+                this.numNodes = 0;
+                this.currentSize = 0L;
                 trackMessage("Done.");
             } catch (RepositoryException e) {
                 LOGGER.error("[finish] Failed to save remaining changes.", e);
@@ -275,39 +209,60 @@ public class RecapSessionImpl implements RecapSession {
         }
     }
 
-    private void copy(Node src, Node dstParent, String dstName, boolean recursive) throws RepositoryException {
+    private void processBatch() throws RepositoryException {
+        if (++this.numNodes >= this.getOptions().getBatchSize()) {
+            trackMessage("Intermediate saving %d nodes (%d kB)...", this.numNodes, this.currentSize / 1000L);
+            long now = System.currentTimeMillis();
+            this.localSession.save();
+            long end = System.currentTimeMillis();
+            trackMessage("Done in %d ms. Total time: %d, total nodes %d, %d kB", end - now, end - this.start,
+                    this.totalNodes, this.totalSize / 1000L);
+            this.numNodes = 0;
+            this.currentSize = 0L;
+            if (this.options.getThrottle() > 0L) {
+                trackMessage("Throttling enabled. Waiting %d second%s...", this.options.getThrottle(), this.options.getThrottle() == 1L ? "" : "s");
+                try {
+                    Thread.sleep(this.options.getThrottle() * 1000L);
+                } catch (InterruptedException e) {
+                }
+            }
+        }
+    }
+
+    private void copy(Node src, Node dstParent, String dstName, boolean recursive) throws RecapSessionException, RepositoryException {
+        if (recap.sessionsInterrupted) {
+            throw new RecapSessionException("RecapSession interrupted.");
+        }
+
         String path = src.getPath();
         String dstPath = dstParent.getPath() + "/" + dstName;
-        if ((this.getFilter() != null) && (!this.getFilter().contains(path))) {
-            trackFilterIgnore(path);
-            return;
-        }
 
         boolean useSysView = src.getDefinition().isProtected();
 
         boolean isNew = false;
         boolean overwrite = this.options.isUpdate();
+        ++totalNodes;
         Node dst;
         if (dstParent.hasNode(dstName)) {
             dst = dstParent.getNode(dstName);
             if (overwrite) {
                 if ((this.options.isOnlyNewer()) && (dstName.equals(JcrConstants.JCR_CONTENT))) {
                     if (isNewer(src, dst)) {
-                        trackPath(PathAction.UPDATE, dstPath);
+                        trackPath(RecapProgressListener.PathAction.UPDATE, dstPath);
                     } else {
                         overwrite = false;
                         recursive = false;
-                        trackPath(PathAction.NO_ACTION, dstPath);
+                        trackPath(RecapProgressListener.PathAction.NO_ACTION, dstPath);
                     }
                 } else {
-                    trackPath(PathAction.UPDATE, dstPath);
+                    trackPath(RecapProgressListener.PathAction.UPDATE, dstPath);
                 }
 
                 if (useSysView) {
                     dst = sysCopy(src, dstParent, dstName);
                 }
             } else {
-                trackPath(PathAction.NO_ACTION, dstPath);
+                trackPath(RecapProgressListener.PathAction.NO_ACTION, dstPath);
             }
         } else {
             try {
@@ -316,10 +271,11 @@ public class RecapSessionImpl implements RecapSession {
                 } else {
                     dst = dstParent.addNode(dstName, src.getPrimaryNodeType().getName());
                 }
-                trackPath(PathAction.ADD, dstPath);
+                trackPath(RecapProgressListener.PathAction.ADD, dstPath);
                 isNew = true;
             } catch (RepositoryException e) {
                 LOGGER.warn("Error while adding node {} (ignored): {}", dstPath, e.toString());
+                trackError(dstPath, e);
                 return;
             }
         }
@@ -411,34 +367,14 @@ public class RecapSessionImpl implements RecapSession {
                 for (String name : names) {
                     try {
                         Node cNode = dst.getNode(name);
-                        trackPath(PathAction.DELETE, cNode.getPath());
+                        trackPath(RecapProgressListener.PathAction.DELETE, cNode.getPath());
                         cNode.remove();
                     } catch (RepositoryException e) {
                     }
                 }
             }
         }
-
-        if (++this.numNodes >= this.getOptions().getBatchSize())
-            try {
-                trackMessage("Intermediate saving %d nodes (%d kB)...", this.numNodes, this.currentSize / 1000L);
-                long now = System.currentTimeMillis();
-                this.localSession.save();
-                long end = System.currentTimeMillis();
-                trackMessage("Done in %d ms. Total time: %d, total nodes %d, %d kB", end - now, end - this.start,
-                        this.totalNodes, this.totalSize / 1000L);
-                this.numNodes = 0;
-                this.currentSize = 0L;
-                if (this.options.getThrottle() > 0L) {
-                    trackMessage("Throttling enabled. Waiting %d second%s...", this.options.getThrottle(), this.options.getThrottle() == 1L ? "" : "s");
-                    try {
-                        Thread.sleep(this.options.getThrottle() * 1000L);
-                    } catch (InterruptedException e) {
-                    }
-                }
-            } catch (RepositoryException e) {
-                LOGGER.error("Error during intermediate save ({}); try again later: {}", this.numNodes, e.toString());
-            }
+        processBatch();
     }
 
     private Node sysCopy(Node src, Node dstParent, String dstName)
@@ -457,9 +393,9 @@ public class RecapSessionImpl implements RecapSession {
         while (iter.hasNext()) {
             Node child = iter.nextNode();
             if (isNew) {
-                trackPath(PathAction.ADD, child.getPath());
+                trackPath(RecapProgressListener.PathAction.ADD, child.getPath());
             } else {
-                trackPath(PathAction.UPDATE, child.getPath());
+                trackPath(RecapProgressListener.PathAction.UPDATE, child.getPath());
             }
             trackTree(child, isNew);
         }
@@ -553,7 +489,7 @@ public class RecapSessionImpl implements RecapSession {
         return this.totalRecapPaths;
     }
 
-    public RecapPath getLastSuccessfulRecapPath() {
+    public String getLastSuccessfulRecapPath() {
         return this.lastSuccessfulPath;
     }
 

@@ -21,10 +21,10 @@
                 <configuration>
                     <instructions>
                         <Export-Package>
-                            net.adamcin.recap.sourcemanager;version=${project.version}
+                            net.adamcin.recap.addressbook;version=${project.version}
                         </Export-Package>
                         <Private-Package>
-                            net.adamcin.recap.sourcemanager.impl.*
+                            net.adamcin.recap.addressbook.impl.*
                         </Private-Package>
                     </instructions>
                 </configuration>
@@ -108,6 +108,14 @@
         <dependency>
             <groupId>org.apache.sling</groupId>
             <artifactId>org.apache.sling.api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.sling</groupId>
+            <artifactId>org.apache.sling.jcr.resource</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.day.jcr.vault</groupId>
+            <artifactId>com.day.jcr.vault</artifactId>
         </dependency>
 
 

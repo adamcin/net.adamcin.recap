@@ -18,6 +18,7 @@
 		<module>parent</module>
 		<module>core</module>
         <module>addressbook</module>
+        <module>remotecontrol</module>
 		<module>ui</module>
 	</modules>
 

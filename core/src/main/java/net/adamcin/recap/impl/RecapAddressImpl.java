@@ -8,51 +8,43 @@ import net.adamcin.recap.api.RecapAddress;
  */
 public class RecapAddressImpl implements RecapAddress {
 
-    String remoteHost;
-    int remotePort;
+    String hostname;
+    Integer port;
     boolean https;
-    String remoteUsername;
-    String remotePassword;
+    String username;
+    String password;
     String contextPath;
 
     public String getHostname() {
-        return remoteHost;
+        return hostname;
     }
 
-    public void setRemoteHost(String remoteHost) {
-        this.remoteHost = remoteHost;
+    public void setHostname(String hostname) {
+        this.hostname = hostname;
     }
 
-    public int getPort() {
-        return remotePort;
+    public Integer getPort() {
+        return port;
     }
 
-    public void setRemotePort(int remotePort) {
-        this.remotePort = remotePort;
-    }
-
-    public boolean isHttps() {
-        return https;
-    }
-
-    public void setHttps(boolean https) {
-        this.https = https;
+    public void setPort(Integer port) {
+        this.port = port;
     }
 
     public String getUsername() {
-        return remoteUsername;
+        return username;
     }
 
-    public void setRemoteUsername(String remoteUsername) {
-        this.remoteUsername = remoteUsername;
+    public void setUsername(String username) {
+        this.username = username;
     }
 
     public String getPassword() {
-        return remotePassword;
+        return password;
     }
 
-    public void setRemotePassword(String remotePassword) {
-        this.remotePassword = remotePassword;
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     public String getContextPath() {
@@ -61,5 +53,13 @@ public class RecapAddressImpl implements RecapAddress {
 
     public void setContextPath(String contextPath) {
         this.contextPath = contextPath;
+    }
+
+    public boolean isHttps() {
+        return https;
+    }
+
+    public void setHttps(boolean https) {
+        this.https = https;
     }
 }

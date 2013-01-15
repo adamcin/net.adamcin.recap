@@ -5,8 +5,8 @@
       <configuration manifestGenerationMode="OsmorcControlled" manifestLocation="" jarfileLocation="net.adamcin.recap.addressbook-0.5.0-SNAPSHOT.jar" outputPathType="CompilerOutputPath" bndFileLocation="" bundlorFileLocation="" bundleActivator="" bundleSymbolicName="net.adamcin.recap.net.adamcin.recap.addressbook" bundleVersion="0.5.0.SNAPSHOT" ignoreFilePattern="" useProjectDefaultManifestFileLocation="true" alwaysRebuildBundleJAR="false" doNotSynchronizeWithMaven="false">
         <additionalProperties>
           <property key="Bundle-Description" value="Parent POM for Recap project" />
-          <property key="Export-Package" value="net.adamcin.recap.sourcemanager;version=0.5.0-SNAPSHOT" />
-          <property key="Private-Package" value="net.adamcin.recap.sourcemanager.impl.*" />
+          <property key="Export-Package" value="net.adamcin.recap.addressbook;version=0.5.0-SNAPSHOT" />
+          <property key="Private-Package" value="net.adamcin.recap.addressbook.impl.*" />
           <property key="Bundle-Name" value="net.adamcin.recap.net.adamcin.recap.addressbook" />
         </additionalProperties>
         <additionalJARContents />
@@ -47,6 +47,8 @@
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.apache.felix:org.apache.felix.scr.annotations:1.7.0" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.apache.sling:org.apache.sling.commons.osgi:2.1.0" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.apache.sling:org.apache.sling.api:2.2.4" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: org.apache.sling:org.apache.sling.jcr.resource:2.0.11-R1239966" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: com.day.jcr.vault:com.day.jcr.vault:2.4.18" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.slf4j:slf4j-simple:1.6.4" level="project" />
   </component>
 </module>

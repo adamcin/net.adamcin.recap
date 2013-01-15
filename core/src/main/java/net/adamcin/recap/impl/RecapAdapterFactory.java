@@ -21,6 +21,7 @@ import org.apache.sling.api.adapter.AdapterFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.jcr.Session;
 import java.io.IOException;
 
 /**
@@ -68,7 +69,7 @@ public class RecapAdapterFactory implements AdapterFactory {
             if (recapAddress != null) {
                 RecapOptions recapOptions = getRecapOptions(adaptable);
                 try {
-                    RecapSession session = recap.initSession(adaptable.getResourceResolver(), recapAddress, recapOptions);
+                    RecapSession session = recap.initSession(adaptable.getResourceResolver().adaptTo(Session.class), recapAddress, recapOptions);
 
                     return (AdapterType) session;
                 } catch (RecapSessionException e) {

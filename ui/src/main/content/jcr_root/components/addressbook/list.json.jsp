@@ -3,7 +3,6 @@
 <%@ page import="org.json.JSONWriter" %>
 <%@ page import="net.adamcin.recap.addressbook.AddressBook" %>
 <%@ page import="net.adamcin.recap.addressbook.Address" %>
-<%@ page import="org.apache.sling.api.resource.ValueMap" %>
 <%--
   Recap Console component.
 --%><%
@@ -27,14 +26,12 @@
             AddressBook addressBook = resourceResolver.adaptTo(AddressBook.class);
             if (addressBook != null) {
                 for (Address address : addressBook.listAddresses()) {
-                    writer.key(address.getResource().getPath()).object();
+                    String path = address.getResource().getPath();
+                    writer.key(path).object();
 
-                    ValueMap props = address.getResource().adaptTo(ValueMap.class);
-                    if (props != null) {
-                        for (ValueMap.Entry<String, Object> entry : props.entrySet()) {
-                            writer.key(entry.getKey()).value(entry.getValue());
-                        }
-                    }
+                    writer.key("path").value(path);
+                    writer.key("title").value(address.getTitle());
+                    writer.key("url").value(recap.getDisplayableUrl(address));
 
                     writer.endObject();
                 }

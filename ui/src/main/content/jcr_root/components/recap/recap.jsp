@@ -35,8 +35,8 @@
                 {#foreach $T as a}
                 <li data-icon="false">
                     <a x-cq-linkchecker="skip" href="<%=request.getContextPath()%>{$T.a$key}.edit.html" data-panel="main">
-                        <h3>{$T.a.isHttps ? "https" : "http"}://{$T.a.username ? $T.a.username : _g.recap.context.defaults.username}@{$T.a.hostname}:{$T.a.port ? $T.a.port : _g.recap.context.defaults.port}</h3>
-                        <p>some other text</p>
+                        <h3>{$T.a.title}</h3>
+                        <p>{$T.a.url}</p>
                     </a>
                 </li>
                 {#/for}

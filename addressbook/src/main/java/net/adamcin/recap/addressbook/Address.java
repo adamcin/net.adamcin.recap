@@ -9,5 +9,6 @@ import org.apache.sling.api.resource.Resource;
  */
 public interface Address extends RecapAddress {
 
+    String getTitle();
     Resource getResource();
 }

@@ -59,13 +59,13 @@
             <p class="error"><%=StringEscapeUtils.escapeHtml(request.getParameter("error"))%></p>
             <% } %>
 
-            <form action="<%=request.getContextPath() + resource.getPath()%>" method="post">
+            <form action="<%=request.getContextPath() + resource.getPath() + "." + AddressBookConstants.SELECTOR_COPY%>.html" method="post">
                 <input id="g-recap-address-edit-resourceType" name="./sling:resourceType" value="<%=AddressBookConstants.RT_ADDRESS%>" type="hidden"/>
                 <div data-role="fieldcontain">
-                    <label for="g-recap-address-edit-title">Address Title *</label>
+                    <label for="g-recap-address-edit-title">Hostname *</label>
                     <input id="g-recap-address-edit-title" type="text" required="required"
                            name="./jcr:title"
-                           value="${address.title}"/>
+                           value="${address.hostname}"/>
                 </div>
                 <div data-role="fieldcontain">
                     <label for="g-recap-address-edit-hostname">Hostname *</label>
@@ -80,12 +80,6 @@
                            value="${address.port}"/>
                 </div>
                 <div data-role="fieldcontain">
-                    <label for="g-recap-address-edit-contextPath">Servlet Context Path</label>
-                    <input id="g-recap-address-edit-contextPath" type="text" placeholder="default: ${defaultContextPath}"
-                           name="./<%=AddressBookConstants.PROP_CONTEXT_PATH%>"
-                           value="${address.contextPath}"/>
-                </div>
-                <div data-role="fieldcontain">
                     <label for="g-recap-address-edit-username">Username</label>
                     <input id="g-recap-address-edit-username" type="text" placeholder="default: ${defaultUsername}"
                            name="./<%=AddressBookConstants.PROP_USERNAME%>"
@@ -96,6 +90,12 @@
                     <input id="g-recap-address-edit-password" type="text" placeholder="default: ${defaultPassword}"
                            name="./<%=AddressBookConstants.PROP_PASSWORD%>"
                            value="${address.password}"/>
+                </div>
+                <div data-role="fieldcontain">
+                    <label for="g-recap-address-edit-contextPath">Servlet Context Path</label>
+                    <input id="g-recap-address-edit-contextPath" type="text" placeholder="default: ${defaultContextPath}"
+                           name="./<%=AddressBookConstants.PROP_CONTEXT_PATH%>"
+                           value="${address.contextPath}"/>
                 </div>
                 <input id="g-recap-address-edit-isHttpsDelete" name="./<%=AddressBookConstants.PROP_IS_HTTPS%>@Delete" value="true" type="hidden"/>
                 <input id="g-recap-address-edit-isHttpsTypeHint" name="./<%=AddressBookConstants.PROP_IS_HTTPS%>@TypeHint" value="Boolean" type="hidden"/>

@@ -2,6 +2,7 @@ package net.adamcin.recap.addressbook.impl;
 
 import net.adamcin.recap.addressbook.AddressBookConstants;
 import net.adamcin.recap.addressbook.Address;
+import org.apache.jackrabbit.JcrConstants;
 import org.apache.sling.api.resource.Resource;
 import org.apache.sling.api.resource.ValueMap;
 
@@ -24,6 +25,10 @@ public class AddressImpl implements Address {
 
     public Resource getResource() {
         return resource;
+    }
+
+    public String getTitle() {
+        return properties.get("jcr:title", String.class);
     }
 
     public String getHostname() {

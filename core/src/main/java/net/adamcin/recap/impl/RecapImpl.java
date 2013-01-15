@@ -17,7 +17,6 @@ import org.apache.jackrabbit.jcr2spi.Jcr2spiRepositoryFactory;
 import org.apache.jackrabbit.spi.commons.logging.Slf4jLogWriterProvider;
 import org.apache.jackrabbit.spi2davex.BatchReadConfig;
 import org.apache.jackrabbit.spi2davex.Spi2davexRepositoryServiceFactory;
-import org.apache.sling.api.resource.ResourceResolver;
 import org.apache.sling.commons.osgi.PropertiesUtil;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
@@ -115,7 +114,7 @@ public class RecapImpl implements Recap {
         return defaultContextPath;
     }
 
-    public RecapSession initSession(ResourceResolver resourceResolver,
+    public RecapSession initSession(Session localJcrSession,
                                     RecapAddress address,
                                     RecapOptions options)
             throws RecapSessionException {
@@ -130,7 +129,6 @@ public class RecapImpl implements Recap {
 
         RecapAddress addr = applyAddressDefaults(address);
         RecapOptions opts = applyOptionsDefaults(options);
-        Session localSession = resourceResolver.adaptTo(Session.class);
         Session srcSession;
 
         ClassLoader orig = Thread.currentThread().getContextClassLoader();
@@ -146,27 +144,16 @@ public class RecapImpl implements Recap {
             Thread.currentThread().setContextClassLoader(orig);
         }
 
-        return new RecapSessionImpl(this, addr, opts, localSession, srcSession);
+        return new RecapSessionImpl(this, addr, opts, localJcrSession, srcSession);
     }
 
     private Repository getRepository(RecapAddress recapAddress) throws RepositoryException {
-        StringBuilder addressBuilder = new StringBuilder(recapAddress.isHttps() ? "https://" : "http://");
-        addressBuilder.append(recapAddress.getHostname());
-        if (recapAddress.getPort() != 80) {
-            addressBuilder.append(":").append(recapAddress.getPort());
-        }
-        if (StringUtils.isNotEmpty(recapAddress.getContextPath()) &&
-                !"/".equals(recapAddress.getContextPath())) {
-            addressBuilder.append(recapAddress.getContextPath());
-        }
-        addressBuilder.append("/crx/-/jcr:root");
-
         Map<String, Object> params = new HashMap<String, Object>();
+        params.put(Spi2davexRepositoryServiceFactory.PARAM_REPOSITORY_URI, getRepositoryUrl(recapAddress));
+        params.put(Spi2davexRepositoryServiceFactory.PARAM_BATCHREAD_CONFIG, DEFAULT_BATCH_READ_CONFIG);
         params.put(Jcr2spiRepositoryFactory.PARAM_REPOSITORY_SERVICE_FACTORY, Spi2davexRepositoryServiceFactory.class.getName());
         params.put(Jcr2spiRepositoryFactory.PARAM_ITEM_CACHE_SIZE, 128);
         params.put(Jcr2spiRepositoryFactory.PARAM_LOG_WRITER_PROVIDER, new Slf4jLogWriterProvider());
-        params.put(Spi2davexRepositoryServiceFactory.PARAM_BATCHREAD_CONFIG, DEFAULT_BATCH_READ_CONFIG);
-        params.put(Spi2davexRepositoryServiceFactory.PARAM_REPOSITORY_URI, addressBuilder.toString());
 
         return new RepositoryFactoryImpl().getRepository(params);
     }
@@ -222,5 +209,31 @@ public class RecapImpl implements Recap {
         }
 
         return dOptions;
+    }
+
+    public String getDisplayableUrl(RecapAddress address) {
+        RecapAddress recapAddress = applyAddressDefaults(address);
+        StringBuilder addressBuilder = new StringBuilder();
+        if (recapAddress.getHostname() != null) {
+            addressBuilder.append((recapAddress.isHttps() ? "https://" : "http://"));
+            addressBuilder.append(recapAddress.getHostname());
+            if (recapAddress.getPort() != null && recapAddress.getPort() != 80) {
+                addressBuilder.append(":").append(recapAddress.getPort());
+            }
+            if (StringUtils.isNotEmpty(recapAddress.getContextPath()) &&
+                    !"/".equals(recapAddress.getContextPath())) {
+                addressBuilder.append(recapAddress.getContextPath());
+            }
+        }
+        return addressBuilder.toString();
+    }
+
+    public String getRepositoryUrl(RecapAddress recapAddress) {
+        String base = getDisplayableUrl(recapAddress);
+        if (StringUtils.isNotEmpty(base)) {
+            return getDisplayableUrl(recapAddress) + "/crx/-/jcr:root";
+        } else {
+            return null;
+        }
     }
 }

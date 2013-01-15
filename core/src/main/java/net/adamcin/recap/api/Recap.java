@@ -1,6 +1,6 @@
 package net.adamcin.recap.api;
 
-import org.apache.sling.api.resource.ResourceResolver;
+import javax.jcr.Session;
 
 /**
  * @author madamcin
@@ -8,7 +8,7 @@ import org.apache.sling.api.resource.ResourceResolver;
  */
 public interface Recap {
 
-    RecapSession initSession(ResourceResolver resourceResolver, RecapAddress address, RecapOptions options)
+    RecapSession initSession(Session localJcrSession, RecapAddress address, RecapOptions options)
             throws RecapSessionException;
 
 
@@ -27,4 +27,6 @@ public interface Recap {
     int getDefaultBatchSize();
 
     String getDefaultLastModifiedProperty();
+
+    String getDisplayableUrl(RecapAddress recapAddress);
 }

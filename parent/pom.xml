@@ -112,7 +112,7 @@
                     <artifactId>vltpack-maven-plugin</artifactId>
                     <version>0.5.0-SNAPSHOT</version>
                     <configuration>
-                        <bundleInstallPath>/apps/recap/install</bundleInstallPath>
+                        <bundleInstallPath>/libs/recap/install</bundleInstallPath>
                     </configuration>
                 </plugin>
             </plugins>

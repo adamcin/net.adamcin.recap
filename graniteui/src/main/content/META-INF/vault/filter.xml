@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<workspaceFilter vesion="1.0">
+	<filter root="/libs/recap">
+		<include pattern="/libs/recap(/.*)?" />
+		<exclude pattern="/libs/recap/install(/.*)?" />
+        <exclude pattern="^.*/rep:accessControl" />
+	</filter>
+</workspaceFilter>

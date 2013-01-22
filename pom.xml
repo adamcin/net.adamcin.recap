@@ -19,7 +19,7 @@
 		<module>core</module>
         <module>addressbook</module>
         <module>remotecontrol</module>
-		<module>ui</module>
+		<module>graniteui</module>
 	</modules>
 
 </project>

@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>net.adamcin.recap</groupId>
+    	<artifactId>net.adamcin.recap.parent</artifactId>
+		<version>0.5.0-SNAPSHOT</version>
+		<relativePath>../parent</relativePath>
+	</parent>
+
+    <artifactId>net.adamcin.recap.graniteui</artifactId>
+
+	<name>Recap - Granite UI</name>
+	<description>rsync for CRX! Recap is based on the 'vlt rcp' command, but focuses on providing a simple web interface for syncing content between CQ instances, using a browser or a command-line tool like curl.</description>
+    <packaging>vltpack</packaging>
+
+    <build>
+
+		<resources>
+			<resource>
+				<directory>src/main/content</directory>
+			</resource>
+		</resources>
+
+        <plugins>
+         	<plugin>
+				<groupId>net.adamcin</groupId>
+				<artifactId>vltpack-maven-plugin</artifactId>
+				<extensions>true</extensions>
+				<configuration>
+					<embedBundles>
+						<bundle>net.adamcin.recap.core</bundle>
+						<bundle>net.adamcin.recap.addressbook</bundle>
+					</embedBundles>
+                    <jcrPath>/libs/recap</jcrPath>
+					<properties>
+						<name>recap</name>
+						<description>
+                            ${project.name} - ${project.description}
+                            &lt;br/&gt;&lt;br/&gt;
+                            Visit &lt;a href="/recap"&gt;/recap&lt;/a&gt; to get started!
+                        </description>
+					</properties>
+                    <definitionProperties>
+                        <providerName>Mark Adamcin</providerName>
+                        <providerUrl>http://adamcin.net/</providerUrl>
+                        <providerLink>https://github.com/adamcin/net.adamcin.recap</providerLink>
+                    </definitionProperties>
+                    <createDefinition>true</createDefinition>
+				</configuration>
+			</plugin>
+        </plugins>
+    </build>
+
+	<dependencies>
+		<dependency>
+			<groupId>net.adamcin.recap</groupId>
+			<artifactId>net.adamcin.recap.core</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+        <dependency>
+            <groupId>net.adamcin.recap</groupId>
+            <artifactId>net.adamcin.recap.addressbook</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>javax.jcr</groupId>
+            <artifactId>jcr</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>commons-lang</groupId>
+            <artifactId>commons-lang</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.sling</groupId>
+            <artifactId>org.apache.sling.api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.jackrabbit</groupId>
+            <artifactId>jackrabbit-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.sling</groupId>
+            <artifactId>org.apache.sling.scripting.jsp.taglib</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.day.commons</groupId>
+            <artifactId>day-commons-jstl</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.adobe.granite</groupId>
+            <artifactId>com.adobe.granite.ui.commons</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.adobe.granite.bundles</groupId>
+            <artifactId>json</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.adobe.granite</groupId>
+            <artifactId>com.adobe.granite.security.user</artifactId>
+        </dependency>
+    </dependencies>
+</project>

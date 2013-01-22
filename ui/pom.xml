@@ -9,7 +9,7 @@
 		<relativePath>../parent</relativePath>
 	</parent>
 
-    <artifactId>net.adamcin.recap.ui</artifactId>
+    <artifactId>net.adamcin.recap.graniteui</artifactId>
     <packaging>vltpack</packaging>
 
     <build>
@@ -50,6 +50,10 @@
             <version>${project.version}</version>
         </dependency>
 
+        <dependency>
+            <groupId>javax.jcr</groupId>
+            <artifactId>jcr</artifactId>
+        </dependency>
         <dependency>
             <groupId>commons-lang</groupId>
             <artifactId>commons-lang</artifactId>

@@ -46,11 +46,17 @@
     %>
 </head>
 <body>
-    <div data-role="page" id="g-recap-address-edit" data-url="<%=request.getRequestURI()%>">
+    <div data-role="page" id="g-recap-address-copy-form" data-url="<%=request.getRequestURI()%>">
 
         <div data-role="header" data-backbtn="false">
             <h1><%=title%></h1>
         </div>
+
+        <%--
+        <script type="text/javascript">
+            _g.$.mobile.loadPage()
+        </script>
+        --%>
 
         <div data-role="content">
             <%
@@ -59,60 +65,14 @@
             <p class="error"><%=StringEscapeUtils.escapeHtml(request.getParameter("error"))%></p>
             <% } %>
 
-            <form action="<%=request.getContextPath() + resource.getPath() + "." + AddressBookConstants.SELECTOR_COPY%>.html" method="post">
-                <input id="g-recap-address-edit-resourceType" name="./sling:resourceType" value="<%=AddressBookConstants.RT_ADDRESS%>" type="hidden"/>
+            <form action="<%=request.getContextPath() + resource.getPath()%>.graniteconsole.html" target="console_frame" method="post">
+                  <%--onsubmit="_g.$.mobile.changePage(_g.$('g-recap-welcome-main'), {pageContainer:_g.$('g-recap-main')})">--%>
                 <div data-role="fieldcontain">
-                    <label for="g-recap-address-edit-title">Hostname *</label>
-                    <input id="g-recap-address-edit-title" type="text" required="required"
-                           name="./jcr:title"
-                           value="${address.hostname}"/>
+                    <label for="g-recap-address-copy-paths">Paths *</label>
+                    <textarea id="g-recap-address-copy-paths" type="text" required="required" placeholder="Specify root paths to copy, one per line"
+                           name="<%=AddressBookConstants.RP_PATHS%>" cols="40" rows="8"></textarea>
                 </div>
-                <div data-role="fieldcontain">
-                    <label for="g-recap-address-edit-hostname">Hostname *</label>
-                    <input id="g-recap-address-edit-hostname" type="text" required="required"
-                           name="./<%=AddressBookConstants.PROP_HOSTNAME%>"
-                           value="${address.hostname}"/>
-                </div>
-                <div data-role="fieldcontain">
-                    <label for="g-recap-address-edit-port">Port</label>
-                    <input id="g-recap-address-edit-port" type="text" placeholder="default: ${defaultPort}"
-                           name="./<%=AddressBookConstants.PROP_PORT%>"
-                           value="${address.port}"/>
-                </div>
-                <div data-role="fieldcontain">
-                    <label for="g-recap-address-edit-username">Username</label>
-                    <input id="g-recap-address-edit-username" type="text" placeholder="default: ${defaultUsername}"
-                           name="./<%=AddressBookConstants.PROP_USERNAME%>"
-                           value="${address.username}"/>
-                </div>
-                <div data-role="fieldcontain">
-                    <label for="g-recap-address-edit-password">Password</label>
-                    <input id="g-recap-address-edit-password" type="text" placeholder="default: ${defaultPassword}"
-                           name="./<%=AddressBookConstants.PROP_PASSWORD%>"
-                           value="${address.password}"/>
-                </div>
-                <div data-role="fieldcontain">
-                    <label for="g-recap-address-edit-contextPath">Servlet Context Path</label>
-                    <input id="g-recap-address-edit-contextPath" type="text" placeholder="default: ${defaultContextPath}"
-                           name="./<%=AddressBookConstants.PROP_CONTEXT_PATH%>"
-                           value="${address.contextPath}"/>
-                </div>
-                <input id="g-recap-address-edit-isHttpsDelete" name="./<%=AddressBookConstants.PROP_IS_HTTPS%>@Delete" value="true" type="hidden"/>
-                <input id="g-recap-address-edit-isHttpsTypeHint" name="./<%=AddressBookConstants.PROP_IS_HTTPS%>@TypeHint" value="Boolean" type="hidden"/>
-                <div data-role="fieldcontain">
-                    <fieldset data-role="controlgroup">
-                        <legend>Protocol</legend>
-                        <label for="g-recap-address-edit-isHttp">HTTP</label>
-                        <input id="g-recap-address-edit-isHttp" type="radio" value="false"
-                               <% if (address == null || Boolean.FALSE.equals(address.isHttps())) { %>checked="true"<% } %>
-                               name="./<%=AddressBookConstants.PROP_IS_HTTPS%>" />
-                        <label for="g-recap-address-edit-isHttps">HTTPS</label>
-                        <input id="g-recap-address-edit-isHttps" type="radio" value="true"
-                               <% if (address != null && Boolean.TRUE.equals(address.isHttps())) { %>checked="true"<% } %>
-                               name="./<%=AddressBookConstants.PROP_IS_HTTPS%>" />
-                    </fieldset>
-                </div>
-                <input type="submit" value="Save" data-theme="a"/>
+                <button type="button" onclick="_g.recap.executeSyncToConsole(this.form)" value="Start Copy Session" data-theme="a"></button>
             </form>
 
 

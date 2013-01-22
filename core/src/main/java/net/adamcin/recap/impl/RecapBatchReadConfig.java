@@ -14,9 +14,7 @@ public class RecapBatchReadConfig implements BatchReadConfig {
 
     public int getDepth(Path path, PathResolver resolver) throws NamespaceException {
         String jcrPath = resolver.getJCRPath(path);
-        if ("/".equals(jcrPath)) {
-            return 2;
-        } else if ("/jcr:system".equals(jcrPath)) {
+        if (path.getDepth() < 3) {
             return 1;
         } else {
             return 4;

@@ -42,6 +42,7 @@
     <orderEntry type="library" name="Maven: org.apache.jackrabbit:jackrabbit-jcr2spi:2.4.0" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.apache.jackrabbit:jackrabbit-api:2.4.0" level="project" />
     <orderEntry type="module" module-name="net.adamcin.recap.addressbook" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: javax.jcr:jcr:2.0" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: commons-lang:commons-lang:2.5" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.apache.sling:org.apache.sling.api:2.2.4" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.apache.sling:org.apache.sling.scripting.jsp.taglib:2.1.6" level="project" />

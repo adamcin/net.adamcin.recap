@@ -125,20 +125,22 @@ public class RecapSessionImpl implements RecapSession {
     }
 
     public Node getOrCreateLocal(Node remoteNode) throws RepositoryException {
-        if (remoteNode.getDepth() > 0) {
+        if (remoteNode.getDepth() == 0) {
+            return this.localSession.getRootNode();
+        } else if (this.localSession.getRootNode().hasNode(remoteNode.getPath().substring(1))) {
+            return this.localSession.getRootNode().getNode(remoteNode.getPath().substring(1));
+        } else {
             Node parent = remoteNode.getParent();
             Node localParent = getOrCreateLocal(parent);
             Node local;
             if (!localParent.hasNode(remoteNode.getName())) {
-                local = parent.addNode(remoteNode.getName(), remoteNode.getPrimaryNodeType().getName());
+                local = localParent.addNode(remoteNode.getName(), remoteNode.getPrimaryNodeType().getName());
                 trackPath(RecapProgressListener.PathAction.ADD, local.getPath());
             } else {
                 local = localParent.getNode(remoteNode.getName());
             }
             processBatch();
             return local;
-        } else {
-            return this.localSession.getRootNode();
         }
     }
 

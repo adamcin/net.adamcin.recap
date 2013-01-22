@@ -155,6 +155,7 @@ public class RecapImpl implements Recap {
         params.put(Jcr2spiRepositoryFactory.PARAM_ITEM_CACHE_SIZE, 128);
         params.put(Jcr2spiRepositoryFactory.PARAM_LOG_WRITER_PROVIDER, new Slf4jLogWriterProvider());
 
+        LOGGER.error("[getRepository] repository SPI params: {}", params);
         return new RepositoryFactoryImpl().getRepository(params);
     }
 
@@ -231,7 +232,7 @@ public class RecapImpl implements Recap {
     public String getRepositoryUrl(RecapAddress recapAddress) {
         String base = getDisplayableUrl(recapAddress);
         if (StringUtils.isNotEmpty(base)) {
-            return getDisplayableUrl(recapAddress) + "/crx/-/jcr:root";
+            return getDisplayableUrl(recapAddress) + "/crx/server";
         } else {
             return null;
         }

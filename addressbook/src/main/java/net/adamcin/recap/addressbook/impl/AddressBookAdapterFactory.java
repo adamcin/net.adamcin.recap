@@ -3,10 +3,12 @@ package net.adamcin.recap.addressbook.impl;
 import net.adamcin.recap.addressbook.Address;
 import net.adamcin.recap.addressbook.AddressBook;
 import net.adamcin.recap.addressbook.AddressBookConstants;
+import net.adamcin.recap.api.Recap;
 import net.adamcin.recap.api.RecapAddress;
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Properties;
 import org.apache.felix.scr.annotations.Property;
+import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
 import org.apache.jackrabbit.api.security.user.User;
 import org.apache.sling.api.SlingConstants;
@@ -46,6 +48,9 @@ import javax.jcr.RepositoryException;
 public class AddressBookAdapterFactory implements AdapterFactory {
     private static final Logger LOGGER = LoggerFactory.getLogger(AddressBookAdapterFactory.class);
 
+    @Reference
+    private Recap recap;
+
     public <AdapterType> AdapterType getAdapter(Object adaptable, Class<AdapterType> type) {
         if (adaptable instanceof Resource) {
             return getAdapter((Resource) adaptable, type);
@@ -82,7 +87,7 @@ public class AddressBookAdapterFactory implements AdapterFactory {
 
     public Address getAddressResource(Resource resource) {
         if (resource != null && ResourceUtil.isA(resource, AddressBookConstants.RT_ADDRESS)) {
-            return new AddressImpl(resource);
+            return new AddressImpl(resource, recap);
         }
         return null;
     }

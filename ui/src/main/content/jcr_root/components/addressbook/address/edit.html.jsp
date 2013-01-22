@@ -23,9 +23,15 @@
     Address address = resource.adaptTo(Address.class);
     String title = "Edit Address";
 
+    String name = resource.getName();
     if (ResourceUtil.isStarResource(resource)) {
         title = "New Address";
+        name = "star";
+    } else {
+        pageContext.setAttribute("isEdit", Boolean.TRUE);
     }
+
+    String pageId = "g-recap-address-edit-" + name;
 
     if (address != null) {
         pageContext.setAttribute("address", address);
@@ -46,7 +52,7 @@
     %>
 </head>
 <body>
-    <div data-role="page" id="g-recap-address-edit" data-url="<%=request.getRequestURI()%>">
+    <div data-role="page" id="<%=pageId%>" data-url="<%=request.getRequestURI()%>">
 
         <div data-role="header" data-backbtn="false">
             <h1><%=title%></h1>
@@ -59,7 +65,8 @@
             <p class="error"><%=StringEscapeUtils.escapeHtml(request.getParameter("error"))%></p>
             <% } %>
 
-            <form action="<%=request.getContextPath() + resource.getPath()%>" method="post">
+            <form action="${request.contextPath}${resource.path}" method="post">
+                <input type="hidden" name="_charset_" value="utf-8" />
                 <input id="g-recap-address-edit-resourceType" name="./sling:resourceType" value="<%=AddressBookConstants.RT_ADDRESS%>" type="hidden"/>
                 <div data-role="fieldcontain">
                     <label for="g-recap-address-edit-title">Address Title *</label>
@@ -112,11 +119,55 @@
                                name="./<%=AddressBookConstants.PROP_IS_HTTPS%>" />
                     </fieldset>
                 </div>
-                <input type="submit" value="Save" data-theme="a"/>
             </form>
-
-
         </div>
+
+        <div data-role="footer">
+            <div class="g-buttonbar">
+                <% if (!ResourceUtil.isStarResource(resource)) { %>
+                <a class="delete ui-btn-right" href="#" id="g-recap-address-delete" onclick="_g.recap.deleteAddress('${resource.path}')" data-icon="delete" data-iconpos="notext">Delete</a>
+                <% } %>
+                <a class="done ui-btn-right" href="#" data-icon="save" data-iconpos="notext">Save</a>
+            </div>
+        </div>
+
+        <%--
+        <% if (!ResourceUtil.isStarResource(resource)) { %>
+        <div data-role="confirm" data-for="g-recap-address-delete">
+            <a data-icon="check" data-role="button">Confirm</a>
+            <a data-icon="back" data-role="button">Cancel</a>
+        </div>
+        <% } %>
+        --%>
+
+        <%--
+        <c:if test="${isEdit}">
+            <div data-role="confirm" data-for="g-recap-address-delete">
+                <a data-icon="check" data-role="button">Confirm</a>
+                <a data-icon="back" data-role="button">Cancel</a>
+            </div>
+        </c:if>
+        --%>
+
+        <script type="text/javascript">
+            _g.$('#<%=pageId%> .done').click(function() {
+                var form = _g.$('#<%=pageId%> form');
+                var action = form.attr("action");
+                var data = form.serialize();
+                _g.$.ajax({url: action, data: data, type: "POST"}).done(function(respData, status, xhr){
+                    if (xhr.status == 201) {
+                        _g.$.mobile.changePage(xhr.getResponseHeader("location")+".edit.html", {pageContainer:_g.$('#g-recap-main')});
+                    }
+                    _g.recap.reloadAddressBook();
+                }).fail(function(resp){
+                    _g.$("<div class='ui-loader ui-overlay-shadow ui-body-e ui-corner-all'><h1>"+ _g.$.mobile.pageLoadErrorMessage +"</h1></div>")
+                    .css({ "display": "block", "opacity": 0.96, "top": _g.$(window).scrollTop() + 100 })
+                    .appendTo( _g.$.mobile.pageContainer )
+                    .delay( 1000 )
+                    .fadeOut( 1500, function(){ _g.$(this).remove(); });
+                });
+            });
+        </script>
 
     </div>
 

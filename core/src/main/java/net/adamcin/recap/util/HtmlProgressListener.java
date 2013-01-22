@@ -53,7 +53,7 @@ public class HtmlProgressListener implements RecapProgressListener {
     }
 
     protected void print(String cssClass, String action, String line) {
-        writer.printf("<span class='%s'><strong>%s</strong>&nbsp;%s</span>%n", cssClass, action, line);
+        writer.printf("<span class='%s'><strong>%s</strong>&nbsp;%s</span><br/>%n", cssClass, action, line);
         if (!noScroll) {
             long now = System.currentTimeMillis();
             if (now > lastScrolled + scrollDelay) {

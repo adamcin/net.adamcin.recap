@@ -22,14 +22,9 @@ _g.recap = (function() {
     var recapContext = contextReq.status == 200 ? _g.$.parseJSON(contextReq.responseText) : {};
 
     var executeSyncToConsole = function(form) {
-        //var data = _g.$(form).serialize();
-        //var action = _g.$(form).action;
-        //alert(data);
-
         _g.$(form).submit();
 
         _g.$.mobile.changePage(_g.$("#g-recap-console"));
-        //_g.$.mobile.changePage(_g.$("#g-recap-console"), {transition: "pop", changeHash: false, pageContainer: _g.$("#g-recap-main")});
     };
 
     var reloadAddressBook = function() {
@@ -46,21 +41,6 @@ _g.recap = (function() {
             listEl.listview("refresh");
             listEl.show();
         });
-        /*
-        _g.$.mobile.changePage(_g.recap.context.addressBookPath + ".html", {
-            allowSamePageTransition: true,
-            reloadPage: true,
-            data: {":ck": (new Date()).getTime()},
-            pageContainer: _g.$('div:jqmData(id="menu")'),
-            reverse: true,
-            transition: "none",
-            changeHash: false,
-            fromHashChange: true
-        });
-        */
-        //_g.$('#g-recap-address-book').load(_g.recap.context.addressBookPath + ".html");
-        //var page = _g.$('#g-recap-address-book').page("enhance");
-        //page.enhance();
     };
 
     var deleteAddress = function(address) {

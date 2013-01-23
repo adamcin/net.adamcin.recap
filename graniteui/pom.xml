@@ -2,46 +2,46 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-	<parent>
-		<groupId>net.adamcin.recap</groupId>
-    	<artifactId>net.adamcin.recap.parent</artifactId>
-		<version>0.5.0-SNAPSHOT</version>
-		<relativePath>../parent</relativePath>
-	</parent>
+    <parent>
+        <groupId>net.adamcin.recap</groupId>
+        <artifactId>net.adamcin.recap.parent</artifactId>
+        <version>0.5.0-SNAPSHOT</version>
+        <relativePath>../parent</relativePath>
+    </parent>
 
     <artifactId>net.adamcin.recap.graniteui</artifactId>
 
-	<name>Recap - Granite UI</name>
-	<description>rsync for CRX! Recap is based on the 'vlt rcp' command, but focuses on providing a simple web interface for syncing content between CRX instances, using a browser or a command-line tool like curl.</description>
+    <name>Recap - Granite UI</name>
+    <description>rsync for CRX! Recap is based on the 'vlt rcp' command, but focuses on providing a simple web interface for syncing content between CRX instances, using a browser or a command-line tool like curl.</description>
     <packaging>vltpack</packaging>
 
     <build>
 
-		<resources>
-			<resource>
-				<directory>src/main/content</directory>
-			</resource>
-		</resources>
+        <resources>
+            <resource>
+                <directory>src/main/content</directory>
+            </resource>
+        </resources>
 
         <plugins>
-         	<plugin>
-				<groupId>net.adamcin</groupId>
-				<artifactId>vltpack-maven-plugin</artifactId>
-				<extensions>true</extensions>
-				<configuration>
-					<embedBundles>
-						<bundle>net.adamcin.recap.core</bundle>
-						<bundle>net.adamcin.recap.addressbook</bundle>
-					</embedBundles>
+            <plugin>
+                <groupId>net.adamcin</groupId>
+                <artifactId>vltpack-maven-plugin</artifactId>
+                <extensions>true</extensions>
+                <configuration>
+                    <embedBundles>
+                        <bundle>net.adamcin.recap.core</bundle>
+                        <bundle>net.adamcin.recap.addressbook</bundle>
+                    </embedBundles>
                     <jcrPath>/libs/recap</jcrPath>
-					<properties>
-						<name>recap</name>
-						<description>
+                    <properties>
+                        <name>recap</name>
+                        <description>
                             Recap - ${project.description}
                             &lt;br/&gt;&lt;br/&gt;
                             Visit &lt;a href="/recap"&gt;/recap&lt;/a&gt; to get started!
                         </description>
-					</properties>
+                    </properties>
                     <definitionProperties>
                         <providerName>Mark Adamcin</providerName>
                         <providerUrl>http://adamcin.net/</providerUrl>
@@ -53,17 +53,17 @@
                         <screenshot>src/site/resources/images/screenshots/sync-console.png</screenshot>
                     </screenshots>
                     <createDefinition>true</createDefinition>
-				</configuration>
-			</plugin>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
 
-	<dependencies>
-		<dependency>
-			<groupId>net.adamcin.recap</groupId>
-			<artifactId>net.adamcin.recap.core</artifactId>
-			<version>${project.version}</version>
-		</dependency>
+    <dependencies>
+        <dependency>
+            <groupId>net.adamcin.recap</groupId>
+            <artifactId>net.adamcin.recap.core</artifactId>
+            <version>${project.version}</version>
+        </dependency>
         <dependency>
             <groupId>net.adamcin.recap</groupId>
             <artifactId>net.adamcin.recap.addressbook</artifactId>

@@ -25,7 +25,7 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>Recap for Adobe CRX | ${title}</title>
+    <title>Recap | rsync for Adobe CRX!</title>
 </head>
 <body>
     <div data-role="page" id="${pageId}" data-url="${slingRequest.requestURI}" data-title="${title}">

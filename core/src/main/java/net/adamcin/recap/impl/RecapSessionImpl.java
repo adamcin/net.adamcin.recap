@@ -152,6 +152,10 @@ public class RecapSessionImpl implements RecapSession {
         trackMessage("Copy %s from http://%s:%d/", rootPath, this.address.getHostname(), this.address.getPort());
 
         try {
+            if (this.start == 0L) {
+                this.start = System.currentTimeMillis();
+            }
+
             Node srcNode = this.getSourceSession().getNode(rootPath);
             Node srcParent = srcNode.getParent();
             Node dstParent = getOrCreateLocal(srcParent);

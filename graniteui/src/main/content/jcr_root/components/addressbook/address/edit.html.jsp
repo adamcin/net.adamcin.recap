@@ -1,8 +1,6 @@
-<%@ page import="com.day.cq.widget.HtmlLibraryManager" %>
 <%@ page import="net.adamcin.recap.addressbook.Address" %>
 <%@ page import="net.adamcin.recap.addressbook.AddressBookConstants" %>
 <%@ page import="net.adamcin.recap.api.Recap" %>
-<%@ page import="org.apache.commons.lang.StringEscapeUtils" %>
 <%@ page import="org.apache.sling.api.resource.ResourceUtil" %>
 <%@ page import="java.util.HashMap" %>
 <%--
@@ -44,7 +42,7 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>Recap for Adobe CRX | ${title}</title>
+    <title>Recap | rsync for Adobe CRX!</title>
     <meta name="viewport" content="width=device-width, minimum-scale=1, maximum-scale=1">
 </head>
 <body>
@@ -58,57 +56,85 @@
     <div data-role="content">
         <form action="${request.contextPath}${resource.path}" method="post">
             <input type="hidden" name="_charset_" value="utf-8" />
-            <input id="g-recap-address-edit-resourceType" name="./sling:resourceType" value="<%=AddressBookConstants.RT_ADDRESS%>" type="hidden"/>
+            <input id="${pageId}-resourceType" name="./sling:resourceType" value="<%=AddressBookConstants.RT_ADDRESS%>" type="hidden"/>
             <div data-role="fieldcontain">
-                <label for="g-recap-address-edit-title">Address Title *</label>
-                <input id="g-recap-address-edit-title" type="text" required="required"
+                <label for="${pageId}-title">Address Title *</label>
+                <input id="${pageId}-title" type="text" required="required"
                        name="./jcr:title"
                        value="${address.title}"/>
+                <p class="ui-input-desc" data-for="${pageId}-title">
+                    Provide a descriptive title for the address.
+                </p>
             </div>
             <div data-role="fieldcontain">
-                <label for="g-recap-address-edit-hostname">Hostname *</label>
-                <input id="g-recap-address-edit-hostname" type="text" required="required"
+                <label for="${pageId}-hostname">Hostname *</label>
+                <input id="${pageId}-hostname" type="text" required="required"
                        name="./<%=AddressBookConstants.PROP_HOSTNAME%>"
                        value="${address.hostname}"/>
+                <p class="ui-input-desc" data-for="${pageId}-hostname">
+                    Specify the hostname of the remote repository.
+                </p>
             </div>
             <div data-role="fieldcontain">
-                <label for="g-recap-address-edit-port">Port</label>
-                <input id="g-recap-address-edit-port" type="text" placeholder="default: ${defaultPort}"
+                <label for="${pageId}-port">Port</label>
+                <input id="${pageId}-port" type="text" placeholder="default: ${defaultPort}"
                        name="./<%=AddressBookConstants.PROP_PORT%>"
                        value="${address.port}"/>
+                <p class="ui-input-desc" data-for="${pageId}-port">
+                    Specify the port of the remote repository.
+                </p>
             </div>
             <div data-role="fieldcontain">
-                <label for="g-recap-address-edit-contextPath">Servlet Context Path</label>
-                <input id="g-recap-address-edit-contextPath" type="text" placeholder="default: ${defaultContextPath}"
-                       name="./<%=AddressBookConstants.PROP_CONTEXT_PATH%>"
-                       value="${address.contextPath}"/>
-            </div>
-            <div data-role="fieldcontain">
-                <label for="g-recap-address-edit-username">Username</label>
-                <input id="g-recap-address-edit-username" type="text" placeholder="default: ${defaultUsername}"
+                <label for="${pageId}-username">Username</label>
+                <input id="${pageId}-username" type="text" placeholder="default: ${defaultUsername}"
                        name="./<%=AddressBookConstants.PROP_USERNAME%>"
                        value="${address.username}"/>
+                <p class="ui-input-desc" data-for="${pageId}-username">
+                    Specify a username with read permission on the content in the remote repository that you wish to copy.
+                </p>
             </div>
             <div data-role="fieldcontain">
-                <label for="g-recap-address-edit-password">Password</label>
-                <input id="g-recap-address-edit-password" type="text" placeholder="default: ${defaultPassword}"
+                <label for="${pageId}-password">Password</label>
+                <input id="${pageId}-password" type="text" placeholder="default: ${defaultPassword}"
                        name="./<%=AddressBookConstants.PROP_PASSWORD%>"
                        value="${address.password}"/>
+                <p class="ui-input-desc" data-for="${pageId}-password">
+                    Specify the password for the account with read permission on the content in the remote repository that you wish to copy.
+                </p>
             </div>
-            <input id="g-recap-address-edit-isHttpsDelete" name="./<%=AddressBookConstants.PROP_IS_HTTPS%>@Delete" value="true" type="hidden"/>
-            <input id="g-recap-address-edit-isHttpsTypeHint" name="./<%=AddressBookConstants.PROP_IS_HTTPS%>@TypeHint" value="Boolean" type="hidden"/>
+            <div data-role="fieldcontain">
+                <p class="ui-input-desc">
+                    <strong>Be aware that unless you are connecting using HTTPS, your credentials will be sent as
+                        cleartext for all sync traffic between the two repositories using this address.
+                        If possible, use an account with no more permissions than those provided by membership in the 'contributor' group.</strong>
+                </p>
+            </div>
+            <input id="${pageId}-isHttpsDelete" name="./<%=AddressBookConstants.PROP_IS_HTTPS%>@Delete" value="true" type="hidden"/>
+            <input id="${pageId}-isHttpsTypeHint" name="./<%=AddressBookConstants.PROP_IS_HTTPS%>@TypeHint" value="Boolean" type="hidden"/>
             <div data-role="fieldcontain">
                 <fieldset data-role="controlgroup">
                     <legend>Protocol</legend>
-                    <label for="g-recap-address-edit-isHttp">HTTP</label>
-                    <input id="g-recap-address-edit-isHttp" type="radio" value="false"
+                    <label for="${pageId}-isHttp">HTTP</label>
+                    <input id="${pageId}-isHttp" type="radio" value="false"
                            <% if (address == null || Boolean.FALSE.equals(address.isHttps())) { %>checked="true"<% } %>
                            name="./<%=AddressBookConstants.PROP_IS_HTTPS%>" />
-                    <label for="g-recap-address-edit-isHttps">HTTPS</label>
-                    <input id="g-recap-address-edit-isHttps" type="radio" value="true"
+                    <label for="${pageId}-isHttps">HTTPS</label>
+                    <input id="${pageId}-isHttps" type="radio" value="true"
                            <% if (address != null && Boolean.TRUE.equals(address.isHttps())) { %>checked="true"<% } %>
                            name="./<%=AddressBookConstants.PROP_IS_HTTPS%>" />
+                    <p class="ui-input-desc" data-for="${pageId}-isHttps">
+                        Choose HTTPS if the remote server supports SSL encryption
+                    </p>
                 </fieldset>
+            </div>
+            <div data-role="fieldcontain">
+                <label for="${pageId}-contextPath">Servlet Context Path</label>
+                <input id="${pageId}-contextPath" type="text" placeholder="default: ${defaultContextPath}"
+                       name="./<%=AddressBookConstants.PROP_CONTEXT_PATH%>"
+                       value="${address.contextPath}"/>
+                <p class="ui-input-desc" data-for="${pageId}-contextPath">
+                    If the remote CRX server is hosted at a different servlet context path than the default, make sure to specify it here.
+                </p>
             </div>
         </form>
     </div>
@@ -116,7 +142,7 @@
     <div data-role="footer">
         <div class="g-buttonbar">
             <% if (!ResourceUtil.isStarResource(resource)) { %>
-            <a class="delete ui-btn-right" href="#" id="g-recap-address-delete" onclick="_g.recap.deleteAddress('${resource.path}')" data-icon="delete" data-iconpos="notext">Delete</a>
+            <a class="delete ui-btn-right" href="#" id="${pageId}-delete" onclick="_g.recap.deleteAddress('${resource.path}')" data-icon="delete" data-iconpos="notext">Delete</a>
             <% } %>
             <a class="done ui-btn-right" href="#" data-icon="save" data-iconpos="notext">Save</a>
         </div>

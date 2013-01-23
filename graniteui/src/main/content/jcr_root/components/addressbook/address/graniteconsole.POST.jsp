@@ -1,20 +1,15 @@
-<%@ page import="com.day.cq.widget.HtmlLibraryManager" %>
 <%@ page import="net.adamcin.recap.addressbook.Address" %>
 <%@ page import="net.adamcin.recap.addressbook.AddressBookConstants" %>
 <%@ page import="net.adamcin.recap.api.Recap" %>
-<%@ page import="org.apache.commons.lang.StringEscapeUtils" %>
-<%@ page import="org.apache.sling.api.resource.ResourceUtil" %>
-<%@ page import="java.util.HashMap" %>
+<%@ page import="net.adamcin.recap.api.RecapException" %>
 <%@ page import="net.adamcin.recap.api.RecapOptions" %>
 <%@ page import="net.adamcin.recap.api.RecapSession" %>
+<%@ page import="net.adamcin.recap.util.HtmlProgressListener" %>
+<%@ page import="org.apache.commons.lang.StringUtils" %>
+<%@ page import="javax.jcr.Session" %>
+<%@ page import="java.io.PrintWriter" %>
 <%@ page import="java.util.ArrayList" %>
 <%@ page import="java.util.List" %>
-<%@ page import="net.adamcin.recap.api.RecapProgressListener" %>
-<%@ page import="org.apache.commons.lang.StringUtils" %>
-<%@ page import="net.adamcin.recap.api.RecapException" %>
-<%@ page import="net.adamcin.recap.util.HtmlProgressListener" %>
-<%@ page import="java.io.PrintWriter" %>
-<%@ page import="javax.jcr.Session" %>
 <%--
   Recap Console component.
 --%><%
@@ -39,7 +34,7 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>Recap for Adobe CRX | Sync Content with <%=address%></title>
+    <title>Recap | rsync for Adobe CRX!</title>
     <meta name="viewport" content="width=device-width, minimum-scale=1, maximum-scale=1">
 </head>
 <body>

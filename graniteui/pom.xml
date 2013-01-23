@@ -12,7 +12,7 @@
     <artifactId>net.adamcin.recap.graniteui</artifactId>
 
 	<name>Recap - Granite UI</name>
-	<description>rsync for CRX! Recap is based on the 'vlt rcp' command, but focuses on providing a simple web interface for syncing content between CQ instances, using a browser or a command-line tool like curl.</description>
+	<description>rsync for CRX! Recap is based on the 'vlt rcp' command, but focuses on providing a simple web interface for syncing content between CRX instances, using a browser or a command-line tool like curl.</description>
     <packaging>vltpack</packaging>
 
     <build>
@@ -37,7 +37,7 @@
 					<properties>
 						<name>recap</name>
 						<description>
-                            ${project.name} - ${project.description}
+                            Recap - ${project.description}
                             &lt;br/&gt;&lt;br/&gt;
                             Visit &lt;a href="/recap"&gt;/recap&lt;/a&gt; to get started!
                         </description>
@@ -47,6 +47,11 @@
                         <providerUrl>http://adamcin.net/</providerUrl>
                         <providerLink>https://github.com/adamcin/net.adamcin.recap</providerLink>
                     </definitionProperties>
+                    <screenshots>
+                        <screenshot>src/site/resources/images/screenshots/edit-address.png</screenshot>
+                        <screenshot>src/site/resources/images/screenshots/sync-form.png</screenshot>
+                        <screenshot>src/site/resources/images/screenshots/sync-console.png</screenshot>
+                    </screenshots>
                     <createDefinition>true</createDefinition>
 				</configuration>
 			</plugin>

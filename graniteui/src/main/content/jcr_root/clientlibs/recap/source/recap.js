@@ -3,7 +3,12 @@
  */
 _g.recap = (function() {
     var recapPath = "/libs/recap/content/recap";
-    var contextPath = CQURLInfo.contextPath || "";
+    var contextPath = "";
+    if (typeof CQURLInfo != 'undefined') {
+        contextPath = CQURLInfo.contextPath || contextPath;
+    } else if (_g.HTTP) {
+        contextPath = _g.HTTP.getContextPath() || contextPath;
+    }
 
     var contextReq = _g.$.ajax({
         dataType: "json",

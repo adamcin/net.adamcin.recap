@@ -1,5 +1,4 @@
 <%@ page import="com.day.cq.widget.HtmlLibraryManager" %>
-<%@ page import="net.adamcin.recap.addressbook.AddressBookConstants" %>
 <%@ page import="net.adamcin.recap.addressbook.AddressBook" %>
 <%--
   Recap Console component.
@@ -18,12 +17,16 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>Recap for Adobe CRX | <%=slingRequest.getRequestPathInfo().getSuffix()%></title>
+    <title>Recap | rsync for Adobe CRX!</title>
     <meta name="viewport" content="width=device-width, minimum-scale=1, maximum-scale=1">
     <%
         HtmlLibraryManager htmlMgr = sling.getService(HtmlLibraryManager.class);
         if (htmlMgr != null) {
             htmlMgr.writeIncludes(slingRequest, out, "recap");
+            /*
+            if (htmlMgr.getLibraries().containsKey("granite.ui.legacy")) {
+            }
+            */
         }
     %>
 </head>
@@ -63,10 +66,23 @@
     <div data-role="panel" data-id="main" id="g-recap-main">
         <div data-role="page" id="g-recap-welcome">
             <div data-role="header">
+                <h2 class="g-uppercase">Welcome to Recap!</h2>
             </div>
 
             <div data-role="content">
-                <span class="g-big">Welcome to Recap</span>
+                <span class="g-big">Recap - rsync for Adobe CRX!</span>
+
+                <p>Recap is based on the 'vlt rcp' command, but focuses on providing a simple web interface for syncing content between CRX instances, using a browser or a command-line tool like curl.</p>
+
+                <h3>Getting Started</h3>
+
+                <ol>
+                    <li>Create an address for a remote CRX instance (be sure to specify appropriate credentials with read permission for the content you want to sync)</li>
+                    <li>Specify a path that exists on the remote instance to be synced to your local (I do not recommend specifying "/" or any of its children so that it has a chance to complete before the end of the week)</li>
+                    <li>Click the 'Start Sync' button.</li>
+                </ol>
+
+                <p>It's that easy!</p>
             </div>
         </div>
 
@@ -84,12 +100,6 @@
     <script type="text/javascript">
         (function() {
             _g.recap.reloadAddressBook();
-            /*
-            _g.$("#g-recap-addresses-menu").live("pageshow", function() {
-            });
-            */
-
-            //_g.$.mobile.changePage("${addressBookPath}.html?:cK=" + (new Date()).getTime(), {pageContainer: _g.$("#g-recap-main")});
         })();
     </script>
 </body>

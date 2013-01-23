@@ -10,10 +10,13 @@
     </parent>
 
     <artifactId>net.adamcin.recap.graniteui</artifactId>
+    <packaging>vltpack</packaging>
 
     <name>Recap - Granite UI</name>
-    <description>rsync for CRX! Recap is based on the 'vlt rcp' command, but focuses on providing a simple web interface for syncing content between CRX instances, using a browser or a command-line tool like curl.</description>
-    <packaging>vltpack</packaging>
+    <description>
+        rsync for CRX! Recap is based on the 'vlt rcp' command, but focuses on providing a simple web interface for
+        syncing content between CRX instances, using a browser or a command-line tool like curl.
+    </description>
 
     <build>
 

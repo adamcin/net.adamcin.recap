@@ -49,6 +49,7 @@
                         <providerName>Mark Adamcin</providerName>
                         <providerUrl>http://adamcin.net/</providerUrl>
                         <providerLink>https://github.com/adamcin/net.adamcin.recap</providerLink>
+                        <testedWith>CQ 5.5 and CQ 5.6 Beta</testedWith>
                     </definitionProperties>
                     <screenshots>
                         <screenshot>src/site/resources/images/screenshots/edit-address.png</screenshot>

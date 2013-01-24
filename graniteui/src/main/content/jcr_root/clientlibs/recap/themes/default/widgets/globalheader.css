@@ -25,34 +25,11 @@
  * For more information, please refer to <http://unlicense.org/>
  */
 
-/*
-.ui-globalheader.ui-bar-a .ui-globalheader-title {
-    color: #999999;
-}
-
-.ui-globalheader.ui-bar-a .ui-globalheader-user {
-    color: #A5A5A5;
-}
-
-.ui-globalheader.ui-bar-a .ui-globalheader-user a {
-    color: #A5A5A5;
-}
-
-.ui-globalheader {
-    height: 58px;
-}
-*/
 .ui-recapheader .ui-globalheader-left {
     float: left;
     width: 60%;
     background: url(../resources/recap_inner_icon.png) no-repeat 12px 8px;
 }
-
-/*
-.ui-globalheader-left > div {
-    float: left;
-}
-*/
 
 .ui-recapheader .ui-globalheader-title {
     border-left: none;
@@ -64,25 +41,3 @@
     font-weight: normal;
     letter-spacing: 0.5px;
 }
-
-/*
-.ui-globalheader-right {
-    float: left;
-    width: 40%;
-    text-align: right;
-}
-
-.ui-globalheader-right > div {
-    float: right;
-}
-
-.ui-globalheader-right .g-buttonbar {
-    padding-top: 5px;
-    padding-right: 9px;
-}
-
-.ui-globalheader-right .g-buttonbar .ui-icon.ui-icon-martian {
-    background-image: url(../../default/resources/gtb-user.png);
-    background-size: 36px 36px;
-}
-*/

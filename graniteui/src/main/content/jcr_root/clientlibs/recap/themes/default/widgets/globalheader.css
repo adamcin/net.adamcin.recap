@@ -1,0 +1,88 @@
+/*
+ * This is free and unencumbered software released into the public domain.
+ *
+ * Anyone is free to copy, modify, publish, use, compile, sell, or
+ * distribute this software, either in source code form or as a compiled
+ * binary, for any purpose, commercial or non-commercial, and by any
+ * means.
+ *
+ * In jurisdictions that recognize copyright laws, the author or authors
+ * of this software dedicate any and all copyright interest in the
+ * software to the public domain. We make this dedication for the benefit
+ * of the public at large and to the detriment of our heirs and
+ * successors. We intend this dedication to be an overt act of
+ * relinquishment in perpetuity of all present and future rights to this
+ * software under copyright law.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+ * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+ * IN NO EVENT SHALL THE AUTHORS BE LIABLE FOR ANY CLAIM, DAMAGES OR
+ * OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
+ * ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+ * OTHER DEALINGS IN THE SOFTWARE.
+ *
+ * For more information, please refer to <http://unlicense.org/>
+ */
+
+/*
+.ui-globalheader.ui-bar-a .ui-globalheader-title {
+    color: #999999;
+}
+
+.ui-globalheader.ui-bar-a .ui-globalheader-user {
+    color: #A5A5A5;
+}
+
+.ui-globalheader.ui-bar-a .ui-globalheader-user a {
+    color: #A5A5A5;
+}
+
+.ui-globalheader {
+    height: 58px;
+}
+*/
+.ui-recapheader .ui-globalheader-left {
+    float: left;
+    width: 60%;
+    background: url(../resources/recap_inner_icon.png) no-repeat 12px 8px;
+}
+
+/*
+.ui-globalheader-left > div {
+    float: left;
+}
+*/
+
+.ui-recapheader .ui-globalheader-title {
+    border-left: none;
+    padding: 17px 17px 0 0px;
+    margin-left: 77px;
+    height: 36px;
+    text-transform: uppercase;
+    font-size: 19px;
+    font-weight: normal;
+    letter-spacing: 0.5px;
+}
+
+/*
+.ui-globalheader-right {
+    float: left;
+    width: 40%;
+    text-align: right;
+}
+
+.ui-globalheader-right > div {
+    float: right;
+}
+
+.ui-globalheader-right .g-buttonbar {
+    padding-top: 5px;
+    padding-right: 9px;
+}
+
+.ui-globalheader-right .g-buttonbar .ui-icon.ui-icon-martian {
+    background-image: url(../../default/resources/gtb-user.png);
+    background-size: 36px 36px;
+}
+*/

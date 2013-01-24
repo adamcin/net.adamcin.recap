@@ -28,6 +28,7 @@
 package net.adamcin.recap.impl;
 
 import net.adamcin.recap.api.RecapOptions;
+import org.apache.jackrabbit.spi2davex.BatchReadConfig;
 
 /**
  * @author madamcin
@@ -38,8 +39,10 @@ public class RecapOptionsImpl implements RecapOptions {
     private String lastModifiedProperty;
     private Integer batchSize;
     private Long throttle;
+    private BatchReadConfig batchReadConfig;
     private boolean onlyNewer;
     private boolean update;
+    private boolean reverse;
 
     public String getLastModifiedProperty() {
         return lastModifiedProperty;
@@ -65,6 +68,14 @@ public class RecapOptionsImpl implements RecapOptions {
         this.throttle = throttle;
     }
 
+    public BatchReadConfig getBatchReadConfig() {
+        return batchReadConfig;
+    }
+
+    public void setBatchReadConfig(BatchReadConfig batchReadConfig) {
+        this.batchReadConfig = batchReadConfig;
+    }
+
     public boolean isOnlyNewer() {
         return onlyNewer;
     }
@@ -79,6 +90,27 @@ public class RecapOptionsImpl implements RecapOptions {
 
     public void setUpdate(boolean update) {
         this.update = update;
+    }
+
+    public boolean isReverse() {
+        return reverse;
+    }
+
+    public void setReverse(boolean reverse) {
+        this.reverse = reverse;
+    }
+
+    @Override
+    public String toString() {
+        return "RecapOptionsImpl{" +
+                "lastModifiedProperty='" + lastModifiedProperty + '\'' +
+                ", batchSize=" + batchSize +
+                ", throttle=" + throttle +
+                ", batchReadConfig=" + batchReadConfig +
+                ", onlyNewer=" + onlyNewer +
+                ", update=" + update +
+                ", reverse=" + reverse +
+                '}';
     }
 }
 

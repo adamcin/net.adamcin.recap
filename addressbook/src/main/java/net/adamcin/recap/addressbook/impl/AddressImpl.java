@@ -84,6 +84,10 @@ public class AddressImpl implements Address {
         return properties.get(AddressBookConstants.PROP_CONTEXT_PATH, String.class);
     }
 
+    public String getPrefix() {
+        return properties.get(AddressBookConstants.PROP_PREFIX, String.class);
+    }
+
     @Override
     public String toString() {
         return recap.getDisplayableUrl(this);

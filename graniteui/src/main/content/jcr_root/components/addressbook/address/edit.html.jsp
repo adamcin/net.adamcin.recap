@@ -43,6 +43,7 @@
         pageContext.setAttribute("defaultUsername", recap.getDefaultUsername());
         pageContext.setAttribute("defaultPassword", recap.getDefaultPassword());
         pageContext.setAttribute("defaultContextPath", recap.getDefaultContextPath());
+        pageContext.setAttribute("defaultPrefix", recap.getDefaultPrefix());
     }
 
     Address address = resource.adaptTo(Address.class);
@@ -161,6 +162,15 @@
                        value="${address.contextPath}"/>
                 <p class="ui-input-desc" data-for="${pageId}-contextPath">
                     If the remote CRX server is hosted at a different servlet context path than the default, make sure to specify it here.
+                </p>
+            </div>
+            <div data-role="fieldcontain">
+                <label for="${pageId}-prefix">Servlet Prefix</label>
+                <input id="${pageId}-prefix" type="text" placeholder="default: ${defaultPrefix}"
+                       name="./<%=AddressBookConstants.PROP_PREFIX %>"
+                       value="${address.prefix}"/>
+                <p class="ui-input-desc" data-for="${pageId}-prefix">
+                    If the remote repository DAVex servlet is hosted at a different servlet path than the default (for instance, if it is not a CRX repository), make sure to specify it here.
                 </p>
             </div>
         </form>

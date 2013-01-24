@@ -41,6 +41,7 @@ public class RecapAddressImpl implements RecapAddress {
     String username;
     String password;
     String contextPath;
+    String prefix;
 
     public String getHostname() {
         return hostname;
@@ -88,5 +89,13 @@ public class RecapAddressImpl implements RecapAddress {
 
     public void setHttps(boolean https) {
         this.https = https;
+    }
+
+    public String getPrefix() {
+        return prefix;
+    }
+
+    public void setPrefix(String prefix) {
+        this.prefix = prefix;
     }
 }

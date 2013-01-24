@@ -80,6 +80,9 @@ public class RecapImpl implements Recap {
     @Property(label = "Default Remote Context Path", value = RecapConstants.DEFAULT_DEFAULT_CONTEXT_PATH)
     private static final String OSGI_DEFAULT_CONTEXT_PATH = "default.contextPath";
 
+    @Property(label = "Default Remote Prefix", value = RecapConstants.DEFAULT_DEFAULT_PREFIX)
+    private static final String OSGI_DEFAULT_PREFIX = "default.prefix";
+
     @Property(label = "Default Batch Size", intValue = RecapConstants.DEFAULT_DEFAULT_BATCH_SIZE)
     private static final String OSGI_DEFAULT_BATCH_SIZE = "default.batchSize";
 
@@ -88,6 +91,7 @@ public class RecapImpl implements Recap {
 
     private int defaultPort;
     private String defaultContextPath;
+    private String defaultPrefix;
     private String defaultUsername;
     private String defaultPassword;
     private int defaultBatchSize;
@@ -100,6 +104,7 @@ public class RecapImpl implements Recap {
         Dictionary<?, ?> props = ctx.getProperties();
         defaultPort = PropertiesUtil.toInteger(props.get(OSGI_DEFAULT_PORT), RecapConstants.DEFAULT_DEFAULT_PORT);
         defaultContextPath = PropertiesUtil.toString(props.get(OSGI_DEFAULT_CONTEXT_PATH), RecapConstants.DEFAULT_DEFAULT_CONTEXT_PATH);
+        defaultPrefix = PropertiesUtil.toString(props.get(OSGI_DEFAULT_PREFIX), RecapConstants.DEFAULT_DEFAULT_PREFIX);
         defaultUsername = PropertiesUtil.toString(props.get(OSGI_DEFAULT_USERNAME), RecapConstants.DEFAULT_DEFAULT_USERNAME);
         defaultPassword = PropertiesUtil.toString(props.get(OSGI_DEFAULT_PASSWORD), RecapConstants.DEFAULT_DEFAULT_PASSWORD);
         defaultBatchSize = PropertiesUtil.toInteger(props.get(OSGI_DEFAULT_BATCH_SIZE), RecapConstants.DEFAULT_DEFAULT_BATCH_SIZE);
@@ -111,6 +116,8 @@ public class RecapImpl implements Recap {
     protected void deactivate(ComponentContext ctx) {
         this.sessionsInterrupted = true;
         defaultPort = 0;
+        defaultContextPath = null;
+        defaultPrefix = null;
         defaultUsername = null;
         defaultPassword = null;
         defaultBatchSize = 0;
@@ -141,6 +148,10 @@ public class RecapImpl implements Recap {
         return defaultContextPath;
     }
 
+    public String getDefaultPrefix() {
+        return defaultPrefix;
+    }
+
     public RecapSession initSession(Session localJcrSession,
                                     RecapAddress address,
                                     RecapOptions options)
@@ -156,12 +167,13 @@ public class RecapImpl implements Recap {
 
         RecapAddress addr = applyAddressDefaults(address);
         RecapOptions opts = applyOptionsDefaults(options);
+        LOGGER.debug("[initSession] opts={}", opts);
         Session srcSession;
 
         ClassLoader orig = Thread.currentThread().getContextClassLoader();
         try {
             Thread.currentThread().setContextClassLoader(getClass().getClassLoader());
-            Repository srcRepo = this.getRepository(addr);
+            Repository srcRepo = this.getRepository(addr, opts.getBatchReadConfig());
             srcSession = srcRepo.login(
                     new SimpleCredentials(addr.getUsername(),
                             addr.getPassword().toCharArray()));
@@ -174,10 +186,10 @@ public class RecapImpl implements Recap {
         return new RecapSessionImpl(this, addr, opts, localJcrSession, srcSession);
     }
 
-    private Repository getRepository(RecapAddress recapAddress) throws RepositoryException {
+    private Repository getRepository(RecapAddress recapAddress, BatchReadConfig batchReadConfig) throws RepositoryException {
         Map<String, Object> params = new HashMap<String, Object>();
         params.put(Spi2davexRepositoryServiceFactory.PARAM_REPOSITORY_URI, getRepositoryUrl(recapAddress));
-        params.put(Spi2davexRepositoryServiceFactory.PARAM_BATCHREAD_CONFIG, DEFAULT_BATCH_READ_CONFIG);
+        params.put(Spi2davexRepositoryServiceFactory.PARAM_BATCHREAD_CONFIG, batchReadConfig);
         params.put(Jcr2spiRepositoryFactory.PARAM_REPOSITORY_SERVICE_FACTORY, Spi2davexRepositoryServiceFactory.class.getName());
         params.put(Jcr2spiRepositoryFactory.PARAM_ITEM_CACHE_SIZE, 128);
         params.put(Jcr2spiRepositoryFactory.PARAM_LOG_WRITER_PROVIDER, new Slf4jLogWriterProvider());
@@ -193,6 +205,7 @@ public class RecapImpl implements Recap {
         dAddress.setUsername(defaultUsername);
         dAddress.setPassword(defaultPassword);
         dAddress.setContextPath(defaultContextPath);
+        dAddress.setPrefix(defaultPrefix);
 
         if (address != null) {
 
@@ -211,6 +224,9 @@ public class RecapImpl implements Recap {
             if (address.getContextPath() != null) {
                 dAddress.setContextPath(address.getContextPath());
             }
+            if (address.getPrefix() != null) {
+                dAddress.setPrefix(address.getPrefix());
+            }
         }
 
         return dAddress;
@@ -221,10 +237,12 @@ public class RecapImpl implements Recap {
         dOptions.setThrottle(0L);
         dOptions.setBatchSize(defaultBatchSize);
         dOptions.setLastModifiedProperty(defaultLastModifiedProperty);
+        dOptions.setBatchReadConfig(DEFAULT_BATCH_READ_CONFIG);
 
         if (options != null) {
             dOptions.setUpdate(options.isUpdate());
             dOptions.setOnlyNewer(options.isOnlyNewer());
+            dOptions.setReverse(options.isReverse());
             if (options.getThrottle() != null) {
                 dOptions.setThrottle(options.getThrottle());
             }
@@ -233,6 +251,9 @@ public class RecapImpl implements Recap {
             }
             if (options.getLastModifiedProperty() != null) {
                 dOptions.setLastModifiedProperty(options.getLastModifiedProperty());
+            }
+            if (options.getBatchReadConfig() != null) {
+                dOptions.setBatchReadConfig(options.getBatchReadConfig());
             }
         }
 
@@ -259,7 +280,11 @@ public class RecapImpl implements Recap {
     public String getRepositoryUrl(RecapAddress recapAddress) {
         String base = getDisplayableUrl(recapAddress);
         if (StringUtils.isNotEmpty(base)) {
-            return getDisplayableUrl(recapAddress) + "/crx/server";
+            if (recapAddress.getPrefix() != null) {
+                return getDisplayableUrl(recapAddress) + recapAddress.getPrefix();
+            } else {
+                return getDisplayableUrl(recapAddress) + "/";
+            }
         } else {
             return null;
         }

@@ -68,11 +68,11 @@ public class HtmlProgressListener implements RecapProgressListener {
     }
 
     public void onError(String path, Exception ex) {
-        print("recap-error", "E", String.format("%s (%s)", path, ex.getMessage()));
+        print("recap-error", "E", String.format("%s (%s: %s)", path, ex.getClass().getSimpleName(), ex.getMessage()));
     }
 
     public void onFailure(String path, Exception ex) {
-        print("recap-error", "F", String.format("%s (%s)", path, ex.getMessage()));
+        print("recap-error", "F", String.format("%s (%s: %s)", path, ex.getClass().getSimpleName(), ex.getMessage()));
     }
 
     public void onPath(PathAction action, int count, String path) {

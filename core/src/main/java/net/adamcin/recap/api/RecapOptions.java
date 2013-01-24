@@ -27,12 +27,13 @@
 
 package net.adamcin.recap.api;
 
+import org.apache.jackrabbit.spi2davex.BatchReadConfig;
+
 /**
  * @author madamcin
  * @version $Id: RecapOptions.java$
  */
 public interface RecapOptions {
-
 
     String getLastModifiedProperty();
 
@@ -40,8 +41,11 @@ public interface RecapOptions {
 
     Long getThrottle();
 
+    BatchReadConfig getBatchReadConfig();
+
     boolean isOnlyNewer();
 
     boolean isUpdate();
 
+    boolean isReverse();
 }

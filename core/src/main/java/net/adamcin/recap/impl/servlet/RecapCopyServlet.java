@@ -68,7 +68,7 @@ public class RecapCopyServlet extends SlingAllMethodsServlet {
                     String[] paths = request.getParameterValues(":path");
                     if (paths != null) {
                         for (String path : paths) {
-                            recapSession.remoteCopy(path);
+                            recapSession.syncPath(path);
                         }
                     }
                 } finally {

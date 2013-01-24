@@ -47,6 +47,8 @@ public interface Recap {
 
     String getDefaultContextPath();
 
+    String getDefaultPrefix();
+
     String getDefaultUsername();
 
     String getDefaultPassword();

@@ -38,4 +38,5 @@ public interface RecapAddress {
     String getUsername();
     String getPassword();
     String getContextPath();
+    String getPrefix();
 }

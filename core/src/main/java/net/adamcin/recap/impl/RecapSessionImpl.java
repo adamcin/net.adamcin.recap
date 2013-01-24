@@ -66,7 +66,7 @@ public class RecapSessionImpl implements RecapSession {
     private final RecapAddress address;
     private final RecapOptions options;
     private final Session localSession;
-    private final Session sourceSession;
+    private final Session remoteSession;
 
     private RecapProgressListener progressListener;
 
@@ -89,14 +89,14 @@ public class RecapSessionImpl implements RecapSession {
                             RecapAddress address,
                             RecapOptions options,
                             Session localSession,
-                            Session sourceSession)
+                            Session remoteSession)
             throws RecapSessionException {
 
         this.recap = recap;
         this.address = address;
         this.options = options;
         this.localSession = localSession;
-        this.sourceSession = sourceSession;
+        this.remoteSession = remoteSession;
 
         allowLastModifiedProperty = isValidNameForSession(this.options.getLastModifiedProperty());
     }
@@ -114,8 +114,8 @@ public class RecapSessionImpl implements RecapSession {
     }
 
     public void logout() {
-        if (this.sourceSession != null) {
-            this.sourceSession.logout();
+        if (this.remoteSession != null) {
+            this.remoteSession.logout();
         }
     }
 
@@ -151,41 +151,56 @@ public class RecapSessionImpl implements RecapSession {
         }
     }
 
-    public Node getOrCreateLocal(Node remoteNode) throws RepositoryException {
-        if (remoteNode.getDepth() == 0) {
-            return this.localSession.getRootNode();
-        } else if (this.localSession.getRootNode().hasNode(remoteNode.getPath().substring(1))) {
-            return this.localSession.getRootNode().getNode(remoteNode.getPath().substring(1));
+    private Session getSourceSession() {
+        if (this.options.isReverse()) {
+            return this.localSession;
         } else {
-            Node parent = remoteNode.getParent();
-            Node localParent = getOrCreateLocal(parent);
-            Node local;
-            if (!localParent.hasNode(remoteNode.getName())) {
-                local = localParent.addNode(remoteNode.getName(), remoteNode.getPrimaryNodeType().getName());
-                trackPath(RecapProgressListener.PathAction.ADD, local.getPath());
-            } else {
-                local = localParent.getNode(remoteNode.getName());
-            }
-            processBatch();
-            return local;
+            return this.remoteSession;
         }
     }
 
-    public void remoteCopy(String rootPath) throws RecapSessionException {
+    private Session getTargetSession() {
+        if (this.options.isReverse()) {
+            return this.remoteSession;
+        } else {
+            return this.localSession;
+        }
+    }
+    public Node getOrCreateTargetNode(Node sourceNode) throws RepositoryException {
+        if (sourceNode.getDepth() == 0) {
+            return getTargetSession().getRootNode();
+        } else if (getTargetSession().getRootNode().hasNode(sourceNode.getPath().substring(1))) {
+            return getTargetSession().getRootNode().getNode(sourceNode.getPath().substring(1));
+        } else {
+            Node sourceParent = sourceNode.getParent();
+            Node targetParent = getOrCreateTargetNode(sourceParent);
+            Node targetNode;
+            if (!targetParent.hasNode(sourceNode.getName())) {
+                targetNode = targetParent.addNode(sourceNode.getName(), sourceNode.getPrimaryNodeType().getName());
+                trackPath(RecapProgressListener.PathAction.ADD, targetNode.getPath());
+            } else {
+                targetNode = targetParent.getNode(sourceNode.getName());
+            }
+            processBatch();
+            return targetNode;
+        }
+    }
+
+    public void syncPath(String rootPath) throws RecapSessionException {
         if (this.finished) {
             throw new RecapSessionException("RecapSession already finished.");
         }
 
-        trackMessage("Copy %s from http://%s:%d/", rootPath, this.address.getHostname(), this.address.getPort());
+        trackMessage("Copy %s %s http://%s:%d/", rootPath, this.options.isReverse() ? "to" : "from", this.address.getHostname(), this.address.getPort());
 
         try {
             if (this.start == 0L) {
                 this.start = System.currentTimeMillis();
             }
 
-            Node srcNode = this.getSourceSession().getNode(rootPath);
+            Node srcNode = getSourceSession().getNode(rootPath);
             Node srcParent = srcNode.getParent();
-            Node dstParent = getOrCreateLocal(srcParent);
+            Node dstParent = getOrCreateTargetNode(srcParent);
 
             String dstName = srcNode.getName();
 
@@ -212,7 +227,7 @@ public class RecapSessionImpl implements RecapSession {
         if (!this.interrupted && this.numNodes > 0) {
             trackMessage("Saving %d nodes...", this.numNodes);
             try {
-                this.getLocalSession().save();
+                getTargetSession().save();
                 this.numNodes = 0;
                 this.currentSize = 0L;
                 trackMessage("Done.");
@@ -246,7 +261,7 @@ public class RecapSessionImpl implements RecapSession {
         if (++this.numNodes >= this.getOptions().getBatchSize()) {
             trackMessage("Intermediate saving %d nodes (%d kB)...", this.numNodes, this.currentSize / 1000L);
             long now = System.currentTimeMillis();
-            this.localSession.save();
+            getTargetSession().save();
             long end = System.currentTimeMillis();
             trackMessage("Done in %d ms. Total time: %d, total nodes %d, %d kB", end - now, end - this.start,
                     this.totalNodes, this.totalSize / 1000L);
@@ -472,10 +487,10 @@ public class RecapSessionImpl implements RecapSession {
             String prefix = name.substring(0, idx);
             String mapped = this.prefixMapping.get(prefix);
             if (mapped == null) {
-                String uri = this.sourceSession.getNamespaceURI(prefix);
+                String uri = getSourceSession().getNamespaceURI(prefix);
                 int i = -1;
                 try {
-                    mapped = this.localSession.getNamespacePrefix(uri);
+                    mapped = getTargetSession().getNamespacePrefix(uri);
                 } catch (NamespaceException e) {
                     mapped = prefix;
                     i = 0;
@@ -483,7 +498,7 @@ public class RecapSessionImpl implements RecapSession {
 
                 while (i >= 0) {
                     try {
-                        this.localSession.getWorkspace().getNamespaceRegistry().registerNamespace(mapped, uri);
+                        getTargetSession().getWorkspace().getNamespaceRegistry().registerNamespace(mapped, uri);
                         i = -1;
                     } catch (NamespaceException e1) {
                         mapped = prefix + i++;
@@ -510,8 +525,8 @@ public class RecapSessionImpl implements RecapSession {
         return name;
     }
 
-    public Session getSourceSession() {
-        return this.sourceSession;
+    public Session getRemoteSession() {
+        return this.remoteSession;
     }
 
     public Session getLocalSession() {

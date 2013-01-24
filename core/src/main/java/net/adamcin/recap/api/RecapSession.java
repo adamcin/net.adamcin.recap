@@ -35,7 +35,7 @@ import javax.jcr.Session;
  */
 public interface RecapSession {
 
-    void remoteCopy(String rootPath) throws RecapSessionException;
+    void syncPath(String rootPath) throws RecapSessionException;
 
     void finish() throws RecapSessionException;
 

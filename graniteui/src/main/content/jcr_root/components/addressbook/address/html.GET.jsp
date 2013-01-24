@@ -43,6 +43,7 @@
         pageContext.setAttribute("defaultBatchSize", recap.getDefaultBatchSize());
     }
     Address address = resource.adaptTo(Address.class);
+    pageContext.setAttribute("address", address);
     String title = "Sync Content with " + (StringUtils.isNotBlank(address.getTitle()) ? address.getTitle() : address.toString());
     pageContext.setAttribute("title", title);
     String pageId = "g-recap-address-sync-" + resource.getName();
@@ -75,11 +76,24 @@
                         <label for="${pageId}-update">Update Existing Nodes</label>
                         <input id="${pageId}-update" type="checkbox" value="true" checked="checked"
                                 name="<%=RecapConstants.RP_UPDATE %>"/>
-                        <p class="ui-input-desc" data-for="${pageId}-update">If checked, properties on existing nodes will be updated from the source repository.</p>
+                        <p class="ui-input-desc" data-for="${pageId}-update">
+                            If checked, properties on existing nodes will be updated from the source repository.
+                        </p>
                         <label for="${pageId}-onlyNewer">Only Newer</label>
                         <input id="${pageId}-onlyNewer" type="checkbox" value="true" checked="checked"
                                 name="<%=RecapConstants.RP_ONLY_NEWER %>"/>
-                        <p class="ui-input-desc" data-for="${pageId}-onlyNewer">If checked, existing nodes will only be updated if the source node is marked as newer than the target node.</p>
+                        <p class="ui-input-desc" data-for="${pageId}-onlyNewer">
+                            If checked, existing nodes will only be updated if the source node is marked as newer than the target node.
+                        </p>
+                        <label for="${pageId}-reverse">Reverse</label>
+                        <input id="${pageId}-reverse" type="checkbox" value="true"
+                               name="<%=RecapConstants.RP_REVERSE %>"/>
+                        <p class="ui-input-desc" data-for="${pageId}-reverse">
+                            If checked, the local repository will serve as the source for the specified paths, and the
+                            <strong>content will be copied to ${address}</strong>. Obviously, this assumes that the credentials
+                            specified in the address provide WRITE permissions for the specified paths and their descendants
+                            in the remote repository.
+                        </p>
                     </fieldset>
                 </div>
                 <div data-role="fieldcontain">
@@ -96,13 +110,15 @@
                     <label for="${pageId}-batchSize">Batch Size</label>
                     <input id="${pageId}-batchSize" type="text" placeholder="default: ${defaultBatchSize}"
                            name="<%=RecapConstants.RP_BATCH_SIZE %>"/>
-                    <p class="ui-input-desc" data-for="${pageId}-batchSize">Specify the number of nodes to sync between intermediate session saves.</p>
+                    <p class="ui-input-desc" data-for="${pageId}-batchSize">
+                        Specify the number of nodes to sync between intermediate session saves.</p>
                 </div>
                 <div data-role="fieldcontain">
                     <label for="${pageId}-throttle">Throttle</label>
                     <input id="${pageId}-throttle" type="text" placeholder="default: 0"
                            name="<%=RecapConstants.RP_THROTTLE %>"/>
-                    <p class="ui-input-desc" data-for="${pageId}-throttle">Specify a number of seconds to wait between nodes.</p>
+                    <p class="ui-input-desc" data-for="${pageId}-throttle">
+                        Specify a number of seconds to wait between nodes. </p>
                 </div>
             </form>
         </div>

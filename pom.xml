@@ -33,7 +33,7 @@
     <parent>
         <groupId>net.adamcin.recap</groupId>
         <artifactId>net.adamcin.recap.parent</artifactId>
-        <version>0.6.0</version>
+        <version>0.7.0-SNAPSHOT</version>
         <relativePath>parent</relativePath>
     </parent>
 

@@ -45,6 +45,7 @@ public class RecapConstants {
 
     public static final int DEFAULT_DEFAULT_PORT = 4502;
     public static final String DEFAULT_DEFAULT_CONTEXT_PATH = "";
+    public static final String DEFAULT_DEFAULT_PREFIX = "/crx/server";
     public static final String DEFAULT_DEFAULT_USERNAME = "anonymous";
     public static final String DEFAULT_DEFAULT_PASSWORD = "anonymous";
     public static final int DEFAULT_DEFAULT_BATCH_SIZE = 1024;
@@ -59,12 +60,14 @@ public class RecapConstants {
     public static final String RP_USERNAME = ":user";
     public static final String RP_PASSWORD = ":pass";
     public static final String RP_CONTEXT_PATH = ":context_path";
+    public static final String RP_PREFIX = ":prefix";
 
     // ------------------------------------------------
     // Request Parameters related to RecapOptions
     // ------------------------------------------------
     public static final String RP_UPDATE = ":update";
     public static final String RP_ONLY_NEWER = ":only_newer";
+    public static final String RP_REVERSE = ":reverse";
     public static final String RP_BATCH_SIZE = ":batch_size";
     public static final String RP_THROTTLE = ":throttle";
     public static final String RP_LAST_MODIFIED_PROPERTY = ":last_modified_property";

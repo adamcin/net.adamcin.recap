@@ -36,6 +36,7 @@ import net.adamcin.recap.api.RecapSession;
 import net.adamcin.recap.api.RecapSessionException;
 import net.adamcin.recap.util.DefaultProgressListener;
 import net.adamcin.recap.util.HtmlProgressListener;
+import org.apache.commons.lang.StringUtils;
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Properties;
 import org.apache.felix.scr.annotations.Property;
@@ -139,7 +140,7 @@ public class RecapAdapterFactory implements AdapterFactory {
 
             String rpPort = request.getParameter(RecapConstants.RP_PORT);
 
-            if (rpPort != null) {
+            if (StringUtils.isNotBlank(rpPort)) {
                 try {
                     address.setPort(Integer.valueOf(rpPort));
                 } catch (Exception e) {
@@ -154,6 +155,7 @@ public class RecapAdapterFactory implements AdapterFactory {
             address.setUsername(request.getParameter(RecapConstants.RP_USERNAME));
             address.setPassword(request.getParameter(RecapConstants.RP_PASSWORD));
             address.setContextPath(request.getParameter(RecapConstants.RP_CONTEXT_PATH));
+            address.setPrefix(request.getParameter(RecapConstants.RP_PREFIX));
 
             return address;
         }
@@ -172,8 +174,12 @@ public class RecapAdapterFactory implements AdapterFactory {
             options.setOnlyNewer(true);
         }
 
+        if ("true".equals(request.getParameter(RecapConstants.RP_REVERSE))) {
+            options.setReverse(true);
+        }
+
         String rpBatchSize = request.getParameter(RecapConstants.RP_BATCH_SIZE);
-        if (rpBatchSize != null) {
+        if (StringUtils.isNotBlank(rpBatchSize)) {
             try {
                 options.setBatchSize(Integer.valueOf(rpBatchSize));
             } catch (Exception e) {
@@ -182,11 +188,11 @@ public class RecapAdapterFactory implements AdapterFactory {
         }
 
         String rpThrottle = request.getParameter(RecapConstants.RP_THROTTLE);
-        if (rpThrottle != null) {
+        if (StringUtils.isNotBlank(rpThrottle)) {
             try {
                 options.setThrottle(Long.valueOf(rpThrottle));
             } catch (Exception e) {
-                LOGGER.error("failed to parse batch_size parameter: " + rpBatchSize, e);
+                LOGGER.error("failed to parse throttle parameter: " + rpBatchSize, e);
             }
         }
 

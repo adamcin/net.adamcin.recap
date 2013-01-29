@@ -39,7 +39,7 @@
     <orderEntry type="library" name="Maven: org.apache.jackrabbit:jackrabbit-jcr2spi:2.4.0" level="project" />
     <orderEntry type="library" name="Maven: org.apache.jackrabbit:jackrabbit-api:2.4.0" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: javax.jcr:jcr:2.0" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Maven: javax.servlet:servlet-api:2.4" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: javax.servlet:servlet-api:2.5" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.osgi:org.osgi.core:4.2.0" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.osgi:org.osgi.compendium:4.2.0" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: commons-lang:commons-lang:2.5" level="project" />

@@ -38,6 +38,7 @@ public interface Recap {
     RecapSession initSession(Session localJcrSession, RecapAddress address, RecapOptions options)
             throws RecapSessionException;
 
+    String getDisplayableUrl(RecapAddress recapAddress);
 
     // -----------------------------------------
     // expose non-private default recap parameters
@@ -58,6 +59,4 @@ public interface Recap {
     String getDefaultBatchReadConfig();
 
     String getDefaultLastModifiedProperty();
-
-    String getDisplayableUrl(RecapAddress recapAddress);
 }

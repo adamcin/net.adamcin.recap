@@ -32,7 +32,7 @@
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.apache.sling:org.apache.sling.commons.json:2.0.6" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.apache.sling:org.apache.sling.scripting.jsp.taglib:2.1.6" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: javax.servlet:jsp-api:2.0" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Maven: javax.servlet:servlet-api:2.4" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: javax.servlet:servlet-api:2.5" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: com.adobe.granite:com.adobe.granite.ui.commons:5.5.14" level="project" />
   </component>
 </module>

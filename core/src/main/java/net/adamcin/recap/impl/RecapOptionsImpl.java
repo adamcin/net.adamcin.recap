@@ -43,6 +43,7 @@ public class RecapOptionsImpl implements RecapOptions {
     private boolean onlyNewer;
     private boolean update;
     private boolean reverse;
+    private boolean noRecurse;
 
     public String getLastModifiedProperty() {
         return lastModifiedProperty;
@@ -100,6 +101,14 @@ public class RecapOptionsImpl implements RecapOptions {
         this.reverse = reverse;
     }
 
+    public boolean isNoRecurse() {
+        return noRecurse;
+    }
+
+    public void setNoRecurse(boolean noRecurse) {
+        this.noRecurse = noRecurse;
+    }
+
     @Override
     public String toString() {
         return "RecapOptionsImpl{" +
@@ -110,6 +119,7 @@ public class RecapOptionsImpl implements RecapOptions {
                 ", onlyNewer=" + onlyNewer +
                 ", update=" + update +
                 ", reverse=" + reverse +
+                ", noRecurse=" + noRecurse +
                 '}';
     }
 }

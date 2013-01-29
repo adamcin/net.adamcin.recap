@@ -107,10 +107,6 @@
             <groupId>org.osgi</groupId>
             <artifactId>org.osgi.compendium</artifactId>
         </dependency>
-        <dependency>
-            <groupId>com.adobe.granite.bundles</groupId>
-            <artifactId>json</artifactId>
-        </dependency>
 
         <dependency>
             <groupId>commons-lang</groupId>
@@ -130,21 +126,8 @@
         </dependency>
         <dependency>
             <groupId>org.apache.sling</groupId>
-            <artifactId>org.apache.sling.commons.osgi</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.sling</groupId>
             <artifactId>org.apache.sling.api</artifactId>
         </dependency>
-        <dependency>
-            <groupId>org.apache.sling</groupId>
-            <artifactId>org.apache.sling.jcr.resource</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.day.jcr.vault</groupId>
-            <artifactId>com.day.jcr.vault</artifactId>
-        </dependency>
-
 
         <dependency>
             <groupId>junit</groupId>

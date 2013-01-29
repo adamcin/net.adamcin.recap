@@ -48,4 +48,6 @@ public interface RecapOptions {
     boolean isUpdate();
 
     boolean isReverse();
+
+    boolean isNoRecurse();
 }

@@ -204,7 +204,7 @@ public class RecapSessionImpl implements RecapSession {
 
             String dstName = srcNode.getName();
 
-            this.copy(srcNode, dstParent, dstName, true);
+            this.copy(srcNode, dstParent, dstName, !this.options.isNoRecurse());
             this.lastSuccessfulPath = rootPath;
             this.totalRecapPaths++;
         } catch (PathNotFoundException e) {

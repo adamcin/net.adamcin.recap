@@ -41,6 +41,7 @@
     if (recap != null) {
         pageContext.setAttribute("defaultLastModifiedProperty", recap.getDefaultLastModifiedProperty());
         pageContext.setAttribute("defaultBatchSize", recap.getDefaultBatchSize());
+        pageContext.setAttribute("defaultBatchReadConfig", recap.getDefaultBatchReadConfig());
     }
     Address address = resource.adaptTo(Address.class);
     pageContext.setAttribute("address", address);
@@ -85,6 +86,12 @@
                         <p class="ui-input-desc" data-for="${pageId}-onlyNewer">
                             If checked, existing nodes will only be updated if the source node is marked as newer than the target node.
                         </p>
+                        <label for="${pageId}-noRecurse">No Recurse</label>
+                        <input id="${pageId}-noRecurse" type="checkbox" value="true"
+                               name="<%=RecapConstants.RP_NO_RECURSE %>"/>
+                        <p class="ui-input-desc" data-for="${pageId}-noRecurse">
+                            If checked, only the properties on each path specified above will be synced. Their descendants will be ignored.
+                        </p>
                         <label for="${pageId}-reverse">Reverse</label>
                         <input id="${pageId}-reverse" type="checkbox" value="true"
                                name="<%=RecapConstants.RP_REVERSE %>"/>
@@ -119,6 +126,25 @@
                            name="<%=RecapConstants.RP_THROTTLE %>"/>
                     <p class="ui-input-desc" data-for="${pageId}-throttle">
                         Specify a number of seconds to wait between nodes. </p>
+                </div>
+                <div data-role="fieldcontain">
+                    <label for="${pageId}-batchReadConfig">Batch Read Config (Very advanced)</label>
+                    <textarea id="${pageId}-batchReadConfig" type="text"
+                              name="<%=RecapConstants.RP_BATCH_READ_CONFIG %>" cols="40" rows="8" placeholder="default: ${defaultBatchReadConfig}"></textarea>
+                    <p class="ui-input-desc" data-for="${pageId}-batchReadConfig">
+                        Specify a whitespace delimited list of JCR DavEx batch read config entries.
+                        An entry may be either an integer depth or a token of the format
+                        "[path]=[depth]", where <strong>[path]</strong> is a repository path and
+                        <strong>[depth]</strong> is an integer representing the depth to read in batch
+                        for the specified path. All depth-only entries will be collected, in order,
+                        to represent the batch-read-depth for paths whose repository depth matches
+                        the 0-based index of the entry. The last depth-only entry listed will be used as
+                        the default batch read depth for all paths not specified by other entries.
+                        For example, if the value of this field is "2 1 3", DavEx will download two
+                        levels of descendants when the root path ("/") is requested, one level of
+                        descendants if "/content" is requested, and three levels of descendants if
+                        "/content/geometrixx" or any of its children or descendants are requested.
+                    </p>
                 </div>
             </form>
         </div>

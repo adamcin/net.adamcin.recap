@@ -1,7 +1,7 @@
 <%@ page import="net.adamcin.recap.addressbook.AddressBook" %>
 <%@ page import="net.adamcin.recap.api.Recap" %>
-<%@ page import="org.json.JSONException" %>
-<%@ page import="org.json.JSONWriter" %>
+<%@ page import="org.apache.sling.commons.json.io.JSONWriter" %>
+<%@ page import="org.apache.sling.commons.json.JSONException" %>
 <%--
   ~ This is free and unencumbered software released into the public domain.
   ~

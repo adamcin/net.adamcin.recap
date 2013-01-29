@@ -43,7 +43,6 @@ import org.apache.sling.api.adapter.AdapterFactory;
 import org.apache.sling.api.resource.Resource;
 import org.apache.sling.api.resource.ResourceResolver;
 import org.apache.sling.api.resource.ResourceUtil;
-import org.apache.sling.jcr.resource.JcrResourceConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -130,7 +129,7 @@ public class AddressBookAdapterFactory implements AdapterFactory {
                         Node userNode = userResource.adaptTo(Node.class);
                         if (userNode != null) {
                             Node addressBookNode = userNode.addNode(AddressBookConstants.NN_ADDRESS_BOOK, "sling:Folder");
-                            addressBookNode.setProperty(JcrResourceConstants.SLING_RESOURCE_TYPE_PROPERTY, AddressBookConstants.RT_ADDRESS_BOOK);
+                            addressBookNode.setProperty("sling:resourceType", AddressBookConstants.RT_ADDRESS_BOOK);
                             userNode.getSession().save();
                             addressBookResource = resolver.getResource(addressBookNode.getPath());
                         }

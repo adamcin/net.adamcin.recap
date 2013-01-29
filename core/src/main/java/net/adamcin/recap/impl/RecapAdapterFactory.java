@@ -178,6 +178,10 @@ public class RecapAdapterFactory implements AdapterFactory {
             options.setReverse(true);
         }
 
+        if ("true".equals(request.getParameter(RecapConstants.RP_NO_RECURSE))) {
+            options.setNoRecurse(true);
+        }
+
         String rpBatchSize = request.getParameter(RecapConstants.RP_BATCH_SIZE);
         if (StringUtils.isNotBlank(rpBatchSize)) {
             try {
@@ -197,6 +201,11 @@ public class RecapAdapterFactory implements AdapterFactory {
         }
 
         options.setLastModifiedProperty(request.getParameter(RecapConstants.RP_LAST_MODIFIED_PROPERTY));
+
+        String rpBatchReadConfig = request.getParameter(RecapConstants.RP_BATCH_READ_CONFIG);
+        if (StringUtils.isNotBlank(rpBatchReadConfig)) {
+            options.setBatchReadConfig(RecapBatchReadConfig.parseParameterValue(rpBatchReadConfig));
+        }
 
         return options;
     }

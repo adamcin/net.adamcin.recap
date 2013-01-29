@@ -55,6 +55,8 @@ public interface Recap {
 
     int getDefaultBatchSize();
 
+    String getDefaultBatchReadConfig();
+
     String getDefaultLastModifiedProperty();
 
     String getDisplayableUrl(RecapAddress recapAddress);

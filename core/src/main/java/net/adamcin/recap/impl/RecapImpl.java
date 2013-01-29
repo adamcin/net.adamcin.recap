@@ -41,14 +41,17 @@ import org.apache.felix.scr.annotations.Property;
 import org.apache.felix.scr.annotations.Service;
 import org.apache.jackrabbit.client.RepositoryFactoryImpl;
 import org.apache.jackrabbit.jcr2spi.Jcr2spiRepositoryFactory;
+import org.apache.jackrabbit.spi.Path;
+import org.apache.jackrabbit.spi.commons.conversion.PathResolver;
 import org.apache.jackrabbit.spi.commons.logging.Slf4jLogWriterProvider;
 import org.apache.jackrabbit.spi2davex.BatchReadConfig;
 import org.apache.jackrabbit.spi2davex.Spi2davexRepositoryServiceFactory;
-import org.apache.sling.commons.osgi.PropertiesUtil;
+import org.apache.sling.commons.osgi.OsgiUtil;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.jcr.NamespaceException;
 import javax.jcr.Repository;
 import javax.jcr.RepositoryException;
 import javax.jcr.Session;
@@ -66,7 +69,6 @@ import java.util.Map;
 public class RecapImpl implements Recap {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RecapImpl.class);
-    private static final BatchReadConfig DEFAULT_BATCH_READ_CONFIG = new RecapBatchReadConfig();
 
     @Property(label = "Default Remote Port", intValue = RecapConstants.DEFAULT_DEFAULT_PORT)
     private static final String OSGI_DEFAULT_PORT = "default.port";
@@ -86,6 +88,9 @@ public class RecapImpl implements Recap {
     @Property(label = "Default Batch Size", intValue = RecapConstants.DEFAULT_DEFAULT_BATCH_SIZE)
     private static final String OSGI_DEFAULT_BATCH_SIZE = "default.batchSize";
 
+    @Property(label = "Default Batch Read Config", value= RecapConstants.DEFAULT_DEFAULT_BATCH_READ_CONFIG)
+    private static final String OSGI_DEFAULT_BATCH_READ_CONFIG = "default.batchReadConfig";
+
     @Property(label = "Default Last Modified Property", value = RecapConstants.DEFAULT_DEFAULT_LAST_MODIFIED_PROPERTY)
     private static final String OSGI_DEFAULT_LAST_MODIFIED_PROPERTY = "default.lastModifiedProperty";
 
@@ -95,6 +100,7 @@ public class RecapImpl implements Recap {
     private String defaultUsername;
     private String defaultPassword;
     private int defaultBatchSize;
+    private String defaultBatchReadConfig;
     private String defaultLastModifiedProperty;
 
     boolean sessionsInterrupted = false;
@@ -102,13 +108,14 @@ public class RecapImpl implements Recap {
     @Activate
     protected void activate(ComponentContext ctx) {
         Dictionary<?, ?> props = ctx.getProperties();
-        defaultPort = PropertiesUtil.toInteger(props.get(OSGI_DEFAULT_PORT), RecapConstants.DEFAULT_DEFAULT_PORT);
-        defaultContextPath = PropertiesUtil.toString(props.get(OSGI_DEFAULT_CONTEXT_PATH), RecapConstants.DEFAULT_DEFAULT_CONTEXT_PATH);
-        defaultPrefix = PropertiesUtil.toString(props.get(OSGI_DEFAULT_PREFIX), RecapConstants.DEFAULT_DEFAULT_PREFIX);
-        defaultUsername = PropertiesUtil.toString(props.get(OSGI_DEFAULT_USERNAME), RecapConstants.DEFAULT_DEFAULT_USERNAME);
-        defaultPassword = PropertiesUtil.toString(props.get(OSGI_DEFAULT_PASSWORD), RecapConstants.DEFAULT_DEFAULT_PASSWORD);
-        defaultBatchSize = PropertiesUtil.toInteger(props.get(OSGI_DEFAULT_BATCH_SIZE), RecapConstants.DEFAULT_DEFAULT_BATCH_SIZE);
-        defaultLastModifiedProperty = PropertiesUtil.toString(props.get(OSGI_DEFAULT_LAST_MODIFIED_PROPERTY), RecapConstants.DEFAULT_DEFAULT_LAST_MODIFIED_PROPERTY);
+        defaultPort = OsgiUtil.toInteger(props.get(OSGI_DEFAULT_PORT), RecapConstants.DEFAULT_DEFAULT_PORT);
+        defaultContextPath = OsgiUtil.toString(props.get(OSGI_DEFAULT_CONTEXT_PATH), RecapConstants.DEFAULT_DEFAULT_CONTEXT_PATH);
+        defaultPrefix = OsgiUtil.toString(props.get(OSGI_DEFAULT_PREFIX), RecapConstants.DEFAULT_DEFAULT_PREFIX);
+        defaultUsername = OsgiUtil.toString(props.get(OSGI_DEFAULT_USERNAME), RecapConstants.DEFAULT_DEFAULT_USERNAME);
+        defaultPassword = OsgiUtil.toString(props.get(OSGI_DEFAULT_PASSWORD), RecapConstants.DEFAULT_DEFAULT_PASSWORD);
+        defaultBatchSize = OsgiUtil.toInteger(props.get(OSGI_DEFAULT_BATCH_SIZE), RecapConstants.DEFAULT_DEFAULT_BATCH_SIZE);
+        defaultBatchReadConfig = OsgiUtil.toString(props.get(OSGI_DEFAULT_BATCH_READ_CONFIG), RecapConstants.DEFAULT_DEFAULT_BATCH_READ_CONFIG);
+        defaultLastModifiedProperty = OsgiUtil.toString(props.get(OSGI_DEFAULT_LAST_MODIFIED_PROPERTY), RecapConstants.DEFAULT_DEFAULT_LAST_MODIFIED_PROPERTY);
         this.sessionsInterrupted = false;
     }
 
@@ -121,6 +128,7 @@ public class RecapImpl implements Recap {
         defaultUsername = null;
         defaultPassword = null;
         defaultBatchSize = 0;
+        defaultBatchReadConfig = null;
         defaultLastModifiedProperty = null;
     }
 
@@ -138,6 +146,10 @@ public class RecapImpl implements Recap {
 
     public int getDefaultBatchSize() {
         return defaultBatchSize;
+    }
+
+    public String getDefaultBatchReadConfig() {
+        return defaultBatchReadConfig;
     }
 
     public String getDefaultLastModifiedProperty() {
@@ -189,7 +201,9 @@ public class RecapImpl implements Recap {
     private Repository getRepository(RecapAddress recapAddress, BatchReadConfig batchReadConfig) throws RepositoryException {
         Map<String, Object> params = new HashMap<String, Object>();
         params.put(Spi2davexRepositoryServiceFactory.PARAM_REPOSITORY_URI, getRepositoryUrl(recapAddress));
-        params.put(Spi2davexRepositoryServiceFactory.PARAM_BATCHREAD_CONFIG, batchReadConfig);
+        if (batchReadConfig != null) {
+            params.put(Spi2davexRepositoryServiceFactory.PARAM_BATCHREAD_CONFIG, batchReadConfig);
+        }
         params.put(Jcr2spiRepositoryFactory.PARAM_REPOSITORY_SERVICE_FACTORY, Spi2davexRepositoryServiceFactory.class.getName());
         params.put(Jcr2spiRepositoryFactory.PARAM_ITEM_CACHE_SIZE, 128);
         params.put(Jcr2spiRepositoryFactory.PARAM_LOG_WRITER_PROVIDER, new Slf4jLogWriterProvider());
@@ -237,7 +251,9 @@ public class RecapImpl implements Recap {
         dOptions.setThrottle(0L);
         dOptions.setBatchSize(defaultBatchSize);
         dOptions.setLastModifiedProperty(defaultLastModifiedProperty);
-        dOptions.setBatchReadConfig(DEFAULT_BATCH_READ_CONFIG);
+        if (defaultBatchReadConfig != null) {
+            dOptions.setBatchReadConfig(RecapBatchReadConfig.parseParameterValue(defaultBatchReadConfig));
+        }
 
         if (options != null) {
             dOptions.setUpdate(options.isUpdate());

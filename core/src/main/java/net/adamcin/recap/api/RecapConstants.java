@@ -43,13 +43,17 @@ public class RecapConstants {
      */
     public static final String SERVLET_COPY_PATH = "/bin/recap/copy";
 
-    public static final int DEFAULT_DEFAULT_PORT = 4502;
+    // ------------------------------------------------
+    // Default Default Config Values
+    // ------------------------------------------------
+    public static final int DEFAULT_DEFAULT_PORT = 8080;
     public static final String DEFAULT_DEFAULT_CONTEXT_PATH = "";
-    public static final String DEFAULT_DEFAULT_PREFIX = "/crx/server";
+    public static final String DEFAULT_DEFAULT_PREFIX = "/server";
     public static final String DEFAULT_DEFAULT_USERNAME = "anonymous";
     public static final String DEFAULT_DEFAULT_PASSWORD = "anonymous";
     public static final int DEFAULT_DEFAULT_BATCH_SIZE = 1024;
-    public static final String DEFAULT_DEFAULT_LAST_MODIFIED_PROPERTY = "cq:lastModified";
+    public static final String DEFAULT_DEFAULT_BATCH_READ_CONFIG = "1 1 1 4";
+    public static final String DEFAULT_DEFAULT_LAST_MODIFIED_PROPERTY = "";
 
     // ------------------------------------------------
     // Request Parameters related to RecapAddresses
@@ -68,7 +72,9 @@ public class RecapConstants {
     public static final String RP_UPDATE = ":update";
     public static final String RP_ONLY_NEWER = ":only_newer";
     public static final String RP_REVERSE = ":reverse";
+    public static final String RP_NO_RECURSE = ":no_recurse";
     public static final String RP_BATCH_SIZE = ":batch_size";
+    public static final String RP_BATCH_READ_CONFIG = ":batch_read_config";
     public static final String RP_THROTTLE = ":throttle";
     public static final String RP_LAST_MODIFIED_PROPERTY = ":last_modified_property";
 

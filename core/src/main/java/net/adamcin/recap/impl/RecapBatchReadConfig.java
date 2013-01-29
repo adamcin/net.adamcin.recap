@@ -27,24 +27,99 @@
 
 package net.adamcin.recap.impl;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.jackrabbit.spi.Path;
 import org.apache.jackrabbit.spi.commons.conversion.PathResolver;
 import org.apache.jackrabbit.spi2davex.BatchReadConfig;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.jcr.NamespaceException;
+import javax.jcr.RepositoryException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.StringTokenizer;
 
 /**
  * @author madamcin
  * @version $Id: RecapBatchReadConfig.java$
  */
 public class RecapBatchReadConfig implements BatchReadConfig {
+    private static final Logger LOGGER = LoggerFactory.getLogger(RecapBatchReadConfig.class);
+
+    private final Map<String, Integer> depthByPath;
+    private final List<Integer> depthByDepth;
+
+    public RecapBatchReadConfig(Map<String, Integer> depthByPath, List<Integer> depthByDepth) {
+        this.depthByPath = depthByPath;
+        this.depthByDepth = depthByDepth;
+    }
 
     public int getDepth(Path path, PathResolver resolver) throws NamespaceException {
         String jcrPath = resolver.getJCRPath(path);
-        if (path.getDepth() < 3) {
-            return 1;
+        if (depthByPath != null && depthByPath.containsKey(jcrPath)) {
+            return depthByPath.get(jcrPath);
+        } else if (depthByDepth != null && depthByDepth.size() > 0) {
+            int depth = depthByDepth.get(depthByDepth.size() - 1);
+
+            try {
+                if (depthByDepth.size() > path.getDepth()) {
+                    return depthByDepth.get(path.getDepth());
+                }
+            } catch (Exception e) {
+                LOGGER.error("[getDepth] failed to determine depth of path: {}", path);
+            }
+
+            return depth;
         } else {
-            return 4;
+            return 1;
         }
+    }
+
+    /**
+     *
+     * @param parameterValue
+     * @return a new RecapBatchReadConfig parsed from the parameter value
+     */
+    public static RecapBatchReadConfig parseParameterValue(String parameterValue) {
+        Map<String, Integer> depthByPath = new HashMap<String, Integer>();
+        List<Integer> depthByDepth = new ArrayList<Integer>();
+
+        if (parameterValue != null) {
+            StringTokenizer tk = new StringTokenizer(parameterValue);
+            if (tk.hasMoreTokens()) {
+                String nextToken = tk.nextToken();
+                LOGGER.debug("[parseParameterValue] parsing token: {}", nextToken);
+                if (nextToken.contains("=")) {
+                    String[] depthByPathParts = nextToken.split("=", 2);
+
+                    try {
+                        String depthByPathPath = depthByPathParts[0];
+                        Integer depthByPathDepth = Integer.valueOf(depthByPathParts[1]);
+                        depthByPath.put(depthByPathPath, depthByPathDepth);
+                    } catch (NumberFormatException e) {
+                        LOGGER.error("[parseParameterValue] failed to parse depthByPath: {}", nextToken);
+                    }
+                } else {
+                    try {
+                        depthByDepth.add(Integer.valueOf(nextToken));
+                    } catch (NumberFormatException e) {
+                        LOGGER.error("[parseParameterValue] failed to parse depthByDepth: {}", nextToken);
+                    }
+                }
+            }
+        }
+
+        return new RecapBatchReadConfig(depthByPath, depthByDepth);
+    }
+
+    @Override
+    public String toString() {
+        return "RecapBatchReadConfig{" +
+                "depthByPath=" + depthByPath +
+                ", depthByDepth=" + depthByDepth +
+                '}';
     }
 }

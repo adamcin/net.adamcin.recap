@@ -41,8 +41,6 @@ import org.apache.felix.scr.annotations.Property;
 import org.apache.felix.scr.annotations.Service;
 import org.apache.jackrabbit.client.RepositoryFactoryImpl;
 import org.apache.jackrabbit.jcr2spi.Jcr2spiRepositoryFactory;
-import org.apache.jackrabbit.spi.Path;
-import org.apache.jackrabbit.spi.commons.conversion.PathResolver;
 import org.apache.jackrabbit.spi.commons.logging.Slf4jLogWriterProvider;
 import org.apache.jackrabbit.spi2davex.BatchReadConfig;
 import org.apache.jackrabbit.spi2davex.Spi2davexRepositoryServiceFactory;
@@ -51,7 +49,6 @@ import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.jcr.NamespaceException;
 import javax.jcr.Repository;
 import javax.jcr.RepositoryException;
 import javax.jcr.Session;

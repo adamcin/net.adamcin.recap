@@ -27,7 +27,6 @@
 
 package net.adamcin.recap.impl;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.jackrabbit.spi.Path;
 import org.apache.jackrabbit.spi.commons.conversion.PathResolver;
 import org.apache.jackrabbit.spi2davex.BatchReadConfig;
@@ -35,7 +34,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.jcr.NamespaceException;
-import javax.jcr.RepositoryException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;

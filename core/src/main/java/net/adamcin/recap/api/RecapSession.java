@@ -30,33 +30,67 @@ package net.adamcin.recap.api;
 import javax.jcr.Session;
 
 /**
+ * Object representing a remote DavEx repository connection for
+ * synchronizing paths with a local JCR session.
+ *
  * @author madamcin
  * @version $Id: RecapSession.java$
  */
 public interface RecapSession {
 
-    void syncPath(String rootPath) throws RecapSessionException;
+    /**
+     * Synchronize a single root path to the target repository:
+     *  1.  create any missing ancestor nodes as stubs in the
+     *      target repository.
+     *  2.  create a node at the specified path if it doesn't exist
+     *  3.  copy properties from source node to the target node
+     *      according to provided options
+     *  4.  (if recursive) copy descendants according to provided
+     *      options
+     * @param path the path to sync
+     * @throws RecapSessionException
+     */
+    void sync(String path) throws RecapSessionException;
 
+    /**
+     * Commit any remaining changes to the target repository and finalize
+     * session statistics
+     * @throws RecapSessionException if commit fails
+     */
     void finish() throws RecapSessionException;
 
+    /**
+     * Logout the remote DavEx repository Session
+     */
     void logout();
 
-    Session getLocalSession();
-
+    /**
+     * Get the RecapOptions provided at the creation of the session,
+     * incorporating default values provided by the Recap service.
+     * @return
+     */
     RecapOptions getOptions();
+
+    /**
+     * Provide a progress listener for the session
+     * @param progressListener
+     */
+    void setProgressListener(RecapProgressListener progressListener);
 
     RecapProgressListener getProgressListener();
 
-    void setProgressListener(RecapProgressListener progressListener);
+    Session getLocalSession();
+
+
 
     //-----------------------------------------------------------------
     // Getters for Session Statistics
     //-----------------------------------------------------------------
     boolean isFinished();
 
-    int getTotalRecapPaths();
+    int getTotalSyncPaths();
 
-    String getLastSuccessfulRecapPath();
+    String getLastSuccessfulSyncPath();
 
     int getTotalNodes();
 

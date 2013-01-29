@@ -186,36 +186,36 @@ public class RecapSessionImpl implements RecapSession {
         }
     }
 
-    public void syncPath(String rootPath) throws RecapSessionException {
+    public void sync(String path) throws RecapSessionException {
         if (this.finished) {
             throw new RecapSessionException("RecapSession already finished.");
         }
 
-        trackMessage("Copy %s %s http://%s:%d/", rootPath, this.options.isReverse() ? "to" : "from", this.address.getHostname(), this.address.getPort());
+        trackMessage("Copy %s %s http://%s:%d/", path, this.options.isReverse() ? "to" : "from", this.address.getHostname(), this.address.getPort());
 
         try {
             if (this.start == 0L) {
                 this.start = System.currentTimeMillis();
             }
 
-            Node srcNode = getSourceSession().getNode(rootPath);
+            Node srcNode = getSourceSession().getNode(path);
             Node srcParent = srcNode.getParent();
             Node dstParent = getOrCreateTargetNode(srcParent);
 
             String dstName = srcNode.getName();
 
             this.copy(srcNode, dstParent, dstName, !this.options.isNoRecurse());
-            this.lastSuccessfulPath = rootPath;
+            this.lastSuccessfulPath = path;
             this.totalRecapPaths++;
         } catch (PathNotFoundException e) {
-            LOGGER.debug("PathNotFoundException while preparing path: {}. Message: {}", rootPath, e.getMessage());
-            trackError(rootPath, e);
+            LOGGER.debug("PathNotFoundException while preparing path: {}. Message: {}", path, e.getMessage());
+            trackError(path, e);
         } catch (RepositoryException e) {
-            LOGGER.error("RepositoryException while copying path: {}. Message: {}", rootPath, e.getMessage());
-            trackFailure(rootPath, e);
+            LOGGER.error("RepositoryException while copying path: {}. Message: {}", path, e.getMessage());
+            trackFailure(path, e);
             this.interrupted = true;
             this.finish();
-            throw new RecapSessionException("RepositoryException while preparing path: " + rootPath, e);
+            throw new RecapSessionException("RepositoryException while preparing path: " + path, e);
         } catch (RecapSessionException e) {
 
         }
@@ -249,7 +249,7 @@ public class RecapSessionImpl implements RecapSession {
                             this.getTotalNodes(), this.getTotalTimeMillis(), this.getTotalSize());
 
             trackMessage("%d root paths added or updated successfully. Last successful path: %s",
-                    this.getTotalRecapPaths(), this.getLastSuccessfulRecapPath());
+                    this.getTotalSyncPaths(), this.getLastSuccessfulSyncPath());
         }
 
         if (exception != null) {
@@ -533,11 +533,11 @@ public class RecapSessionImpl implements RecapSession {
         return this.localSession;
     }
 
-    public int getTotalRecapPaths() {
+    public int getTotalSyncPaths() {
         return this.totalRecapPaths;
     }
 
-    public String getLastSuccessfulRecapPath() {
+    public String getLastSuccessfulSyncPath() {
         return this.lastSuccessfulPath;
     }
 

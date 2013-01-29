@@ -53,7 +53,9 @@
                     <instructions>
                         <Export-Package>
                             net.adamcin.recap.api.*;version=${project.version},
-                            net.adamcin.recap.util.*;version=${project.version}
+                            net.adamcin.recap.util.*;version=${project.version},
+                            org.apache.jackrabbit.spi2dav.*;version=${jackrabbit.version},
+                            org.apache.jackrabbit.spi2davex.*;version=${jackrabbit.version}
                         </Export-Package>
                         <Private-Package>
                             net.adamcin.recap.impl.*

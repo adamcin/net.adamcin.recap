@@ -91,7 +91,7 @@
 
                 for (String path : paths) {
                     if (StringUtils.isNotEmpty(path) && path.startsWith("/")) {
-                        recapSession.syncPath(path);
+                        recapSession.sync(path);
                     }
                 }
             } finally {

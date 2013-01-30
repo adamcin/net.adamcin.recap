@@ -118,7 +118,7 @@
                 <h1 class="g-uppercase">Sync Console</h1>
             </div>
 
-            <div data-role="content">
+            <div data-role="content" style="overflow:hidden">
                 <iframe name="console_frame" width="100%" height="100%"></iframe>
             </div>
         </div>

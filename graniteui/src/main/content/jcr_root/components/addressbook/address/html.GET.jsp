@@ -86,7 +86,7 @@
                         <p class="ui-input-desc" data-for="${pageId}-onlyNewer">
                             If checked, existing nodes will only be updated if the source node is marked as newer than the target node.
                         </p>
-                        <label for="${pageId}-noRecurse">No Recurse</label>
+                        <label for="${pageId}-noRecurse">Non-Recursive</label>
                         <input id="${pageId}-noRecurse" type="checkbox" value="true"
                                name="<%=RecapConstants.RP_NO_RECURSE %>"/>
                         <p class="ui-input-desc" data-for="${pageId}-noRecurse">

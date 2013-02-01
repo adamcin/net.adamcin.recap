@@ -123,7 +123,7 @@
             </div>
             <div data-role="fieldcontain">
                 <label for="${pageId}-password">Password</label>
-                <input id="${pageId}-password" type="text" placeholder="default: ${defaultPassword}"
+                <input id="${pageId}-password" type="password" placeholder="default: ${defaultPassword}"
                        name="./<%=AddressBookConstants.PROP_PASSWORD%>"
                        value="${address.password}"/>
                 <p class="ui-input-desc" data-for="${pageId}-password">
@@ -184,15 +184,6 @@
             <a class="done ui-btn-right" href="#" data-icon="save" data-iconpos="notext">Save</a>
         </div>
     </div>
-
-    <%--
-    <% if (!ResourceUtil.isStarResource(resource)) { %>
-    <div data-role="confirm" data-for="g-recap-address-delete">
-        <a data-icon="check" data-role="button">Confirm</a>
-        <a data-icon="back" data-role="button">Cancel</a>
-    </div>
-    <% } %>
-    --%>
 
     <script type="text/javascript">
         _g.$('#<%=pageId%> .done').click(function() {

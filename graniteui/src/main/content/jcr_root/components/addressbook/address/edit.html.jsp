@@ -39,9 +39,10 @@
 %><%
     Recap recap = sling.getService(Recap.class);
     if (recap != null) {
+        String defaultPassword = (recap.getDefaultPassword() != null ? recap.getDefaultPassword() : "");
         pageContext.setAttribute("defaultPort", recap.getDefaultPort());
         pageContext.setAttribute("defaultUsername", recap.getDefaultUsername());
-        pageContext.setAttribute("defaultPassword", recap.getDefaultPassword());
+        pageContext.setAttribute("defaultPassword", defaultPassword.replaceAll(".", "*"));
         pageContext.setAttribute("defaultContextPath", recap.getDefaultContextPath());
         pageContext.setAttribute("defaultPrefix", recap.getDefaultPrefix());
     }

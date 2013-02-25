@@ -179,17 +179,13 @@ public class RecapImpl implements Recap {
         LOGGER.debug("[initSession] opts={}", opts);
         Session srcSession;
 
-        ClassLoader orig = Thread.currentThread().getContextClassLoader();
         try {
-            Thread.currentThread().setContextClassLoader(getClass().getClassLoader());
             Repository srcRepo = this.getRepository(addr, opts.getBatchReadConfig());
             srcSession = srcRepo.login(
                     new SimpleCredentials(addr.getUsername(),
                             addr.getPassword().toCharArray()));
         } catch (Exception e) {
             throw new RecapSessionException("Failed to login to source repository.", e);
-        } finally {
-            Thread.currentThread().setContextClassLoader(orig);
         }
 
         return new RecapSessionImpl(this, addr, opts, localJcrSession, srcSession);
@@ -205,7 +201,7 @@ public class RecapImpl implements Recap {
         params.put(Jcr2spiRepositoryFactory.PARAM_ITEM_CACHE_SIZE, 128);
         params.put(Jcr2spiRepositoryFactory.PARAM_LOG_WRITER_PROVIDER, new Slf4jLogWriterProvider());
 
-        LOGGER.error("[getRepository] repository SPI params: {}", params);
+        LOGGER.debug("[getRepository] repository SPI params: {}", params);
         return new RepositoryFactoryImpl().getRepository(params);
     }
 

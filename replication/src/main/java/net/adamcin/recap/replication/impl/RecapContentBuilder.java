@@ -28,6 +28,7 @@
 package net.adamcin.recap.replication.impl;
 
 import com.day.cq.replication.*;
+import net.adamcin.recap.replication.RecapReplicationConstants;
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Property;
 import org.apache.felix.scr.annotations.Service;
@@ -43,10 +44,9 @@ import javax.jcr.Session;
  */
 @Component
 @Service
-@Property(name = "name", value = RecapContentBuilder.NAME, propertyPrivate = true)
+@Property(name = "name", value = RecapReplicationConstants.SERIALIZATION_TYPE, propertyPrivate = true)
 public class RecapContentBuilder implements ContentBuilder {
 
-    public static final String NAME = "recap";
     public static final String TITLE = "Recap";
 
     public ReplicationContent create(Session session, ReplicationAction action, ReplicationContentFactory factory)
@@ -55,7 +55,7 @@ public class RecapContentBuilder implements ContentBuilder {
     }
 
     public String getName() {
-        return NAME;
+        return RecapReplicationConstants.SERIALIZATION_TYPE;
     }
 
     public String getTitle() {

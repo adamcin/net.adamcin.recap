@@ -30,6 +30,7 @@ package net.adamcin.recap.replication.impl;
 import com.day.cq.replication.*;
 import com.day.cq.replication.ReplicationLog.Level;
 import net.adamcin.recap.api.*;
+import net.adamcin.recap.replication.RecapReplicationConstants;
 import org.apache.commons.lang.StringUtils;
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Reference;
@@ -58,8 +59,6 @@ import java.net.URISyntaxException;
 public class RecapTransportHandler implements TransportHandler, PollingTransportHandler {
     private static final Logger LOGGER = LoggerFactory.getLogger(RecapTransportHandler.class);
 
-    public static final String PREFIX_RECAP = "recap+";
-
     @Reference
     private Recap recap;
 
@@ -76,8 +75,8 @@ public class RecapTransportHandler implements TransportHandler, PollingTransport
 
         final String uri = config.getTransportURI();
 
-        if (!uri.startsWith(PREFIX_RECAP)) {
-            throw new ReplicationException("uri must start with " + PREFIX_RECAP);
+        if (!uri.startsWith(RecapReplicationConstants.TRANSPORT_URI_SCHEME_PREFIX)) {
+            throw new ReplicationException("uri must start with " + RecapReplicationConstants.TRANSPORT_URI_SCHEME_PREFIX);
         }
 
         final String user = config.getTransportUser();
@@ -85,7 +84,7 @@ public class RecapTransportHandler implements TransportHandler, PollingTransport
 
         try {
 
-            final URI parsed = new URI(uri.substring(PREFIX_RECAP.length()));
+            final URI parsed = new URI(uri.substring(RecapReplicationConstants.TRANSPORT_URI_SCHEME_PREFIX.length()));
             final boolean https = "https".equals(parsed.getScheme());
             final String host = parsed.getHost();
             final int port = parsed.getPort() < 0 ? (https ? 443 : 80) : parsed.getPort();
@@ -110,7 +109,7 @@ public class RecapTransportHandler implements TransportHandler, PollingTransport
         String uri = config == null ? null : config.getTransportURI();
         LOGGER.error("[canHandle] uri={}", uri);
         return (uri != null)
-                && (uri.startsWith(PREFIX_RECAP));
+                && (uri.startsWith(RecapReplicationConstants.TRANSPORT_URI_SCHEME_PREFIX));
     }
 
     public ReverseReplication[] poll(TransportContext ctx, ReplicationTransaction tx, ReplicationContentFactory factory)
@@ -118,6 +117,13 @@ public class RecapTransportHandler implements TransportHandler, PollingTransport
         return new ReverseReplication[0];
     }
 
+    /**
+     * Delivers a replication transaction by reverse-syncing the ReplicationAction's list of paths.
+     * @param ctx
+     * @param tx
+     * @return
+     * @throws ReplicationException
+     */
     public ReplicationResult deliver(TransportContext ctx, ReplicationTransaction tx)
             throws ReplicationException {
         LOGGER.error("[deliver] uri={}", tx.getAction().getPaths());
@@ -136,13 +142,17 @@ public class RecapTransportHandler implements TransportHandler, PollingTransport
             resolver = resolverFactory.getAdministrativeResourceResolver(null);
 
             RecapOptions options = new RecapOptions() {
+                // Return true for these options
+                public boolean isOnlyNewer() { return true; }
+                public boolean isUpdate() { return true; }
+                public boolean isReverse() { return true; }
+
+                // TODO: can API calls specify a different last modified property per replication request?
                 public String getLastModifiedProperty() { return null; }
                 public Integer getBatchSize() { return null; }
                 public Long getThrottle() { return null; }
                 public BatchReadConfig getBatchReadConfig() { return null; }
-                public boolean isOnlyNewer() { return true; }
-                public boolean isUpdate() { return true; }
-                public boolean isReverse() { return true; }
+
                 public boolean isNoRecurse() { return false; }
             };
 

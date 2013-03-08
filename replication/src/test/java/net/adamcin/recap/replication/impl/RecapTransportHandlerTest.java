@@ -31,7 +31,6 @@ import com.day.cq.replication.AgentConfig;
 import com.day.cq.replication.AgentConfigGroup;
 import com.day.cq.replication.ReplicationLog;
 import net.adamcin.recap.api.RecapAddress;
-import org.apache.commons.lang.StringUtils;
 import org.apache.sling.api.resource.ValueMap;
 import org.junit.Test;
 

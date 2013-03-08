@@ -27,18 +27,9 @@
 
 package net.adamcin.recap.impl;
 
-import net.adamcin.recap.api.Recap;
-import net.adamcin.recap.api.RecapAddress;
-import net.adamcin.recap.api.RecapConstants;
-import net.adamcin.recap.api.RecapOptions;
-import net.adamcin.recap.api.RecapSession;
-import net.adamcin.recap.api.RecapSessionException;
+import net.adamcin.recap.api.*;
 import org.apache.commons.lang.StringUtils;
-import org.apache.felix.scr.annotations.Activate;
-import org.apache.felix.scr.annotations.Component;
-import org.apache.felix.scr.annotations.Deactivate;
-import org.apache.felix.scr.annotations.Property;
-import org.apache.felix.scr.annotations.Service;
+import org.apache.felix.scr.annotations.*;
 import org.apache.jackrabbit.client.RepositoryFactoryImpl;
 import org.apache.jackrabbit.jcr2spi.Jcr2spiRepositoryFactory;
 import org.apache.jackrabbit.spi.commons.logging.Slf4jLogWriterProvider;
@@ -53,7 +44,6 @@ import javax.jcr.Repository;
 import javax.jcr.RepositoryException;
 import javax.jcr.Session;
 import javax.jcr.SimpleCredentials;
-import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -68,28 +58,28 @@ public class RecapImpl implements Recap {
     private static final Logger LOGGER = LoggerFactory.getLogger(RecapImpl.class);
 
     @Property(label = "Default Remote Port", intValue = RecapConstants.DEFAULT_DEFAULT_PORT)
-    private static final String OSGI_DEFAULT_PORT = "default.port";
+    protected static final String OSGI_DEFAULT_PORT = "default.port";
 
     @Property(label = "Default Remote Username", value = RecapConstants.DEFAULT_DEFAULT_USERNAME)
-    private static final String OSGI_DEFAULT_USERNAME = "default.username";
+    protected static final String OSGI_DEFAULT_USERNAME = "default.username";
 
     @Property(label = "Default Remote Password", value = RecapConstants.DEFAULT_DEFAULT_PASSWORD)
-    private static final String OSGI_DEFAULT_PASSWORD = "default.password";
+    protected static final String OSGI_DEFAULT_PASSWORD = "default.password";
 
     @Property(label = "Default Remote Context Path", value = RecapConstants.DEFAULT_DEFAULT_CONTEXT_PATH)
-    private static final String OSGI_DEFAULT_CONTEXT_PATH = "default.contextPath";
+    protected static final String OSGI_DEFAULT_CONTEXT_PATH = "default.contextPath";
 
     @Property(label = "Default Remote Prefix", value = RecapConstants.DEFAULT_DEFAULT_PREFIX)
-    private static final String OSGI_DEFAULT_PREFIX = "default.prefix";
+    protected static final String OSGI_DEFAULT_PREFIX = "default.prefix";
 
     @Property(label = "Default Batch Size", intValue = RecapConstants.DEFAULT_DEFAULT_BATCH_SIZE)
-    private static final String OSGI_DEFAULT_BATCH_SIZE = "default.batchSize";
+    protected static final String OSGI_DEFAULT_BATCH_SIZE = "default.batchSize";
 
     @Property(label = "Default Batch Read Config", value= RecapConstants.DEFAULT_DEFAULT_BATCH_READ_CONFIG)
-    private static final String OSGI_DEFAULT_BATCH_READ_CONFIG = "default.batchReadConfig";
+    protected static final String OSGI_DEFAULT_BATCH_READ_CONFIG = "default.batchReadConfig";
 
     @Property(label = "Default Last Modified Property", value = RecapConstants.DEFAULT_DEFAULT_LAST_MODIFIED_PROPERTY)
-    private static final String OSGI_DEFAULT_LAST_MODIFIED_PROPERTY = "default.lastModifiedProperty";
+    protected static final String OSGI_DEFAULT_LAST_MODIFIED_PROPERTY = "default.lastModifiedProperty";
 
     private int defaultPort;
     private String defaultContextPath;
@@ -103,8 +93,10 @@ public class RecapImpl implements Recap {
     boolean sessionsInterrupted = false;
 
     @Activate
-    protected void activate(ComponentContext ctx) {
-        Dictionary<?, ?> props = ctx.getProperties();
+    protected void activate(ComponentContext ctx, Map<String, Object> props) {
+        this.sessionsInterrupted = false;
+
+        LOGGER.debug("[activate] props={}", props);
         defaultPort = OsgiUtil.toInteger(props.get(OSGI_DEFAULT_PORT), RecapConstants.DEFAULT_DEFAULT_PORT);
         defaultContextPath = OsgiUtil.toString(props.get(OSGI_DEFAULT_CONTEXT_PATH), RecapConstants.DEFAULT_DEFAULT_CONTEXT_PATH);
         defaultPrefix = OsgiUtil.toString(props.get(OSGI_DEFAULT_PREFIX), RecapConstants.DEFAULT_DEFAULT_PREFIX);
@@ -113,7 +105,6 @@ public class RecapImpl implements Recap {
         defaultBatchSize = OsgiUtil.toInteger(props.get(OSGI_DEFAULT_BATCH_SIZE), RecapConstants.DEFAULT_DEFAULT_BATCH_SIZE);
         defaultBatchReadConfig = OsgiUtil.toString(props.get(OSGI_DEFAULT_BATCH_READ_CONFIG), RecapConstants.DEFAULT_DEFAULT_BATCH_READ_CONFIG);
         defaultLastModifiedProperty = OsgiUtil.toString(props.get(OSGI_DEFAULT_LAST_MODIFIED_PROPERTY), RecapConstants.DEFAULT_DEFAULT_LAST_MODIFIED_PROPERTY);
-        this.sessionsInterrupted = false;
     }
 
     @Deactivate
@@ -179,13 +170,17 @@ public class RecapImpl implements Recap {
         LOGGER.debug("[initSession] opts={}", opts);
         Session srcSession;
 
+        ClassLoader orig = Thread.currentThread().getContextClassLoader();
         try {
+            Thread.currentThread().setContextClassLoader(getClass().getClassLoader());
             Repository srcRepo = this.getRepository(addr, opts.getBatchReadConfig());
             srcSession = srcRepo.login(
                     new SimpleCredentials(addr.getUsername(),
                             addr.getPassword().toCharArray()));
         } catch (Exception e) {
             throw new RecapSessionException("Failed to login to source repository.", e);
+        } finally {
+            Thread.currentThread().setContextClassLoader(orig);
         }
 
         return new RecapSessionImpl(this, addr, opts, localJcrSession, srcSession);
@@ -219,7 +214,7 @@ public class RecapImpl implements Recap {
             dAddress.setHostname(address.getHostname());
             dAddress.setHttps(address.isHttps());
 
-            if (address.getPort() != null) {
+            if (address.getPort() != null && address.getPort() > 0) {
                 dAddress.setPort(address.getPort());
             }
             if (address.getUsername() != null) {
@@ -275,7 +270,9 @@ public class RecapImpl implements Recap {
         if (recapAddress.getHostname() != null) {
             addressBuilder.append((recapAddress.isHttps() ? "https://" : "http://"));
             addressBuilder.append(recapAddress.getHostname());
-            if (recapAddress.getPort() != null && recapAddress.getPort() != 80) {
+            if (recapAddress.getPort() != null &&
+                    !(!recapAddress.isHttps() && recapAddress.getPort() == 80) &&
+                    !(recapAddress.isHttps() && recapAddress.getPort() == 443)) {
                 addressBuilder.append(":").append(recapAddress.getPort());
             }
             if (StringUtils.isNotEmpty(recapAddress.getContextPath()) &&
@@ -286,7 +283,8 @@ public class RecapImpl implements Recap {
         return addressBuilder.toString();
     }
 
-    public String getRepositoryUrl(RecapAddress recapAddress) {
+    public String getRepositoryUrl(RecapAddress address) {
+        RecapAddress recapAddress = applyAddressDefaults(address);
         String base = getDisplayableUrl(recapAddress);
         if (StringUtils.isNotEmpty(base)) {
             if (recapAddress.getPrefix() != null) {

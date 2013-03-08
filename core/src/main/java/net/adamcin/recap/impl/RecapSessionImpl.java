@@ -27,11 +27,7 @@
 
 package net.adamcin.recap.impl;
 
-import net.adamcin.recap.api.RecapAddress;
-import net.adamcin.recap.api.RecapOptions;
-import net.adamcin.recap.api.RecapProgressListener;
-import net.adamcin.recap.api.RecapSession;
-import net.adamcin.recap.api.RecapSessionException;
+import net.adamcin.recap.api.*;
 import org.apache.commons.lang.StringUtils;
 import org.apache.jackrabbit.JcrConstants;
 import org.slf4j.Logger;
@@ -39,21 +35,9 @@ import org.slf4j.LoggerFactory;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 
-import javax.jcr.NamespaceException;
-import javax.jcr.Node;
-import javax.jcr.NodeIterator;
-import javax.jcr.PathNotFoundException;
-import javax.jcr.Property;
-import javax.jcr.PropertyIterator;
-import javax.jcr.RepositoryException;
-import javax.jcr.Session;
-import javax.jcr.Value;
+import javax.jcr.*;
 import javax.jcr.nodetype.NodeType;
-import java.util.Calendar;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * @author madamcin

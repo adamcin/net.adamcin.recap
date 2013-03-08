@@ -27,21 +27,11 @@
 
 package net.adamcin.recap.impl;
 
-import net.adamcin.recap.api.Recap;
-import net.adamcin.recap.api.RecapAddress;
-import net.adamcin.recap.api.RecapConstants;
-import net.adamcin.recap.api.RecapOptions;
-import net.adamcin.recap.api.RecapProgressListener;
-import net.adamcin.recap.api.RecapSession;
-import net.adamcin.recap.api.RecapSessionException;
+import net.adamcin.recap.api.*;
 import net.adamcin.recap.util.DefaultProgressListener;
 import net.adamcin.recap.util.HtmlProgressListener;
 import org.apache.commons.lang.StringUtils;
-import org.apache.felix.scr.annotations.Component;
-import org.apache.felix.scr.annotations.Properties;
-import org.apache.felix.scr.annotations.Property;
-import org.apache.felix.scr.annotations.Reference;
-import org.apache.felix.scr.annotations.Service;
+import org.apache.felix.scr.annotations.*;
 import org.apache.sling.api.SlingConstants;
 import org.apache.sling.api.SlingHttpServletRequest;
 import org.apache.sling.api.SlingHttpServletResponse;

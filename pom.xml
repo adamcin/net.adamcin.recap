@@ -45,6 +45,7 @@
 		<module>parent</module>
 		<module>core</module>
         <module>addressbook</module>
+        <module>replication</module>
 		<module>graniteui</module>
 	</modules>
 

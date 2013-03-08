@@ -7,11 +7,11 @@
           <property key="Bundle-Description" value="Parent POM for Recap project" />
           <property key="Export-Package" value="net.adamcin.recap.api.*;version=0.7.0-SNAPSHOT,net.adamcin.recap.util.*;version=0.7.0-SNAPSHOT,org.apache.jackrabbit.spi2dav.*;version=2.4.0,org.apache.jackrabbit.spi2davex.*;version=2.4.0" />
           <property key="Private-Package" value="net.adamcin.recap.impl.*" />
-          <property key="Embed-Dependency" value="jackrabbit-jcr-client,jackrabbit-spi2dav,jackrabbit-jcr2spi" />
+          <property key="Embed-Dependency" value="jackrabbit-jcr-client;inline=false,jackrabbit-jcr2spi;inline=false,jackrabbit-spi2dav" />
           <property key="Bundle-Name" value="net.adamcin.recap.net.adamcin.recap.core" />
-          <property key="Bundle-ClassPath" value=".,jackrabbit-jcr-client-2.4.0.jar,jackrabbit-spi2dav-2.4.0.jar,jackrabbit-jcr2spi-2.4.0.jar" />
-          <property key="Include-Resource" value="jackrabbit-jcr-client-2.4.0.jar=$MAVEN_REPOSITORY$/org/apache/jackrabbit/jackrabbit-jcr-client/2.4.0/jackrabbit-jcr-client-2.4.0.jar,jackrabbit-spi2dav-2.4.0.jar=$MAVEN_REPOSITORY$/org/apache/jackrabbit/jackrabbit-spi2dav/2.4.0/jackrabbit-spi2dav-2.4.0.jar,jackrabbit-jcr2spi-2.4.0.jar=$MAVEN_REPOSITORY$/org/apache/jackrabbit/jackrabbit-jcr2spi/2.4.0/jackrabbit-jcr2spi-2.4.0.jar" />
-          <property key="Embedded-Artifacts" value="jackrabbit-jcr-client-2.4.0.jar;g=&quot;org.apache.jackrabbit&quot;;a=&quot;jackrabbit-jcr-client&quot;;v=&quot;2.4.0&quot;,jackrabbit-spi2dav-2.4.0.jar;g=&quot;org.apache.jackrabbit&quot;;a=&quot;jackrabbit-spi2dav&quot;;v=&quot;2.4.0&quot;,jackrabbit-jcr2spi-2.4.0.jar;g=&quot;org.apache.jackrabbit&quot;;a=&quot;jackrabbit-jcr2spi&quot;;v=&quot;2.4.0&quot;" />
+          <property key="Bundle-ClassPath" value=".,jackrabbit-jcr-client-2.4.0.jar,jackrabbit-jcr2spi-2.4.0.jar,jackrabbit-spi2dav-2.4.0.jar" />
+          <property key="Include-Resource" value="jackrabbit-jcr-client-2.4.0.jar=$MAVEN_REPOSITORY$/org/apache/jackrabbit/jackrabbit-jcr-client/2.4.0/jackrabbit-jcr-client-2.4.0.jar,jackrabbit-jcr2spi-2.4.0.jar=$MAVEN_REPOSITORY$/org/apache/jackrabbit/jackrabbit-jcr2spi/2.4.0/jackrabbit-jcr2spi-2.4.0.jar,jackrabbit-spi2dav-2.4.0.jar=$MAVEN_REPOSITORY$/org/apache/jackrabbit/jackrabbit-spi2dav/2.4.0/jackrabbit-spi2dav-2.4.0.jar" />
+          <property key="Embedded-Artifacts" value="jackrabbit-jcr-client-2.4.0.jar;g=&quot;org.apache.jackrabbit&quot;;a=&quot;jackrabbit-jcr-client&quot;;v=&quot;2.4.0&quot;,jackrabbit-jcr2spi-2.4.0.jar;g=&quot;org.apache.jackrabbit&quot;;a=&quot;jackrabbit-jcr2spi&quot;;v=&quot;2.4.0&quot;,jackrabbit-spi2dav-2.4.0.jar;g=&quot;org.apache.jackrabbit&quot;;a=&quot;jackrabbit-spi2dav&quot;;v=&quot;2.4.0&quot;" />
         </additionalProperties>
         <additionalJARContents />
       </configuration>
@@ -23,6 +23,7 @@
     <content url="file://$MODULE_DIR$">
       <sourceFolder url="file://$MODULE_DIR$/src/main/resources" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/main/java" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/test/java" isTestSource="true" />
       <excludeFolder url="file://$MODULE_DIR$/target" />
     </content>
     <orderEntry type="inheritedJdk" />

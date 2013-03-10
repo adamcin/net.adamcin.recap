@@ -30,6 +30,7 @@ package net.adamcin.recap.impl;
 import net.adamcin.recap.api.*;
 import org.apache.commons.lang.StringUtils;
 import org.apache.jackrabbit.JcrConstants;
+import org.apache.jackrabbit.util.Text;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.ContentHandler;
@@ -55,7 +56,7 @@ public class RecapSessionImpl implements RecapSession {
     private RecapProgressListener progressListener;
 
     private String lastSuccessfulPath;
-    private int totalRecapPaths = 0;
+    private int totalSyncPaths = 0;
     private int numNodes = 0;
     private int totalNodes = 0;
     private long totalSize = 0L;
@@ -150,6 +151,33 @@ public class RecapSessionImpl implements RecapSession {
             return this.localSession;
         }
     }
+
+    public void checkPermissions(String path) throws RecapSessionException {
+        String parentPath = Text.getRelativeParent(path, 1);
+
+        try {
+            getSourceSession().checkPermission(path, Session.ACTION_READ);
+        } catch (RepositoryException e) {
+            trackError(path, e);
+        }
+
+        try {
+            getTargetSession().checkPermission(parentPath, Session.ACTION_READ);
+            getTargetSession().checkPermission(parentPath, Session.ACTION_ADD_NODE);
+        } catch (RepositoryException e) {
+            trackError(parentPath, e);
+        }
+
+        try {
+            getTargetSession().checkPermission(path, Session.ACTION_READ);
+            getTargetSession().checkPermission(path, Session.ACTION_ADD_NODE);
+            getTargetSession().checkPermission(path, Session.ACTION_SET_PROPERTY);
+            getTargetSession().checkPermission(path, Session.ACTION_REMOVE);
+        } catch (RepositoryException e) {
+            trackError(path, e);
+        }
+    }
+
     public Node getOrCreateTargetNode(Node sourceNode) throws RepositoryException {
         if (sourceNode.getDepth() == 0) {
             return getTargetSession().getRootNode();
@@ -175,7 +203,7 @@ public class RecapSessionImpl implements RecapSession {
             throw new RecapSessionException("RecapSession already finished.");
         }
 
-        trackMessage("Copy %s %s http://%s:%d/", path, this.options.isReverse() ? "to" : "from", this.address.getHostname(), this.address.getPort());
+        trackMessage("Sync %s %s http://%s:%d/", path, this.options.isReverse() ? "to" : "from", this.address.getHostname(), this.address.getPort());
 
         try {
             if (this.start == 0L) {
@@ -190,7 +218,7 @@ public class RecapSessionImpl implements RecapSession {
 
             this.copy(srcNode, dstParent, dstName, !this.options.isNoRecurse());
             this.lastSuccessfulPath = path;
-            this.totalRecapPaths++;
+            this.totalSyncPaths++;
         } catch (PathNotFoundException e) {
             LOGGER.debug("PathNotFoundException while preparing path: {}. Message: {}", path, e.getMessage());
             trackError(path, e);
@@ -200,8 +228,59 @@ public class RecapSessionImpl implements RecapSession {
             this.interrupted = true;
             this.finish();
             throw new RecapSessionException("RepositoryException while preparing path: " + path, e);
-        } catch (RecapSessionException e) {
+        }
+    }
 
+    public void syncContent(String path) throws RecapSessionException {
+        if (this.finished) {
+            throw new RecapSessionException("RecapSession already finished.");
+        }
+
+        trackMessage("Sync %s %s http://%s:%d/", path, this.options.isReverse() ? "to" : "from", this.address.getHostname(), this.address.getPort());
+
+        try {
+            if (this.start == 0L) {
+                this.start = System.currentTimeMillis();
+            }
+
+            Node srcNode = getSourceSession().getNode(path);
+            Node srcParent = srcNode.getParent();
+            Node dstParent = getOrCreateTargetNode(srcParent);
+
+            String dstName = srcNode.getName();
+
+            this.copy(srcNode, dstParent, dstName, false);
+
+            if (srcNode.hasNode(JcrConstants.JCR_CONTENT)) {
+                Node srcContentNode = srcNode.getNode(JcrConstants.JCR_CONTENT);
+
+                this.copy(srcContentNode, dstParent.getNode(dstName), JcrConstants.JCR_CONTENT,
+                        !this.options.isNoRecurse());
+            }
+
+            this.lastSuccessfulPath = path;
+            this.totalSyncPaths++;
+        } catch (PathNotFoundException e) {
+            LOGGER.debug("PathNotFoundException while preparing path: {}. Message: {}", path, e.getMessage());
+            trackError(path, e);
+        } catch (RepositoryException e) {
+            LOGGER.error("RepositoryException while copying path: {}. Message: {}", path, e.getMessage());
+            trackFailure(path, e);
+            this.interrupted = true;
+            this.finish();
+            throw new RecapSessionException("RepositoryException while preparing path: " + path, e);
+        }
+    }
+
+    public void delete(String path) throws RecapSessionException {
+        if (this.finished) {
+            throw new RecapSessionException("RecapSession already finished.");
+        }
+    }
+
+    public void deleteContent(String path) throws RecapSessionException {
+        if (this.finished) {
+            throw new RecapSessionException("RecapSession already finished.");
         }
     }
 
@@ -518,7 +597,7 @@ public class RecapSessionImpl implements RecapSession {
     }
 
     public int getTotalSyncPaths() {
-        return this.totalRecapPaths;
+        return this.totalSyncPaths;
     }
 
     public String getLastSuccessfulSyncPath() {

@@ -39,6 +39,14 @@ import javax.jcr.Session;
 public interface RecapSession {
 
     /**
+     * Checks for appropriate permissions on source and target repositories
+     * at the specified path, without executing a sync
+     * @param path
+     * @throws RecapSessionException if permissions are insufficient
+     */
+    void checkPermissions(String path) throws RecapSessionException;
+
+    /**
      * Synchronize a single root path to the target repository:
      *  1.  create any missing ancestor nodes as stubs in the
      *      target repository.
@@ -51,6 +59,23 @@ public interface RecapSession {
      * @throws RecapSessionException
      */
     void sync(String path) throws RecapSessionException;
+
+    /**
+     * Synchronize a single root path to the target repository:
+     *  1.  create any missing ancestor nodes as stubs in the
+     *      target repository.
+     *  2.  create a node at the specified path if it doesn't exist
+     *  3.  copy properties from source node to the target node
+     *      according to provided options
+     *  4.  If source node has a jcr:content child node, sync the
+     *      jcr:content node to the target repository, obeying
+     *      recursive option for descendants of the jcr:content node
+     * @param path
+     * @throws RecapSessionException
+     */
+    void syncContent(String path) throws RecapSessionException;
+
+    void delete(String path) throws RecapSessionException;
 
     /**
      * Commit any remaining changes to the target repository and finalize
@@ -80,8 +105,6 @@ public interface RecapSession {
     RecapProgressListener getProgressListener();
 
     Session getLocalSession();
-
-
 
     //-----------------------------------------------------------------
     // Getters for Session Statistics

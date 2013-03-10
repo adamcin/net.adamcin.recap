@@ -30,6 +30,7 @@ package net.adamcin.recap.addressbook.impl;
 import net.adamcin.recap.addressbook.Address;
 import net.adamcin.recap.addressbook.AddressBookConstants;
 import net.adamcin.recap.api.Recap;
+import net.adamcin.recap.util.DefaultRecapAddress;
 import org.apache.sling.api.resource.Resource;
 import org.apache.sling.api.resource.ValueMap;
 
@@ -37,7 +38,7 @@ import org.apache.sling.api.resource.ValueMap;
  * @author madamcin
  * @version $Id: AddressImpl.java$
  */
-public class AddressImpl implements Address {
+public class AddressImpl extends DefaultRecapAddress implements Address {
 
     private final Resource resource;
     private final ValueMap properties;

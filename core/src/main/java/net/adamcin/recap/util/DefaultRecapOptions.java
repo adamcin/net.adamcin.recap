@@ -25,77 +25,46 @@
  * For more information, please refer to <http://unlicense.org/>
  */
 
-package net.adamcin.recap.impl;
+package net.adamcin.recap.util;
 
-import net.adamcin.recap.util.DefaultRecapAddress;
+import net.adamcin.recap.api.RecapOptions;
+import org.apache.jackrabbit.spi2davex.BatchReadConfig;
 
-/**
- * @author madamcin
- * @version $Id: RecapRequestImpl.java$
- */
-public class RecapAddressImpl extends DefaultRecapAddress {
+public class DefaultRecapOptions implements RecapOptions {
 
-    String hostname;
-    Integer port;
-    boolean https;
-    String username;
-    String password;
-    String contextPath;
-    String prefix;
-
-    public String getHostname() {
-        return hostname;
+    public String getLastModifiedProperty() {
+        return null;
     }
 
-    public void setHostname(String hostname) {
-        this.hostname = hostname;
+    public Integer getBatchSize() {
+        return null;
     }
 
-    public Integer getPort() {
-        return port;
+    public Long getThrottle() {
+        return null;
     }
 
-    public void setPort(Integer port) {
-        this.port = port;
+    public BatchReadConfig getBatchReadConfig() {
+        return null;
     }
 
-    public String getUsername() {
-        return username;
+    public boolean isOnlyNewer() {
+        return false;
     }
 
-    public void setUsername(String username) {
-        this.username = username;
+    public boolean isUpdate() {
+        return false;
     }
 
-    public String getPassword() {
-        return password;
+    public boolean isReverse() {
+        return false;
     }
 
-    public void setPassword(String password) {
-        this.password = password;
+    public boolean isNoRecurse() {
+        return false;
     }
 
-    public String getContextPath() {
-        return contextPath;
-    }
-
-    public void setContextPath(String contextPath) {
-        this.contextPath = contextPath;
-    }
-
-    public boolean isHttps() {
-        return https;
-    }
-
-    public void setHttps(boolean https) {
-        this.https = https;
-    }
-
-    public String getPrefix() {
-        return prefix;
-    }
-
-    public void setPrefix(String prefix) {
-        this.prefix = prefix;
+    public boolean isNoDelete() {
+        return false;
     }
 }

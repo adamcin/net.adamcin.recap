@@ -25,77 +25,37 @@
  * For more information, please refer to <http://unlicense.org/>
  */
 
-package net.adamcin.recap.impl;
+package net.adamcin.recap.util;
 
-import net.adamcin.recap.util.DefaultRecapAddress;
+import net.adamcin.recap.api.RecapAddress;
 
-/**
- * @author madamcin
- * @version $Id: RecapRequestImpl.java$
- */
-public class RecapAddressImpl extends DefaultRecapAddress {
+public class DefaultRecapAddress implements RecapAddress {
 
-    String hostname;
-    Integer port;
-    boolean https;
-    String username;
-    String password;
-    String contextPath;
-    String prefix;
-
-    public String getHostname() {
-        return hostname;
+    public boolean isHttps() {
+        return false;
     }
 
-    public void setHostname(String hostname) {
-        this.hostname = hostname;
+    public String getHostname() {
+        return null;
     }
 
     public Integer getPort() {
-        return port;
-    }
-
-    public void setPort(Integer port) {
-        this.port = port;
+        return null;
     }
 
     public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
+        return null;
     }
 
     public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
+        return null;
     }
 
     public String getContextPath() {
-        return contextPath;
-    }
-
-    public void setContextPath(String contextPath) {
-        this.contextPath = contextPath;
-    }
-
-    public boolean isHttps() {
-        return https;
-    }
-
-    public void setHttps(boolean https) {
-        this.https = https;
+        return null;
     }
 
     public String getPrefix() {
-        return prefix;
-    }
-
-    public void setPrefix(String prefix) {
-        this.prefix = prefix;
+        return null;
     }
 }

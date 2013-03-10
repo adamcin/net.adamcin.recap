@@ -28,13 +28,14 @@
 package net.adamcin.recap.impl;
 
 import net.adamcin.recap.api.RecapOptions;
+import net.adamcin.recap.util.DefaultRecapOptions;
 import org.apache.jackrabbit.spi2davex.BatchReadConfig;
 
 /**
  * @author madamcin
  * @version $Id: RecapOptionsImpl.java$
  */
-public class RecapOptionsImpl implements RecapOptions {
+public class RecapOptionsImpl extends DefaultRecapOptions {
 
     private String lastModifiedProperty;
     private Integer batchSize;

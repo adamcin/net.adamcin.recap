@@ -27,38 +27,19 @@
 
 package net.adamcin.recap.replication.impl;
 
-import com.day.cq.replication.*;
+import com.day.cq.replication.AgentConfig;
+import com.day.cq.replication.AgentConfigGroup;
+import com.day.cq.replication.ReplicationLog;
+import net.adamcin.recap.api.RecapAddress;
 import net.adamcin.recap.replication.RecapReplicationUtil;
-import org.apache.felix.scr.annotations.Component;
-import org.apache.felix.scr.annotations.Property;
-import org.apache.felix.scr.annotations.Service;
+import net.adamcin.recap.replication.ReplicationLogProgressListener;
+import org.apache.sling.api.resource.ValueMap;
+import org.junit.Test;
 
-import javax.jcr.Session;
+import static org.junit.Assert.*;
 
-/**
- * Recap content builder implementation to prevent serialization of content, since the recap service syncs content
- * from the real content path. This is one of the benefits provided by using this agent type as an alternative to the
- * default type, as it will not pollute the DataStore with orphaned replication payloads. It comes at the cost of
- * reliably sending content snapshots, as the content that is replicated by this agent is whatever state the content is
- * in when the replication job is processed from the queue, not when it is added to the queue.
- */
-@Component
-@Service
-@Property(name = "name", value = RecapReplicationUtil.SERIALIZATION_TYPE, propertyPrivate = true)
-public class RecapContentBuilder implements ContentBuilder {
+public class DefaultRecapTransportHandlerTest {
 
-    public static final String TITLE = "Recap";
 
-    public ReplicationContent create(Session session, ReplicationAction action, ReplicationContentFactory factory)
-            throws ReplicationException {
-        return ReplicationContent.VOID;
-    }
 
-    public String getName() {
-        return RecapReplicationUtil.SERIALIZATION_TYPE;
-    }
-
-    public String getTitle() {
-        return TITLE;
-    }
 }

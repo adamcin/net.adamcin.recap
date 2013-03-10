@@ -27,22 +27,45 @@
 
 package net.adamcin.recap.replication;
 
+import com.day.cq.replication.ReplicationLog;
+import net.adamcin.recap.api.RecapProgressListener;
+
 /**
- * Useful constants for API-level usage of Recap replication agents in Adobe Granite
+ * Implementation of RecapProgressListener that wraps a ReplicationLog.
  */
-public final class RecapReplicationConstants {
+public class ReplicationLogProgressListener implements RecapProgressListener {
 
-    /**
-     * specify recap replication agent transport URI using recap+http:// or recap+https:// scheme
-     */
-    public static final String TRANSPORT_URI_SCHEME_PREFIX = "recap+";
+    private final ReplicationLog log;
 
-    /**
-     * specify recap replication agent serialization type to "recap"
-     */
-    public static final String SERIALIZATION_TYPE = "recap";
+    public ReplicationLogProgressListener(ReplicationLog log) {
+        this.log = log;
+    }
 
-    private RecapReplicationConstants() {
-        // prevent instantiation
+    public void onMessage(String fmt, Object... args) {
+        if (atLeast(log.getLevel(), ReplicationLog.Level.INFO)) {
+            log.info("M %s", String.format(fmt, args));
+        }
+    }
+
+    public void onError(String path, Exception ex) {
+        if (atLeast(log.getLevel(), ReplicationLog.Level.WARN)) {
+            log.warn("E %s (%s)", path, ex.getMessage());
+        }
+    }
+
+    public void onFailure(String path, Exception ex) {
+        if (atLeast(log.getLevel(), ReplicationLog.Level.ERROR)) {
+            log.warn("F %s (%s)", path, ex.getMessage());
+        }
+    }
+
+    public void onPath(PathAction action, int count, String path) {
+        if (atLeast(log.getLevel(), ReplicationLog.Level.DEBUG)) {
+            log.warn("%s %s", action, path);
+        }
+    }
+
+    public static boolean atLeast(ReplicationLog.Level logLevel, ReplicationLog.Level compareToLevel) {
+        return logLevel.compareTo(compareToLevel) <= 0;
     }
 }

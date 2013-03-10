@@ -1,4 +1,4 @@
-/*
+package net.adamcin.recap.replication;/*
  * This is free and unencumbered software released into the public domain.
  *
  * Anyone is free to copy, modify, publish, use, compile, sell, or
@@ -25,31 +25,35 @@
  * For more information, please refer to <http://unlicense.org/>
  */
 
-package net.adamcin.recap.api;
 
-import org.apache.jackrabbit.spi2davex.BatchReadConfig;
+import com.day.cq.replication.AgentConfig;
+import net.adamcin.recap.api.RecapAddress;
+import org.junit.Test;
 
-/**
- * @author madamcin
- * @version $Id: RecapOptions.java$
- */
-public interface RecapOptions {
+import static org.junit.Assert.*;
 
-    String getLastModifiedProperty();
+public class RecapReplicationUtilTest {
 
-    Integer getBatchSize();
 
-    Long getThrottle();
+    @Test
+    public void testGetAgentAddress() {
+        AgentConfig mockConfig = new MockTransportAgentConfig("recap+http://localhost/", "admin", "adminadmin");
 
-    BatchReadConfig getBatchReadConfig();
+        RecapAddress agentAddress = null;
 
-    boolean isOnlyNewer();
+        try {
+            agentAddress = RecapReplicationUtil.getAgentAddress(mockConfig);
 
-    boolean isUpdate();
+            assertEquals("host should be localhost", "localhost", agentAddress.getHostname());
+            assertEquals("port should be 80", 80, (int) agentAddress.getPort());
+            assertEquals("user should be admin", "admin", agentAddress.getUsername());
+            assertEquals("pass should be adminadmin", "adminadmin", agentAddress.getPassword());
+            assertEquals("prefix should be /", "/", agentAddress.getPrefix());
 
-    boolean isReverse();
+        } catch (Exception e) {
+            fail("threw an exception: " + e);
+        }
 
-    boolean isNoRecurse();
+    }
 
-    boolean isNoDelete();
 }

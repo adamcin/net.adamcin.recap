@@ -80,7 +80,7 @@ public interface Recap {
 
     int getDefaultBatchSize();
 
-    String getDefaultBatchReadConfig();
+    String getDefaultRequestDepthConfig();
 
     String getDefaultLastModifiedProperty();
 }

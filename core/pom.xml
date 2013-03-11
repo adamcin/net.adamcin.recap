@@ -53,9 +53,7 @@
                     <instructions>
                         <Export-Package>
                             net.adamcin.recap.api.*;version=${project.version},
-                            net.adamcin.recap.util.*;version=${project.version},
-                            org.apache.jackrabbit.spi2dav.*;version=${jackrabbit.version},
-                            org.apache.jackrabbit.spi2davex.*;version=${jackrabbit.version}
+                            net.adamcin.recap.util.*;version=${project.version}
                         </Export-Package>
                         <Private-Package>
                             net.adamcin.recap.impl.*
@@ -63,7 +61,7 @@
                         <Embed-Dependency>
                             jackrabbit-jcr-client;inline=false,
                             jackrabbit-jcr2spi;inline=false,
-                            jackrabbit-spi2dav
+                            jackrabbit-spi2dav;inline=false
                         </Embed-Dependency>
                     </instructions>
                 </configuration>

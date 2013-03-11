@@ -27,9 +27,9 @@
 
 package net.adamcin.recap.impl;
 
-import net.adamcin.recap.api.RecapOptions;
+import net.adamcin.recap.api.RecapFilter;
+import net.adamcin.recap.api.RequestDepthConfig;
 import net.adamcin.recap.util.DefaultRecapOptions;
-import org.apache.jackrabbit.spi2davex.BatchReadConfig;
 
 /**
  * @author madamcin
@@ -40,11 +40,13 @@ public class RecapOptionsImpl extends DefaultRecapOptions {
     private String lastModifiedProperty;
     private Integer batchSize;
     private Long throttle;
-    private BatchReadConfig batchReadConfig;
+    private RequestDepthConfig requestDepthConfig;
+    private RecapFilter filter;
     private boolean onlyNewer;
     private boolean update;
     private boolean reverse;
     private boolean noRecurse;
+    private boolean noDelete;
 
     public String getLastModifiedProperty() {
         return lastModifiedProperty;
@@ -70,12 +72,20 @@ public class RecapOptionsImpl extends DefaultRecapOptions {
         this.throttle = throttle;
     }
 
-    public BatchReadConfig getBatchReadConfig() {
-        return batchReadConfig;
+    public RequestDepthConfig getRequestDepthConfig() {
+        return requestDepthConfig;
     }
 
-    public void setBatchReadConfig(BatchReadConfig batchReadConfig) {
-        this.batchReadConfig = batchReadConfig;
+    public void setRequestDepthConfig(RequestDepthConfig requestDepthConfig) {
+        this.requestDepthConfig = requestDepthConfig;
+    }
+
+    public RecapFilter getFilter() {
+        return filter;
+    }
+
+    public void setFilter(RecapFilter filter) {
+        this.filter = filter;
     }
 
     public boolean isOnlyNewer() {
@@ -110,17 +120,26 @@ public class RecapOptionsImpl extends DefaultRecapOptions {
         this.noRecurse = noRecurse;
     }
 
+    public boolean isNoDelete() {
+        return noDelete;
+    }
+
+    public void setNoDelete(boolean noDelete) {
+        this.noDelete = noDelete;
+    }
+
     @Override
     public String toString() {
         return "RecapOptionsImpl{" +
                 "lastModifiedProperty='" + lastModifiedProperty + '\'' +
                 ", batchSize=" + batchSize +
                 ", throttle=" + throttle +
-                ", batchReadConfig=" + batchReadConfig +
+                ", requestDepthConfig=" + requestDepthConfig +
                 ", onlyNewer=" + onlyNewer +
                 ", update=" + update +
                 ", reverse=" + reverse +
                 ", noRecurse=" + noRecurse +
+                ", noDelete=" + noDelete +
                 '}';
     }
 }

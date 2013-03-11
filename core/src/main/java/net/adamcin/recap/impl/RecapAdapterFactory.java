@@ -29,6 +29,7 @@ package net.adamcin.recap.impl;
 
 import net.adamcin.recap.api.*;
 import net.adamcin.recap.util.DefaultProgressListener;
+import net.adamcin.recap.util.DefaultRequestDepthConfig;
 import net.adamcin.recap.util.HtmlProgressListener;
 import org.apache.commons.lang.StringUtils;
 import org.apache.felix.scr.annotations.*;
@@ -192,9 +193,9 @@ public class RecapAdapterFactory implements AdapterFactory {
 
         options.setLastModifiedProperty(request.getParameter(RecapConstants.RP_LAST_MODIFIED_PROPERTY));
 
-        String rpBatchReadConfig = request.getParameter(RecapConstants.RP_BATCH_READ_CONFIG);
+        String rpBatchReadConfig = request.getParameter(RecapConstants.RP_READ_DEPTH_CONFIG);
         if (StringUtils.isNotBlank(rpBatchReadConfig)) {
-            options.setBatchReadConfig(RecapBatchReadConfig.parseParameterValue(rpBatchReadConfig));
+            options.setRequestDepthConfig(DefaultRequestDepthConfig.parseParameterValue(rpBatchReadConfig));
         }
 
         return options;

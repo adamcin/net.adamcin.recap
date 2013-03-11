@@ -25,37 +25,25 @@
  * For more information, please refer to <http://unlicense.org/>
  */
 
-package net.adamcin.recap.api;
+package net.adamcin.recap.impl;
 
-/**
- * @author madamcin
- * @version $Id: RecapProgressListener.java$
- */
-public interface RecapProgressListener {
+import net.adamcin.recap.api.RequestDepthConfig;
+import org.apache.jackrabbit.spi.Path;
+import org.apache.jackrabbit.spi.commons.conversion.PathResolver;
+import org.apache.jackrabbit.spi2davex.BatchReadConfig;
 
-    void onMessage(String fmt, Object... args);
+import javax.jcr.NamespaceException;
 
-    void onError(String path, Exception ex);
 
-    void onFailure(String path, Exception ex);
+public class BatchReadConfigAdapter implements BatchReadConfig {
 
-    void onPath(PathAction action, int count, String path);
+    private final RequestDepthConfig config;
 
-    enum PathAction {
-        ADD("A"), UPDATE("U"), DELETE("D"), IGNORE("I"), NO_ACTION("-");
+    public BatchReadConfigAdapter(RequestDepthConfig config) {
+        this.config = config;
+    }
 
-        String action;
-        PathAction(String action) {
-            this.action = action;
-        }
-
-        String getAction() {
-            return action;
-        }
-
-        @Override
-        public String toString() {
-            return action;
-        }
+    public int getDepth(Path path, PathResolver pathResolver) throws NamespaceException {
+        return this.config.getRequestDepth(pathResolver.getJCRPath(path), path.getDepth());
     }
 }

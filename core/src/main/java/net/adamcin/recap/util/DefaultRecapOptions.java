@@ -27,8 +27,9 @@
 
 package net.adamcin.recap.util;
 
+import net.adamcin.recap.api.RecapFilter;
 import net.adamcin.recap.api.RecapOptions;
-import org.apache.jackrabbit.spi2davex.BatchReadConfig;
+import net.adamcin.recap.api.RequestDepthConfig;
 
 public class DefaultRecapOptions implements RecapOptions {
 
@@ -44,7 +45,11 @@ public class DefaultRecapOptions implements RecapOptions {
         return null;
     }
 
-    public BatchReadConfig getBatchReadConfig() {
+    public RequestDepthConfig getRequestDepthConfig() {
+        return null;
+    }
+
+    public RecapFilter getFilter() {
         return null;
     }
 

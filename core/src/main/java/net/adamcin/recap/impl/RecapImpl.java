@@ -28,6 +28,7 @@
 package net.adamcin.recap.impl;
 
 import net.adamcin.recap.api.*;
+import net.adamcin.recap.util.DefaultRequestDepthConfig;
 import org.apache.commons.lang.StringUtils;
 import org.apache.felix.scr.annotations.*;
 import org.apache.jackrabbit.client.RepositoryFactoryImpl;
@@ -57,6 +58,12 @@ public class RecapImpl implements Recap {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RecapImpl.class);
 
+    private static final RecapFilter DEFAULT_FILTER = new RecapFilter() {
+        public boolean includesPath(String path) {
+            return true;
+        }
+    };
+
     @Property(label = "Default Remote Port", intValue = RecapConstants.DEFAULT_DEFAULT_PORT)
     protected static final String OSGI_DEFAULT_PORT = "default.port";
 
@@ -75,8 +82,8 @@ public class RecapImpl implements Recap {
     @Property(label = "Default Batch Size", intValue = RecapConstants.DEFAULT_DEFAULT_BATCH_SIZE)
     protected static final String OSGI_DEFAULT_BATCH_SIZE = "default.batchSize";
 
-    @Property(label = "Default Batch Read Config", value= RecapConstants.DEFAULT_DEFAULT_BATCH_READ_CONFIG)
-    protected static final String OSGI_DEFAULT_BATCH_READ_CONFIG = "default.batchReadConfig";
+    @Property(label = "Default Request Depth Config", value= RecapConstants.DEFAULT_DEFAULT_REQUEST_DEPTH_CONFIG)
+    protected static final String OSGI_DEFAULT_REQUEST_DEPTH_CONFIG = "default.requestDepthConfig";
 
     @Property(label = "Default Last Modified Property", value = RecapConstants.DEFAULT_DEFAULT_LAST_MODIFIED_PROPERTY)
     protected static final String OSGI_DEFAULT_LAST_MODIFIED_PROPERTY = "default.lastModifiedProperty";
@@ -87,7 +94,7 @@ public class RecapImpl implements Recap {
     private String defaultUsername;
     private String defaultPassword;
     private int defaultBatchSize;
-    private String defaultBatchReadConfig;
+    private String defaultRequestDepthConfig;
     private String defaultLastModifiedProperty;
 
     boolean sessionsInterrupted = false;
@@ -103,7 +110,7 @@ public class RecapImpl implements Recap {
         defaultUsername = OsgiUtil.toString(props.get(OSGI_DEFAULT_USERNAME), RecapConstants.DEFAULT_DEFAULT_USERNAME);
         defaultPassword = OsgiUtil.toString(props.get(OSGI_DEFAULT_PASSWORD), RecapConstants.DEFAULT_DEFAULT_PASSWORD);
         defaultBatchSize = OsgiUtil.toInteger(props.get(OSGI_DEFAULT_BATCH_SIZE), RecapConstants.DEFAULT_DEFAULT_BATCH_SIZE);
-        defaultBatchReadConfig = OsgiUtil.toString(props.get(OSGI_DEFAULT_BATCH_READ_CONFIG), RecapConstants.DEFAULT_DEFAULT_BATCH_READ_CONFIG);
+        defaultRequestDepthConfig = OsgiUtil.toString(props.get(OSGI_DEFAULT_REQUEST_DEPTH_CONFIG), RecapConstants.DEFAULT_DEFAULT_REQUEST_DEPTH_CONFIG);
         defaultLastModifiedProperty = OsgiUtil.toString(props.get(OSGI_DEFAULT_LAST_MODIFIED_PROPERTY), RecapConstants.DEFAULT_DEFAULT_LAST_MODIFIED_PROPERTY);
     }
 
@@ -116,7 +123,7 @@ public class RecapImpl implements Recap {
         defaultUsername = null;
         defaultPassword = null;
         defaultBatchSize = 0;
-        defaultBatchReadConfig = null;
+        defaultRequestDepthConfig = null;
         defaultLastModifiedProperty = null;
     }
 
@@ -136,8 +143,8 @@ public class RecapImpl implements Recap {
         return defaultBatchSize;
     }
 
-    public String getDefaultBatchReadConfig() {
-        return defaultBatchReadConfig;
+    public String getDefaultRequestDepthConfig() {
+        return defaultRequestDepthConfig;
     }
 
     public String getDefaultLastModifiedProperty() {
@@ -173,7 +180,7 @@ public class RecapImpl implements Recap {
         ClassLoader orig = Thread.currentThread().getContextClassLoader();
         try {
             Thread.currentThread().setContextClassLoader(getClass().getClassLoader());
-            Repository srcRepo = this.getRepository(addr, opts.getBatchReadConfig());
+            Repository srcRepo = this.getRepository(addr, new BatchReadConfigAdapter(opts.getRequestDepthConfig()));
             srcSession = srcRepo.login(
                     new SimpleCredentials(addr.getUsername(),
                             addr.getPassword().toCharArray()));
@@ -239,14 +246,15 @@ public class RecapImpl implements Recap {
         dOptions.setThrottle(0L);
         dOptions.setBatchSize(defaultBatchSize);
         dOptions.setLastModifiedProperty(defaultLastModifiedProperty);
-        if (defaultBatchReadConfig != null) {
-            dOptions.setBatchReadConfig(RecapBatchReadConfig.parseParameterValue(defaultBatchReadConfig));
-        }
+        dOptions.setRequestDepthConfig(DefaultRequestDepthConfig.parseParameterValue(defaultRequestDepthConfig));
+        dOptions.setFilter(DEFAULT_FILTER);
 
         if (options != null) {
             dOptions.setUpdate(options.isUpdate());
             dOptions.setOnlyNewer(options.isOnlyNewer());
             dOptions.setReverse(options.isReverse());
+            dOptions.setNoRecurse(options.isNoRecurse());
+            dOptions.setNoDelete(options.isNoDelete());
             if (options.getThrottle() != null) {
                 dOptions.setThrottle(options.getThrottle());
             }
@@ -256,8 +264,11 @@ public class RecapImpl implements Recap {
             if (options.getLastModifiedProperty() != null) {
                 dOptions.setLastModifiedProperty(options.getLastModifiedProperty());
             }
-            if (options.getBatchReadConfig() != null) {
-                dOptions.setBatchReadConfig(options.getBatchReadConfig());
+            if (options.getRequestDepthConfig() != null) {
+                dOptions.setRequestDepthConfig(options.getRequestDepthConfig());
+            }
+            if (options.getFilter() != null) {
+                dOptions.setFilter(options.getFilter());
             }
         }
 

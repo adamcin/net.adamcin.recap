@@ -27,8 +27,6 @@
 
 package net.adamcin.recap.api;
 
-import org.apache.jackrabbit.spi2davex.BatchReadConfig;
-
 /**
  * @author madamcin
  * @version $Id: RecapOptions.java$
@@ -41,7 +39,9 @@ public interface RecapOptions {
 
     Long getThrottle();
 
-    BatchReadConfig getBatchReadConfig();
+    RequestDepthConfig getRequestDepthConfig();
+
+    RecapFilter getFilter();
 
     boolean isOnlyNewer();
 

@@ -5,9 +5,9 @@
       <configuration manifestGenerationMode="OsmorcControlled" manifestLocation="" jarfileLocation="net.adamcin.recap.core-0.7.0-SNAPSHOT.jar" outputPathType="CompilerOutputPath" bndFileLocation="" bundlorFileLocation="" bundleActivator="" bundleSymbolicName="net.adamcin.recap.net.adamcin.recap.core" bundleVersion="0.7.0.SNAPSHOT" ignoreFilePattern="" useProjectDefaultManifestFileLocation="true" alwaysRebuildBundleJAR="false" doNotSynchronizeWithMaven="false">
         <additionalProperties>
           <property key="Bundle-Description" value="Parent POM for Recap project" />
-          <property key="Export-Package" value="net.adamcin.recap.api.*;version=0.7.0-SNAPSHOT,net.adamcin.recap.util.*;version=0.7.0-SNAPSHOT,org.apache.jackrabbit.spi2dav.*;version=2.4.0,org.apache.jackrabbit.spi2davex.*;version=2.4.0" />
+          <property key="Export-Package" value="net.adamcin.recap.api.*;version=0.7.0-SNAPSHOT,net.adamcin.recap.util.*;version=0.7.0-SNAPSHOT" />
           <property key="Private-Package" value="net.adamcin.recap.impl.*" />
-          <property key="Embed-Dependency" value="jackrabbit-jcr-client;inline=false,jackrabbit-jcr2spi;inline=false,jackrabbit-spi2dav" />
+          <property key="Embed-Dependency" value="jackrabbit-jcr-client;inline=false,jackrabbit-jcr2spi;inline=false,jackrabbit-spi2dav;inline=false" />
           <property key="Bundle-Name" value="net.adamcin.recap.net.adamcin.recap.core" />
           <property key="Bundle-ClassPath" value=".,jackrabbit-jcr-client-2.4.0.jar,jackrabbit-jcr2spi-2.4.0.jar,jackrabbit-spi2dav-2.4.0.jar" />
           <property key="Include-Resource" value="jackrabbit-jcr-client-2.4.0.jar=$MAVEN_REPOSITORY$/org/apache/jackrabbit/jackrabbit-jcr-client/2.4.0/jackrabbit-jcr-client-2.4.0.jar,jackrabbit-jcr2spi-2.4.0.jar=$MAVEN_REPOSITORY$/org/apache/jackrabbit/jackrabbit-jcr2spi/2.4.0/jackrabbit-jcr2spi-2.4.0.jar,jackrabbit-spi2dav-2.4.0.jar=$MAVEN_REPOSITORY$/org/apache/jackrabbit/jackrabbit-spi2dav/2.4.0/jackrabbit-spi2dav-2.4.0.jar" />

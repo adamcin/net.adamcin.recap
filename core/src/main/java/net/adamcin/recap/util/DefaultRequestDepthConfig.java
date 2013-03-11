@@ -25,45 +25,37 @@
  * For more information, please refer to <http://unlicense.org/>
  */
 
-package net.adamcin.recap.impl;
+package net.adamcin.recap.util;
 
-import org.apache.jackrabbit.spi.Path;
-import org.apache.jackrabbit.spi.commons.conversion.PathResolver;
-import org.apache.jackrabbit.spi2davex.BatchReadConfig;
+import net.adamcin.recap.api.RequestDepthConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.jcr.NamespaceException;
 import java.util.*;
 
 /**
  * @author madamcin
- * @version $Id: RecapBatchReadConfig.java$
+ * @version $Id: DefaultRequestDepthConfig.java$
  */
-public class RecapBatchReadConfig implements BatchReadConfig {
-    private static final Logger LOGGER = LoggerFactory.getLogger(RecapBatchReadConfig.class);
+public class DefaultRequestDepthConfig implements RequestDepthConfig {
+    private static final Logger LOGGER = LoggerFactory.getLogger(DefaultRequestDepthConfig.class);
 
     private final Map<String, Integer> depthByPath;
     private final List<Integer> depthByDepth;
 
-    public RecapBatchReadConfig(Map<String, Integer> depthByPath, List<Integer> depthByDepth) {
+    public DefaultRequestDepthConfig(Map<String, Integer> depthByPath, List<Integer> depthByDepth) {
         this.depthByPath = depthByPath;
         this.depthByDepth = depthByDepth;
     }
 
-    public int getDepth(Path path, PathResolver resolver) throws NamespaceException {
-        String jcrPath = resolver.getJCRPath(path);
+    public int getRequestDepth(String jcrPath, int pathDepth) {
         if (depthByPath != null && depthByPath.containsKey(jcrPath)) {
             return depthByPath.get(jcrPath);
         } else if (depthByDepth != null && depthByDepth.size() > 0) {
             int depth = depthByDepth.get(depthByDepth.size() - 1);
 
-            try {
-                if (depthByDepth.size() > path.getDepth()) {
-                    return depthByDepth.get(path.getDepth());
-                }
-            } catch (Exception e) {
-                LOGGER.error("[getDepth] failed to determine depth of path: {}", path);
+            if (depthByDepth.size() > pathDepth) {
+                return depthByDepth.get(pathDepth);
             }
 
             return depth;
@@ -75,9 +67,9 @@ public class RecapBatchReadConfig implements BatchReadConfig {
     /**
      *
      * @param parameterValue
-     * @return a new RecapBatchReadConfig parsed from the parameter value
+     * @return a new DefaultRequestDepthConfig parsed from the parameter value
      */
-    public static RecapBatchReadConfig parseParameterValue(String parameterValue) {
+    public static DefaultRequestDepthConfig parseParameterValue(String parameterValue) {
         Map<String, Integer> depthByPath = new HashMap<String, Integer>();
         List<Integer> depthByDepth = new ArrayList<Integer>();
 
@@ -106,12 +98,12 @@ public class RecapBatchReadConfig implements BatchReadConfig {
             }
         }
 
-        return new RecapBatchReadConfig(depthByPath, depthByDepth);
+        return new DefaultRequestDepthConfig(depthByPath, depthByDepth);
     }
 
     @Override
     public String toString() {
-        return "RecapBatchReadConfig{" +
+        return "DefaultRequestDepthConfig{" +
                 "depthByPath=" + depthByPath +
                 ", depthByDepth=" + depthByDepth +
                 '}';

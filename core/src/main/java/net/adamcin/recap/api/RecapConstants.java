@@ -52,7 +52,7 @@ public class RecapConstants {
     public static final String DEFAULT_DEFAULT_USERNAME = "anonymous";
     public static final String DEFAULT_DEFAULT_PASSWORD = "anonymous";
     public static final int DEFAULT_DEFAULT_BATCH_SIZE = 1024;
-    public static final String DEFAULT_DEFAULT_BATCH_READ_CONFIG = "1 1 1 4";
+    public static final String DEFAULT_DEFAULT_REQUEST_DEPTH_CONFIG = "";
     public static final String DEFAULT_DEFAULT_LAST_MODIFIED_PROPERTY = "";
 
     // ------------------------------------------------
@@ -73,8 +73,9 @@ public class RecapConstants {
     public static final String RP_ONLY_NEWER = ":only_newer";
     public static final String RP_REVERSE = ":reverse";
     public static final String RP_NO_RECURSE = ":no_recurse";
+    public static final String RP_NO_DELETE = ":no_delete";
     public static final String RP_BATCH_SIZE = ":batch_size";
-    public static final String RP_BATCH_READ_CONFIG = ":batch_read_config";
+    public static final String RP_READ_DEPTH_CONFIG = ":read_depth_config";
     public static final String RP_THROTTLE = ":throttle";
     public static final String RP_LAST_MODIFIED_PROPERTY = ":last_modified_property";
 

@@ -244,6 +244,7 @@ public class RecapSessionImpl implements RecapSession {
             }
 
             Node srcNode = getSourceSession().getNode(path);
+
             Node srcParent = srcNode.getParent();
             Node dstParent = getOrCreateTargetNode(srcParent);
 
@@ -260,6 +261,7 @@ public class RecapSessionImpl implements RecapSession {
 
             this.lastSuccessfulPath = path;
             this.totalSyncPaths++;
+
         } catch (PathNotFoundException e) {
             LOGGER.debug("PathNotFoundException while preparing path: {}. Message: {}", path, e.getMessage());
             trackError(path, e);
@@ -273,12 +275,6 @@ public class RecapSessionImpl implements RecapSession {
     }
 
     public void delete(String path) throws RecapSessionException {
-        if (this.finished) {
-            throw new RecapSessionException("RecapSession already finished.");
-        }
-    }
-
-    public void deleteContent(String path) throws RecapSessionException {
         if (this.finished) {
             throw new RecapSessionException("RecapSession already finished.");
         }
@@ -340,7 +336,18 @@ public class RecapSessionImpl implements RecapSession {
         }
     }
 
-    private void copy(Node src, Node dstParent, String dstName, boolean recursive) throws RecapSessionException, RepositoryException {
+    /**
+     * The recursive copy function
+     * @param src existing source node
+     * @param dstParent existing destination parent node
+     * @param dstName name of destination node
+     * @param recursive
+     * @throws RecapSessionException
+     * @throws RepositoryException
+     */
+    private void copy(Node src, Node dstParent, String dstName, boolean recursive)
+            throws RecapSessionException, RepositoryException {
+
         if (recap.sessionsInterrupted) {
             throw new RecapSessionException("RecapSession interrupted.");
         }
@@ -349,14 +356,17 @@ public class RecapSessionImpl implements RecapSession {
         String dstPath = dstParent.getPath() + "/" + dstName;
 
         boolean useSysView = src.getDefinition().isProtected();
-
         boolean isNew = false;
         boolean overwrite = this.options.isUpdate();
+        boolean included = this.options.getFilter().includesPath(path);
+
         ++totalNodes;
         Node dst;
         if (dstParent.hasNode(dstName)) {
             dst = dstParent.getNode(dstName);
-            if (overwrite) {
+            if (!included) {
+                trackPath(RecapProgressListener.PathAction.IGNORE, dstPath);
+            } else if (overwrite) {
                 if ((this.options.isOnlyNewer()) && (dstName.equals(JcrConstants.JCR_CONTENT))) {
                     if (isNewer(src, dst)) {
                         trackPath(RecapProgressListener.PathAction.UPDATE, dstPath);
@@ -377,7 +387,7 @@ public class RecapSessionImpl implements RecapSession {
             }
         } else {
             try {
-                if (useSysView) {
+                if (included && useSysView) {
                     dst = sysCopy(src, dstParent, dstName);
                 } else {
                     dst = dstParent.addNode(dstName, src.getPrimaryNodeType().getName());
@@ -390,11 +400,11 @@ public class RecapSessionImpl implements RecapSession {
                 return;
             }
         }
-        if (useSysView) {
+        if (included && useSysView) {
             trackTree(dst, isNew);
         } else {
             Set<String> names = new HashSet<String>();
-            if ((overwrite) || (isNew)) {
+            if (included && ((overwrite) || (isNew))) {
                 if (!isNew) {
                     for (NodeType nt : dst.getMixinNodeTypes()) {
                         names.add(nt.getName());
@@ -475,16 +485,20 @@ public class RecapSessionImpl implements RecapSession {
                     copy(child, dst, cName, true);
                 }
 
-                for (String name : names) {
-                    try {
-                        Node cNode = dst.getNode(name);
-                        trackPath(RecapProgressListener.PathAction.DELETE, cNode.getPath());
-                        cNode.remove();
-                    } catch (RepositoryException e) {
+                if (!options.isNoDelete()) {
+                    for (String name : names) {
+                        try {
+                            Node cNode = dst.getNode(name);
+                            trackPath(RecapProgressListener.PathAction.DELETE, cNode.getPath());
+                            cNode.remove();
+                        } catch (RepositoryException e) {
+                            LOGGER.warn("[copy] failed to delete existing node in dst that does not exist in src", e);
+                        }
                     }
                 }
             }
         }
+
         processBatch();
     }
 

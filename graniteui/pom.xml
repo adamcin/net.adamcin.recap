@@ -60,6 +60,7 @@
                 <extensions>true</extensions>
                 <configuration>
                     <embedBundles>
+                        <bundle>net.adamcin.recap.batchsession</bundle>
                         <bundle>net.adamcin.recap.core</bundle>
                         <bundle>net.adamcin.recap.addressbook</bundle>
                         <bundle>net.adamcin.recap.replication</bundle>
@@ -94,6 +95,11 @@
     </build>
 
     <dependencies>
+        <dependency>
+            <groupId>net.adamcin.recap</groupId>
+            <artifactId>net.adamcin.recap.batchsession</artifactId>
+            <version>${project.version}</version>
+        </dependency>
         <dependency>
             <groupId>net.adamcin.recap</groupId>
             <artifactId>net.adamcin.recap.core</artifactId>

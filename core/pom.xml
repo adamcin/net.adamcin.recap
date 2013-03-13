@@ -90,6 +90,11 @@
 
     <dependencies>
         <dependency>
+            <groupId>net.adamcin.recap</groupId>
+            <artifactId>net.adamcin.recap.batchsession</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
             <groupId>javax.jcr</groupId>
             <artifactId>jcr</artifactId>
         </dependency>

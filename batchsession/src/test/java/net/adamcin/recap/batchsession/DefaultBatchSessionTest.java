@@ -108,21 +108,21 @@ public class DefaultBatchSessionTest {
 
             Node n1 = n0.addNode("n1", JcrConstants.NT_FOLDER);
             Node n2 = n1.addNode("n2", JcrConstants.NT_FOLDER);
-            assertEquals("no changes yet", 0, tracker.getChanges());
+            assertEquals("no changes yet", 0, tracker.getTotalCount());
             assertTrue("original session should have pending changes",
                     session.hasPendingChanges());
             Node n3 = n2.addNode("n3", JcrConstants.NT_FOLDER);
-            assertEquals("should have 5 changes", 5, tracker.getChanges());
+            assertEquals("should have 5 changes", 5, tracker.getTotalCount());
             assertFalse("original session should not have pending changes",
                     session.hasPendingChanges());
 
 
             Node n4 = n3.addNode("n4", JcrConstants.NT_FOLDER);
-            assertEquals("still has 5 changes (after n4)", 5, tracker.getChanges());
+            assertEquals("still has 5 changes (after n4)", 5, tracker.getTotalCount());
 
             // force save
             n4.getSession().save();
-            assertEquals("should have 2 more changes (after n4)", 7, tracker.getChanges());
+            assertEquals("should have 2 more changes (after n4)", 7, tracker.getTotalCount());
 
         } catch (Exception e) {
             LOGGER.error("Exception: {}", e);
@@ -136,30 +136,32 @@ public class DefaultBatchSessionTest {
 
     static class BatchSaveTracker extends DefaultBatchSessionListener {
         int saves = 0;
-        int changes = 0;
-        Set<String> paths = new HashSet<String>();
+        int totalCount = 0;
+        Set<String> totalPaths = new HashSet<String>();
 
         @Override
         public void onSave(BatchSaveInfo info) {
             super.onSave(info);
-            int savedChanges = info.getSavedChanges();
-            Set<String> changedPaths = info.getChangedPaths();
-            LOGGER.info("[onSave] savedChanges={}, paths={}", savedChanges, changedPaths);
+            int count = info.getCount();
+            Set<String> paths = info.getPaths();
+            long time = info.getTime();
+            LOGGER.info("[onSave] count={}, paths={}, time={}",
+                    new Object[]{count, paths, time});
             saves++;
-            changes += savedChanges;
-            paths.addAll(changedPaths);
+            totalCount += count;
+            totalPaths.addAll(paths);
         }
 
         public int getSaves() {
             return saves;
         }
 
-        public int getChanges() {
-            return changes;
+        public int getTotalCount() {
+            return totalCount;
         }
 
-        public Set<String> getPaths() {
-            return paths;
+        public Set<String> getTotalPaths() {
+            return totalPaths;
         }
     }
 }

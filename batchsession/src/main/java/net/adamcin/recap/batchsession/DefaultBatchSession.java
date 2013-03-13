@@ -54,7 +54,8 @@ import java.security.AccessControlException;
 import java.util.*;
 
 /**
- * Default implementation of the {@link BatchSession} interface. This is quite a massive class due to the
+ * Default implementation of the {@link BatchSession} interface. This is quite a massive class due to the complexity of
+ * the JCR {@link Session}, {@link Node}, and {@link Property} interfaces
  */
 public final class DefaultBatchSession implements BatchSession {
     private static final Logger LOGGER = LoggerFactory.getLogger(DefaultBatchSession.class);
@@ -134,15 +135,15 @@ public final class DefaultBatchSession implements BatchSession {
     }
 
     /**
-     * The client should record all paths modified during JCR operations and call this method with
-     * those paths so that the BatchManagerImpl can track the number of changes in the current batch.
-     * If the sum of the number of newly modified paths and the number previously uncommitted changes equals or
+     * The client should record all totalPaths modified during JCR operations and call this method with
+     * those totalPaths so that the BatchManagerImpl can track the number of changes in the current batch.
+     * If the sum of the number of newly modified totalPaths and the number previously uncommitted changes equals or
      * exceeds the batch size, the session will be saved and the listener's onSave() method
-     * will be called with the number of changes committed by this save and a set containing the modified paths.
+     * will be called with the number of changes committed by this save and a set containing the modified totalPaths.
      * If the value of the moreChanges argument is less than 0, the BatchManagerImpl will immediately
      * save any uncommitted changes.
      *
-     * @param changedPaths JCR paths that were modified since the last call to processChanges. Must not be null.
+     * @param changedPaths JCR totalPaths that were modified since the last call to processChanges. Must not be null.
      * @throws javax.jcr.RepositoryException if the BatchManagerImpl is not live, or if the call to session.save() fails.
      */
     private void processChanges(String... changedPaths) throws RepositoryException {
@@ -161,7 +162,7 @@ public final class DefaultBatchSession implements BatchSession {
      * If the value of the moreChanges argument is less than 0, the BatchManagerImpl will immediately
      * save any uncommitted changes.
      *
-     * @param changedPaths collection of JCR paths that were modified since the last call to processChanges.
+     * @param changedPaths collection of JCR totalPaths that were modified since the last call to processChanges.
      *                     May be empty. Must not be null.
      * @throws javax.jcr.RepositoryException if the BatchManagerImpl is not live, or if the call to session.save() fails.
      */
@@ -175,7 +176,7 @@ public final class DefaultBatchSession implements BatchSession {
             throw new RepositoryException("[processChanges] JCR Session is not live.");
         }
 
-        // merge paths into this.uncommittedPaths
+        // merge totalPaths into this.uncommittedPaths
         this.uncommittedPaths.addAll(changedPaths);
 
         // If moreChanges is negative, or if the sum of moreChanges and this.uncommitted changes is
@@ -189,21 +190,21 @@ public final class DefaultBatchSession implements BatchSession {
                 // Remember the current value of this.uncommittedChanges
                 final int savedChanges = this.uncommittedPaths.size();
 
-                // Remember the current set of changed paths
+                // Remember the current set of changed totalPaths
                 final Set<String> savedPaths = Collections.unmodifiableSet(
                         new HashSet<String>(this.uncommittedPaths));
 
                 // Reset uncommitted batch
                 refresh(false);
 
-                // Add the paths to this.paths
+                // Add the totalPaths to this.totalPaths
                 this.committedPaths.addAll(savedPaths);
 
                 // Notify the listener
                 BatchSaveInfo info = new BatchSaveInfo() {
-                    public int getSavedChanges() { return savedChanges; }
-                    public Set<String> getChangedPaths() {  return savedPaths; }
-                    public long getSaveDuration() { return saveDuration; }
+                    public int getCount() { return savedChanges; }
+                    public Set<String> getPaths() {  return savedPaths; }
+                    public long getTime() { return saveDuration; }
                 };
 
                 for (BatchSessionListener listener : this.listeners) {

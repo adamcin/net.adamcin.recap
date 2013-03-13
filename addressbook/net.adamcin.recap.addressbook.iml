@@ -23,6 +23,7 @@
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module" module-name="net.adamcin.recap.core" />
+    <orderEntry type="module" module-name="net.adamcin.recap.batchsession" />
     <orderEntry type="library" name="Maven: org.apache.jackrabbit:jackrabbit-jcr-client:2.4.0" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.slf4j:slf4j-api:1.6.1" level="project" />
     <orderEntry type="library" name="Maven: org.apache.jackrabbit:jackrabbit-spi2dav:2.4.0" level="project" />

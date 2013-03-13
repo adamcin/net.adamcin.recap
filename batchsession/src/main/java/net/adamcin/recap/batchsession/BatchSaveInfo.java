@@ -30,9 +30,24 @@ package net.adamcin.recap.batchsession;
 
 import java.util.Set;
 
+/**
+ * Simple interface used by the {@link BatchSession} to communicate details of a session save to an attached
+ * {@link BatchSessionListener}
+ */
 public interface BatchSaveInfo {
 
-    int getSavedChanges();
-    Set<String> getChangedPaths();
-    long getSaveDuration();
+    /**
+     * @return the number of nodes modified by the save
+     */
+    int getCount();
+
+    /**
+     * @return the set of paths modified by the save
+     */
+    Set<String> getPaths();
+
+    /**
+     * @return the time in milliseconds the underlying JCR session took to commit the save.
+     */
+    long getTime();
 }

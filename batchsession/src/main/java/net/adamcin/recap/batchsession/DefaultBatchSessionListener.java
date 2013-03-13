@@ -28,7 +28,7 @@
 package net.adamcin.recap.batchsession;
 
 /**
- * Basic implementation of BatchSessionListener
+ * Basic implementation of {@link BatchSessionListener}
  * @author madamcin
  */
 public class DefaultBatchSessionListener implements BatchSessionListener {

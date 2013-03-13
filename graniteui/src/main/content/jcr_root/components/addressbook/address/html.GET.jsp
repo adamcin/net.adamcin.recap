@@ -136,7 +136,7 @@
                 <div data-role="fieldcontain">
                     <label for="${pageId}-requestDepthConfig">Request Depth Config (Very advanced)</label>
                     <textarea id="${pageId}-requestDepthConfig" type="text"
-                              name="<%=RecapConstants.RP_READ_DEPTH_CONFIG %>" cols="40" rows="8" placeholder="default: ${defaultRequestDepthConfig}"></textarea>
+                              name="<%=RecapConstants.RP_REQUEST_DEPTH_CONFIG %>" cols="40" rows="8" placeholder="default: ${defaultRequestDepthConfig}"></textarea>
                     <p class="ui-input-desc" data-for="${pageId}-requestDepthConfig">
                         Specify a whitespace delimited list of Recap Request Depth Config entries.
                         An entry may be either an integer depth or a token of the format

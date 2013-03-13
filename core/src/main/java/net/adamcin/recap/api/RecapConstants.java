@@ -32,7 +32,7 @@ package net.adamcin.recap.api;
  * @author madamcin
  * @version $Id: RecapConstants.java$
  */
-public class RecapConstants {
+public final class RecapConstants {
 
     private RecapConstants() {
         // prevent instantiation
@@ -75,7 +75,7 @@ public class RecapConstants {
     public static final String RP_NO_RECURSE = ":no_recurse";
     public static final String RP_NO_DELETE = ":no_delete";
     public static final String RP_BATCH_SIZE = ":batch_size";
-    public static final String RP_READ_DEPTH_CONFIG = ":read_depth_config";
+    public static final String RP_REQUEST_DEPTH_CONFIG = ":request_depth_config";
     public static final String RP_THROTTLE = ":throttle";
     public static final String RP_LAST_MODIFIED_PROPERTY = ":last_modified_property";
 

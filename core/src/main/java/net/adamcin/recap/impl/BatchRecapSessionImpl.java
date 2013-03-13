@@ -44,7 +44,10 @@ import javax.jcr.*;
 import javax.jcr.nodetype.NodeType;
 import java.util.*;
 
-public class BatchRecapSessionImpl implements RecapSession {
+/**
+ * Implementation of {@link RecapSession} using a {@link BatchSession} to manage auto-saves
+ */
+final class BatchRecapSessionImpl implements RecapSession {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BatchRecapSessionImpl.class);
 
@@ -93,6 +96,8 @@ public class BatchRecapSessionImpl implements RecapSession {
         Session dstSession = getDestinationSession();
         targetSession = new DefaultBatchSession(dstSession);
         targetSession.addListener(new SyncSaveListener());
+
+        allowLastModifiedProperty = isValidNameForSession(this.options.getLastModifiedProperty());
     }
 
     private Session getSourceSession() {
@@ -125,18 +130,18 @@ public class BatchRecapSessionImpl implements RecapSession {
 
         @Override
         public void onSave(BatchSaveInfo info) {
-            totalNodes += info.getCount();
             long afterSave = System.currentTimeMillis();
             trackMessage("Saved %d nodes (%d kB) in %d ms.",
                     info.getCount(), currentSize / 1000L, info.getTime());
-            trackMessage("Total time: %d, total nodes %d, %d kB",
-                    afterSave - start, totalNodes, totalSize / 1000L);
+            trackMessage("Total time: %d ms, total nodes %d, %d kB",
+                    afterSave - start, totalNodes, totalSize / 1024L);
             currentSize = 0L;
             if (options.getThrottle() > 0L && !interrupted && !finished) {
                 trackMessage("Throttling enabled. Waiting %ds...", options.getThrottle());
                 try {
                     Thread.sleep(options.getThrottle() * 1000L);
                 } catch (InterruptedException e) {
+                    LOGGER.debug("[onSave] thread interrupted.");
                 }
             }
         }
@@ -374,6 +379,8 @@ public class BatchRecapSessionImpl implements RecapSession {
         boolean overwrite = this.options.isUpdate();
         boolean included = this.options.getFilter().includesPath(path);
 
+        getTargetSession().disableAutoSave();
+
         ++totalNodes;
         Node dst;
         if (dstParent.hasNode(dstName)) {
@@ -414,6 +421,7 @@ public class BatchRecapSessionImpl implements RecapSession {
                 return;
             }
         }
+
         if (included && useSysView) {
             trackTree(dst, isNew);
         } else {
@@ -479,9 +487,13 @@ public class BatchRecapSessionImpl implements RecapSession {
                     try {
                         dst.getProperty(pName).remove();
                     } catch (RepositoryException e) {
+                        LOGGER.warn("[copy] failed to remove property {} from node {}", pName, path);
                     }
                 }
             }
+
+            // re-enable auto-save before recursion
+            getTargetSession().enableAutoSave();
 
             if (recursive) {
                 names.clear();

@@ -124,6 +124,7 @@ public class DefaultBatchSessionTest {
             n4.getSession().save();
             assertEquals("should have 2 more changes (after n4)", 7, tracker.getTotalCount());
 
+
         } catch (Exception e) {
             LOGGER.error("Exception: {}", e);
             TestUtil.sprintFail(e);

@@ -28,10 +28,6 @@
 package net.adamcin.recap.impl;
 
 import net.adamcin.recap.api.*;
-import net.adamcin.recap.batchsession.BatchSaveInfo;
-import net.adamcin.recap.batchsession.BatchSession;
-import net.adamcin.recap.batchsession.DefaultBatchSession;
-import net.adamcin.recap.batchsession.DefaultBatchSessionListener;
 import org.apache.commons.lang.StringUtils;
 import org.apache.jackrabbit.JcrConstants;
 import org.apache.jackrabbit.util.Text;
@@ -45,23 +41,23 @@ import javax.jcr.nodetype.NodeType;
 import java.util.*;
 
 /**
- * Implementation of {@link RecapSession} using a {@link BatchSession} to manage auto-saves
+ * @author madamcin
+ * @version $Id: OldRecapSessionImpl.java$
  */
-final class BatchRecapSessionImpl implements RecapSession {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(BatchRecapSessionImpl.class);
+public class OldRecapSessionImpl implements RecapSession {
+    private static final Logger LOGGER = LoggerFactory.getLogger(OldRecapSessionImpl.class);
 
     private final RecapImpl recap;
     private final RecapAddress address;
     private final RecapOptions options;
     private final Session localSession;
     private final Session remoteSession;
-    private RecapProgressListener progressListener;
 
-    private final BatchSession targetSession;
+    private RecapProgressListener progressListener;
 
     private String lastSuccessfulPath;
     private int totalSyncPaths = 0;
+    private int numNodes = 0;
     private int totalNodes = 0;
     private long totalSize = 0L;
     private long currentSize = 0L;
@@ -74,18 +70,12 @@ final class BatchRecapSessionImpl implements RecapSession {
     private boolean finished = false;
 
 
-    public BatchRecapSessionImpl(RecapImpl recap,
-                                 RecapAddress address,
-                                 RecapOptions options,
-                                 Session localSession,
-                                 Session remoteSession) {
-
-        if (localSession == null) {
-            throw new NullPointerException("localSession");
-        }
-        if (remoteSession == null) {
-            throw new NullPointerException("remoteSession");
-        }
+    public OldRecapSessionImpl(RecapImpl recap,
+                               RecapAddress address,
+                               RecapOptions options,
+                               Session localSession,
+                               Session remoteSession)
+            throws RecapSessionException {
 
         this.recap = recap;
         this.address = address;
@@ -93,134 +83,7 @@ final class BatchRecapSessionImpl implements RecapSession {
         this.localSession = localSession;
         this.remoteSession = remoteSession;
 
-        Session dstSession = getDestinationSession();
-        targetSession = new DefaultBatchSession(dstSession);
-        targetSession.addListener(new SyncSaveListener());
-
         allowLastModifiedProperty = isValidNameForSession(this.options.getLastModifiedProperty());
-    }
-
-    private Session getSourceSession() {
-        if (this.options.isReverse()) {
-            return this.localSession;
-        } else {
-            return this.remoteSession;
-        }
-    }
-
-    private Session getDestinationSession() {
-        if (this.options.isReverse()) {
-            return this.remoteSession;
-        } else {
-            return this.localSession;
-        }
-    }
-
-    public BatchSession getTargetSession() {
-        return targetSession;
-    }
-
-    private void start() {
-        if (this.start == 0L) {
-            this.start = System.currentTimeMillis();
-        }
-    }
-
-    class SyncSaveListener extends DefaultBatchSessionListener {
-
-        @Override
-        public void onSave(BatchSaveInfo info) {
-            long afterSave = System.currentTimeMillis();
-            trackMessage("Saved %d nodes (%d kB) in %d ms.",
-                    info.getCount(), currentSize / 1000L, info.getTime());
-            trackMessage("Total time: %d ms, total nodes %d, %d kB",
-                    afterSave - start, totalNodes, totalSize / 1024L);
-            currentSize = 0L;
-            if (options.getThrottle() > 0L && !interrupted && !finished) {
-                trackMessage("Throttling enabled. Waiting %ds...", options.getThrottle());
-                try {
-                    Thread.sleep(options.getThrottle() * 1000L);
-                } catch (InterruptedException e) {
-                    LOGGER.debug("[onSave] thread interrupted.");
-                }
-            }
-        }
-    }
-
-    public void checkPermissions(String path) throws RecapSessionException {
-        String parentPath = Text.getRelativeParent(path, 1);
-
-        try {
-            getSourceSession().checkPermission(path, Session.ACTION_READ);
-        } catch (RepositoryException e) {
-            trackError(path, e);
-        }
-
-        try {
-            getTargetSession().checkPermission(parentPath, Session.ACTION_READ);
-            getTargetSession().checkPermission(parentPath, Session.ACTION_ADD_NODE);
-        } catch (RepositoryException e) {
-            trackError(parentPath, e);
-        }
-
-        try {
-            getTargetSession().checkPermission(path, Session.ACTION_READ);
-            getTargetSession().checkPermission(path, Session.ACTION_ADD_NODE);
-            getTargetSession().checkPermission(path, Session.ACTION_SET_PROPERTY);
-            getTargetSession().checkPermission(path, Session.ACTION_REMOVE);
-        } catch (RepositoryException e) {
-            trackError(path, e);
-        }
-    }
-
-    public Node getOrCreateTargetNode(Node sourceNode) throws RepositoryException {
-        if (sourceNode.getDepth() == 0) {
-            return getTargetSession().getRootNode();
-        } else if (getTargetSession().getRootNode().hasNode(sourceNode.getPath().substring(1))) {
-            return getTargetSession().getRootNode().getNode(sourceNode.getPath().substring(1));
-        } else {
-            Node sourceParent = sourceNode.getParent();
-            Node targetParent = getOrCreateTargetNode(sourceParent);
-            Node targetNode;
-            if (!targetParent.hasNode(sourceNode.getName())) {
-                targetNode = targetParent.addNode(sourceNode.getName(), sourceNode.getPrimaryNodeType().getName());
-                trackPath(RecapProgressListener.PathAction.ADD, targetNode.getPath());
-            } else {
-                targetNode = targetParent.getNode(sourceNode.getName());
-            }
-            return targetNode;
-        }
-    }
-
-    public void sync(String path) throws RecapSessionException {
-        if (this.finished) {
-            throw new RecapSessionException("RecapSession already finished.");
-        }
-
-        trackMessage("Sync %s %s http://%s:%d/", path, this.options.isReverse() ? "to" : "from", this.address.getHostname(), this.address.getPort());
-
-        try {
-            start();
-
-            Node srcNode = getSourceSession().getNode(path);
-            Node srcParent = srcNode.getParent();
-            Node dstParent = getOrCreateTargetNode(srcParent);
-
-            String dstName = srcNode.getName();
-
-            this.copy(srcNode, dstParent, dstName, !this.options.isNoRecurse());
-            this.lastSuccessfulPath = path;
-            this.totalSyncPaths++;
-        } catch (PathNotFoundException e) {
-            LOGGER.debug("PathNotFoundException while preparing path: {}. Message: {}", path, e.getMessage());
-            trackError(path, e);
-        } catch (RepositoryException e) {
-            LOGGER.error("RepositoryException while copying path: {}. Message: {}", path, e.getMessage());
-            trackFailure(path, e);
-            this.interrupted = true;
-            this.finish();
-            throw new RecapSessionException("RepositoryException while preparing path: " + path, e);
-        }
     }
 
     public RecapAddress getAddress() {
@@ -270,6 +133,101 @@ final class BatchRecapSessionImpl implements RecapSession {
     private void trackMessage(String fmt, Object... args) {
         if (this.getProgressListener() != null) {
             this.getProgressListener().onMessage(fmt, args);
+        }
+    }
+
+    private Session getSourceSession() {
+        if (this.options.isReverse()) {
+            return this.localSession;
+        } else {
+            return this.remoteSession;
+        }
+    }
+
+    private Session getTargetSession() {
+        if (this.options.isReverse()) {
+            return this.remoteSession;
+        } else {
+            return this.localSession;
+        }
+    }
+
+    public void checkPermissions(String path) throws RecapSessionException {
+        String parentPath = Text.getRelativeParent(path, 1);
+
+        try {
+            getSourceSession().checkPermission(path, Session.ACTION_READ);
+        } catch (RepositoryException e) {
+            trackError(path, e);
+        }
+
+        try {
+            getTargetSession().checkPermission(parentPath, Session.ACTION_READ);
+            getTargetSession().checkPermission(parentPath, Session.ACTION_ADD_NODE);
+        } catch (RepositoryException e) {
+            trackError(parentPath, e);
+        }
+
+        try {
+            getTargetSession().checkPermission(path, Session.ACTION_READ);
+            getTargetSession().checkPermission(path, Session.ACTION_ADD_NODE);
+            getTargetSession().checkPermission(path, Session.ACTION_SET_PROPERTY);
+            getTargetSession().checkPermission(path, Session.ACTION_REMOVE);
+        } catch (RepositoryException e) {
+            trackError(path, e);
+        }
+    }
+
+    public Node getOrCreateTargetNode(Node sourceNode) throws RepositoryException {
+        if (sourceNode.getDepth() == 0) {
+            return getTargetSession().getRootNode();
+        } else if (getTargetSession().getRootNode().hasNode(sourceNode.getPath().substring(1))) {
+            return getTargetSession().getRootNode().getNode(sourceNode.getPath().substring(1));
+        } else {
+            Node sourceParent = sourceNode.getParent();
+            Node targetParent = getOrCreateTargetNode(sourceParent);
+            Node targetNode;
+            if (!targetParent.hasNode(sourceNode.getName())) {
+                targetNode = targetParent.addNode(sourceNode.getName(), sourceNode.getPrimaryNodeType().getName());
+                trackPath(RecapProgressListener.PathAction.ADD, targetNode.getPath());
+            } else {
+                targetNode = targetParent.getNode(sourceNode.getName());
+            }
+            processBatch();
+            return targetNode;
+        }
+    }
+
+    public void sync(String path) throws RecapSessionException {
+        if (this.finished) {
+            throw new RecapSessionException("RecapSession already finished.");
+        }
+
+        trackMessage("Sync %s %s http://%s:%d/", path, this.options.isReverse() ? "to" : "from", this.address.getHostname(), this.address.getPort());
+
+        try {
+            if (this.start == 0L) {
+                this.start = System.currentTimeMillis();
+            }
+
+            Node srcNode = getSourceSession().getNode(path);
+            Node srcParent = srcNode.getParent();
+            Node dstParent = getOrCreateTargetNode(srcParent);
+
+            String dstName = srcNode.getName();
+
+            this.copy(srcNode, dstParent, dstName, !this.options.isNoRecurse());
+            this.lastSuccessfulPath = path;
+            this.totalSyncPaths++;
+        } catch (PathNotFoundException e) {
+            LOGGER.debug("PathNotFoundException while preparing path: {}. Message: {}", path, e.getMessage());
+            trackError(path, e);
+        } catch (RepositoryException e) {
+            LOGGER.error("RepositoryException while copying path: {}. Message: {}", path, e.getMessage());
+            trackFailure(path, e);
+            this.interrupted = true;
+            this.finish();
+            throw new RecapSessionException("RepositoryException while preparing path: " + path, e);
         }
     }
 
@@ -325,9 +283,12 @@ final class BatchRecapSessionImpl implements RecapSession {
     public void finish() throws RecapSessionException {
         this.finished = true;
         RecapSessionException exception = null;
-        if (!this.interrupted) {
+        if (!this.interrupted && this.numNodes > 0) {
+            trackMessage("Saving %d nodes...", this.numNodes);
             try {
-                getTargetSession().commit();
+                getTargetSession().save();
+                this.numNodes = 0;
+                this.currentSize = 0L;
                 trackMessage("Done.");
             } catch (RepositoryException e) {
                 LOGGER.error("[finish] Failed to save remaining changes.", e);
@@ -343,8 +304,8 @@ final class BatchRecapSessionImpl implements RecapSession {
         if (this.getTotalNodes() > 0) {
 
             trackMessage("Copy %s. %d nodes in %dms. %d bytes",
-                    (this.interrupted ? "interrupted" : "completed"),
-                    this.getTotalNodes(), this.getTotalTimeMillis(), this.getTotalSize());
+                            (this.interrupted ? "interrupted" : "completed"),
+                            this.getTotalNodes(), this.getTotalTimeMillis(), this.getTotalSize());
 
             trackMessage("%d root paths added or updated successfully. Last successful path: %s",
                     this.getTotalSyncPaths(), this.getLastSuccessfulSyncPath());
@@ -352,6 +313,26 @@ final class BatchRecapSessionImpl implements RecapSession {
 
         if (exception != null) {
             throw exception;
+        }
+    }
+
+    private void processBatch() throws RepositoryException {
+        if (++this.numNodes >= this.getOptions().getBatchSize()) {
+            trackMessage("Intermediate saving %d nodes (%d kB)...", this.numNodes, this.currentSize / 1000L);
+            long now = System.currentTimeMillis();
+            getTargetSession().save();
+            long end = System.currentTimeMillis();
+            trackMessage("Done in %d ms. Total time: %d, total nodes %d, %d kB", end - now, end - this.start,
+                    this.totalNodes, this.totalSize / 1000L);
+            this.numNodes = 0;
+            this.currentSize = 0L;
+            if (this.options.getThrottle() > 0L) {
+                trackMessage("Throttling enabled. Waiting %d second%s...", this.options.getThrottle(), this.options.getThrottle() == 1L ? "" : "s");
+                try {
+                    Thread.sleep(this.options.getThrottle() * 1000L);
+                } catch (InterruptedException e) {
+                }
+            }
         }
     }
 
@@ -378,8 +359,6 @@ final class BatchRecapSessionImpl implements RecapSession {
         boolean isNew = false;
         boolean overwrite = this.options.isUpdate();
         boolean included = this.options.getFilter().includesPath(path);
-
-        getTargetSession().disableAutoSave();
 
         ++totalNodes;
         Node dst;
@@ -421,7 +400,6 @@ final class BatchRecapSessionImpl implements RecapSession {
                 return;
             }
         }
-
         if (included && useSysView) {
             trackTree(dst, isNew);
         } else {
@@ -487,13 +465,9 @@ final class BatchRecapSessionImpl implements RecapSession {
                     try {
                         dst.getProperty(pName).remove();
                     } catch (RepositoryException e) {
-                        LOGGER.warn("[copy] failed to remove property {} from node {}", pName, path);
                     }
                 }
             }
-
-            // re-enable auto-save before recursion
-            getTargetSession().enableAutoSave();
 
             if (recursive) {
                 names.clear();
@@ -524,6 +498,8 @@ final class BatchRecapSessionImpl implements RecapSession {
                 }
             }
         }
+
+        processBatch();
     }
 
     private Node sysCopy(Node src, Node dstParent, String dstName)
@@ -653,4 +629,5 @@ final class BatchRecapSessionImpl implements RecapSession {
     public long getTotalTimeMillis() {
         return this.end - this.start;
     }
+
 }

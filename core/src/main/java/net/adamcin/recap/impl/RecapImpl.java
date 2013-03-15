@@ -190,8 +190,7 @@ public class RecapImpl implements Recap {
             Thread.currentThread().setContextClassLoader(orig);
         }
 
-        //return new RecapSessionImpl(this, addr, opts, localJcrSession, srcSession);
-        return new BatchRecapSessionImpl(this, addr, opts, localJcrSession, srcSession);
+        return new RecapSessionImpl(this, addr, opts, localJcrSession, srcSession);
     }
 
     private Repository getRepository(RecapAddress recapAddress, BatchReadConfig batchReadConfig) throws RepositoryException {

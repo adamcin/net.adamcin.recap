@@ -39,6 +39,8 @@
     <artifactId>net.adamcin.recap.core</artifactId>
     <packaging>bundle</packaging>
 
+    <name>Recap - Core</name>
+    <description>Recap core API and implementation</description>
 
     <build>
         <plugins>

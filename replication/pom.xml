@@ -39,6 +39,10 @@
     <artifactId>net.adamcin.recap.replication</artifactId>
     <packaging>bundle</packaging>
 
+    <name>Recap - Replication</name>
+    <description>Recap-based implementation of Adobe Granite Replication services,
+        like ContentBuilder and TransportHandler</description>
+
     <build>
         <plugins>
             <plugin>

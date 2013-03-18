@@ -37,8 +37,17 @@
         <relativePath>parent</relativePath>
     </parent>
 
+    <url>http://adamcin.net/net.adamcin.recap</url>
+
 	<artifactId>net.adamcin.recap</artifactId>
-	<version>1-SNAPSHOT</version>
+
+    <name>Recap</name>
+    <description>Rsync for Adobe Granite!</description>
+
+    <properties>
+        <site.root></site.root>
+    </properties>
+
 	<packaging>pom</packaging>
 
 	<modules>
@@ -49,5 +58,18 @@
         <module>replication</module>
 		<module>graniteui</module>
 	</modules>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>com.github.github</groupId>
+                <artifactId>site-maven-plugin</artifactId>
+                <configuration>
+                    <message>Creating site for ${project.artifactId} ${project.version}</message>
+                    <path>${site.root}</path>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 
 </project>

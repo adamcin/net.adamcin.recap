@@ -47,7 +47,7 @@ import java.util.*;
 /**
  * Implementation of {@link RecapSession} using a {@link BatchSession} to manage auto-saves
  */
-final class RecapSessionImpl implements RecapSession {
+public final class RecapSessionImpl implements RecapSession {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RecapSessionImpl.class);
 

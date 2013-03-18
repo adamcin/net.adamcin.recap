@@ -39,6 +39,9 @@
     <artifactId>net.adamcin.recap.addressbook</artifactId>
     <packaging>bundle</packaging>
 
+    <name>Recap - Address Book</name>
+    <description>Sling-based Address Book implementation for Recap</description>
+
     <build>
         <plugins>
             <plugin>
@@ -77,6 +80,10 @@
                         </goals>
                     </execution>
                 </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
             </plugin>
         </plugins>
     </build>

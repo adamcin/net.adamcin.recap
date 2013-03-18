@@ -77,7 +77,7 @@
                     <definitionProperties>
                         <providerName>Mark Adamcin</providerName>
                         <providerUrl>http://adamcin.net/</providerUrl>
-                        <providerLink>https://github.com/adamcin/net.adamcin.recap</providerLink>
+                        <providerLink>https://adamcin.net/net.adamcin.recap</providerLink>
                         <testedWith>CQ 5.5, CQ 5.6</testedWith>
                     </definitionProperties>
                     <thumbnail>src/site/resources/images/recap_package_thumbnail.png</thumbnail>

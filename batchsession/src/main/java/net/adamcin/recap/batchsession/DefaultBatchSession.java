@@ -187,6 +187,9 @@ public final class DefaultBatchSession implements BatchSession {
             if (saveDuration >= 0L) {
                 this.totalSaves++;
 
+                // Remove any purged Versions
+                final int purgedVersionCount = versionManager == null ? 0 : purgeVersions();
+
                 // Remember the current value of this.uncommittedChanges
                 final int savedChanges = this.uncommittedPaths.size();
 
@@ -205,6 +208,7 @@ public final class DefaultBatchSession implements BatchSession {
                     public int getCount() { return savedChanges; }
                     public Set<String> getPaths() {  return savedPaths; }
                     public long getTime() { return saveDuration; }
+                    public int getPurgedVersionCount() { return purgedVersionCount; }
                 };
 
                 for (BatchSessionListener listener : this.listeners) {
@@ -256,24 +260,24 @@ public final class DefaultBatchSession implements BatchSession {
                 this.session.save();
             }
 
-            // Remove any purged Versions
-            if (versionManager != null) {
-                purgeVersions();
-            }
-
             return System.currentTimeMillis() - now;
         } else {
             return -1L;
         }
     }
 
-    private void purgeVersions() throws RepositoryException {
+    private int purgeVersions() throws RepositoryException {
+        int count = 0;
         Iterator<Version> versions = this.versionsToPurge.iterator();
         while (versions.hasNext()) {
             Version version = versions.next();
-            version.remove();
+            if (!JcrConstants.JCR_ROOTVERSION.equals(version.getName())) {
+                version.getContainingHistory().removeVersion(version.getName());
+                count++;
+            }
             versions.remove();
         }
+        return count;
     }
 
     public void addListener(BatchSessionListener listener) {
@@ -330,6 +334,7 @@ public final class DefaultBatchSession implements BatchSession {
     private class RemoveVisitor extends TraversingItemVisitor {
         private Set<String> changes = new HashSet<String>();
         final boolean purgeVersionHistory;
+        String rootPath = null;
 
         RemoveVisitor(final boolean purgeVersionHistory) throws RepositoryException {
             this.purgeVersionHistory = purgeVersionHistory;
@@ -343,6 +348,9 @@ public final class DefaultBatchSession implements BatchSession {
         protected void entering(Node node, int level)
                 throws RepositoryException {
             final String path = node.getPath();
+            if (level == 0) {
+                rootPath = path;
+            }
             if (versionManager != null && node.isNodeType(JcrConstants.MIX_VERSIONABLE)) {
                 if (!versionManager.isCheckedOut(path)) {
                     versionManager.checkout(path);
@@ -365,19 +373,35 @@ public final class DefaultBatchSession implements BatchSession {
         protected void leaving(final Node node, final int level)
                 throws RepositoryException {
 
+            final String path = node.getPath();
+            List<Version> versions = null;
             if (purgeVersionHistory) {
-                versionsToPurge.addAll(getVersions(node));
+                versions = getVersions(node);
+                versionsToPurge.addAll(versions);
             }
+
+            final int versionCount = versions == null ? 0 : versions.size();
 
             // Defer deletion if the node cannot be deleted without deleting the parent
             // as well (which is enforced for mandatory and protected nodes)
             if (node.getDefinition().isMandatory() || node.getDefinition().isProtected()) {
-                changes.add(node.getPath());
+                changes.add(path);
             } else {
                 changes.add(node.getParent().getPath());
-                changes.add(node.getPath());
+                changes.add(path);
                 try {
                     node.remove();
+                    BatchRemoveInfo info = new BatchRemoveInfo() {
+                        public String getRootPath() { return rootPath; }
+                        public String getPath() { return path; }
+                        public int getDepth() { return level; }
+                        public int getPurgedVersionCount() { return versionCount; }
+                    };
+
+                    for (BatchSessionListener listener : listeners) {
+                        listener.onRemove(info);
+                    }
+
                     processChanges(changes.toArray(new String[changes.size()]));
                 } finally {
                     changes.clear();
@@ -387,13 +411,16 @@ public final class DefaultBatchSession implements BatchSession {
 
         private List<Version> getVersions(final Node node)
                 throws RepositoryException {
-            List<Version> versions = new LinkedList<Version>();
+            List<Version> versions = new ArrayList<Version>();
             final String path = node.getPath();
             if (versionManager != null && node.isNodeType(JcrConstants.MIX_VERSIONABLE)) {
                 VersionHistory vh = versionManager.getVersionHistory(path);
                 VersionIterator vit = vh.getAllVersions();
                 while (vit.hasNext()) {
-                    versions.add(vit.nextVersion());
+                    Version version = vit.nextVersion();
+                    if (!JcrConstants.JCR_ROOTVERSION.equals(version.getName())) {
+                        versions.add(version);
+                    }
                 }
             }
 

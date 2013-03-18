@@ -35,14 +35,17 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.jcr.Node;
-import javax.jcr.Session;
-import javax.jcr.SimpleCredentials;
+import javax.jcr.*;
+import javax.jcr.version.Version;
+import javax.jcr.version.VersionHistory;
+import javax.jcr.version.VersionIterator;
+import javax.jcr.version.VersionManager;
 import java.io.File;
 import java.util.HashSet;
 import java.util.Set;
 
 import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 public class DefaultBatchSessionTest {
     private static final Logger LOGGER = LoggerFactory.getLogger(DefaultBatchSessionTest.class);
@@ -135,10 +138,102 @@ public class DefaultBatchSessionTest {
         }
     }
 
+    @Test
+    public void testPurgeVersion() {
+        Session session = null;
+        try {
+            session = repository.login(new SimpleCredentials("admin", "admin".toCharArray()));
+
+            BatchSaveTracker tracker = new BatchSaveTracker();
+
+            DefaultBatchSession batchSession = new DefaultBatchSession(session);
+            batchSession.setBatchSize(5);
+            batchSession.addListener(tracker);
+
+            VersionManager vm = batchSession.getWorkspace().getVersionManager();
+
+            Node v0 = batchSession.getRootNode().addNode("v0", JcrConstants.NT_UNSTRUCTURED);
+
+            v0.addMixin(JcrConstants.MIX_VERSIONABLE);
+            v0.setProperty("versionState", "initial");
+
+            assertEquals("versionState property should be", "initial", v0.getProperty("versionState").getString());
+
+            batchSession.save();
+
+            vm.checkin(v0.getPath());
+            vm.checkout(v0.getPath());
+
+            VersionHistory vh0 = vm.getVersionHistory(v0.getPath());
+
+            String vhPath = vh0.getPath();
+
+            Node v0r0 = vh0.getVersion("1.0").getFrozenNode();
+
+            assertTrue("version 1.0 frozen node should have versionState property", v0r0.hasProperty("versionState"));
+            assertEquals("versionState property should be", "initial", v0r0.getProperty("versionState").getString());
+
+            batchSession.removeItem(v0.getPath());
+
+            batchSession.save();
+
+            assertFalse("/v0 should no longer exist", batchSession.getRootNode().hasNode("v0"));
+            assertEquals("tracker should indicate no total purged versions", 0, tracker.getTotalVersionCount());
+            assertEquals("tracker should indicate no expected purged versions", 0, tracker.getExpectedVersionCount());
+
+            assertTrue("there should still be a version history at the same path as before",
+                    batchSession.getRootNode().hasNode(vhPath.substring(1)));
+
+            Node v1 = batchSession.getRootNode().addNode("v1", JcrConstants.NT_UNSTRUCTURED);
+
+            v1.addMixin(JcrConstants.MIX_VERSIONABLE);
+            v1.setProperty("versionState", "initial");
+
+            assertEquals("versionState property should be", "initial", v1.getProperty("versionState").getString());
+
+            batchSession.save();
+
+            vm.checkin(v1.getPath());
+            vm.checkout(v1.getPath());
+
+            VersionHistory vh1 = vm.getVersionHistory(v1.getPath());
+
+            String vh1Path = vh1.getPath();
+
+            Node v1r0 = vh1.getVersion("1.0").getFrozenNode();
+
+            assertTrue("version 1.0 frozen node should have versionState property", v1r0.hasProperty("versionState"));
+            assertEquals("versionState property should be", "initial", v1r0.getProperty("versionState").getString());
+
+            batchSession.purge(v1.getPath());
+
+            assertEquals("tracker should indicate zero total purged versions", 0, tracker.getTotalVersionCount());
+            assertEquals("tracker should indicate one expected purged versions", 1, tracker.getExpectedVersionCount());
+
+            batchSession.save();
+
+            assertFalse("/v1 should no longer exist", batchSession.getRootNode().hasNode("v1"));
+            assertEquals("tracker should indicate one total purged versions", 1, tracker.getTotalVersionCount());
+            assertEquals("tracker should indicate one expected purged versions", 1, tracker.getExpectedVersionCount());
+
+
+        } catch (Exception e) {
+            LOGGER.error("Exception: {}", e);
+            TestUtil.sprintFail(e);
+        } finally {
+            if (session != null && session.isLive()) {
+                session.logout();
+            }
+        }
+
+    }
+
     static class BatchSaveTracker extends DefaultBatchSessionListener {
         int saves = 0;
         int totalCount = 0;
         Set<String> totalPaths = new HashSet<String>();
+        int totalVersionCount = 0;
+        int expectedVersionCount = 0;
 
         @Override
         public void onSave(BatchSaveInfo info) {
@@ -150,7 +245,14 @@ public class DefaultBatchSessionTest {
                     new Object[]{count, paths, time});
             saves++;
             totalCount += count;
+            totalVersionCount += info.getPurgedVersionCount();
             totalPaths.addAll(paths);
+        }
+
+        @Override
+        public void onRemove(BatchRemoveInfo info) {
+            super.onRemove(info);
+            expectedVersionCount += info.getPurgedVersionCount();
         }
 
         public int getSaves() {
@@ -163,6 +265,14 @@ public class DefaultBatchSessionTest {
 
         public Set<String> getTotalPaths() {
             return totalPaths;
+        }
+
+        public int getTotalVersionCount() {
+            return totalVersionCount;
+        }
+
+        public int getExpectedVersionCount() {
+            return expectedVersionCount;
         }
     }
 }

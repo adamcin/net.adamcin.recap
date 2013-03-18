@@ -34,4 +34,6 @@ package net.adamcin.recap.batchsession;
 public class DefaultBatchSessionListener implements BatchSessionListener {
 
     public void onSave(BatchSaveInfo info) { /* do nothing */ }
+
+    public void onRemove(BatchRemoveInfo info) { /* do nothing */ }
 }

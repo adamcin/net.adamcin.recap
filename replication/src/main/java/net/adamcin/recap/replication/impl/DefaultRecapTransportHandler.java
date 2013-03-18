@@ -81,7 +81,7 @@ public class DefaultRecapTransportHandler implements TransportHandler {
     public ReplicationResult deliver(TransportContext ctx, ReplicationTransaction tx)
             throws ReplicationException {
 
-        LOGGER.error("[deliver] uri={}", tx.getAction().getPaths());
+        LOGGER.debug("[deliver] uri={}", tx.getAction().getPaths());
         if (ctx.getConfig() == null) {
             throw new ReplicationException("config can't be null");
         }
@@ -110,6 +110,11 @@ public class DefaultRecapTransportHandler implements TransportHandler {
                     doTest(session, action);
                 } else if (action.getType() == ReplicationActionType.ACTIVATE) {
                     doActivateContent(session, action);
+                } else if (action.getType() == ReplicationActionType.DEACTIVATE
+                        || action.getType() == ReplicationActionType.DELETE) {
+                    doDelete(session, action);
+                } else {
+                    LOGGER.debug("[deliver] replication action type {} not supported.", action.getType());
                 }
             } finally {
                 session.finish();
@@ -137,6 +142,13 @@ public class DefaultRecapTransportHandler implements TransportHandler {
             throws RecapSessionException {
         for (String path : action.getPaths()) {
             session.syncContent(path);
+        }
+    }
+
+    protected void doDelete(RecapSession session, ReplicationAction action)
+            throws RecapSessionException {
+        for (String path : action.getPaths()) {
+            session.delete(path);
         }
     }
 }

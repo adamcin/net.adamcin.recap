@@ -28,10 +28,7 @@
 package net.adamcin.recap.impl;
 
 import net.adamcin.recap.api.*;
-import net.adamcin.recap.batchsession.BatchSaveInfo;
-import net.adamcin.recap.batchsession.BatchSession;
-import net.adamcin.recap.batchsession.DefaultBatchSession;
-import net.adamcin.recap.batchsession.DefaultBatchSessionListener;
+import net.adamcin.recap.batchsession.*;
 import org.apache.commons.lang.StringUtils;
 import org.apache.jackrabbit.JcrConstants;
 import org.apache.jackrabbit.util.Text;
@@ -130,6 +127,7 @@ public final class RecapSessionImpl implements RecapSession {
 
         @Override
         public void onSave(BatchSaveInfo info) {
+            super.onSave(info);
             long afterSave = System.currentTimeMillis();
             trackMessage("Saved %d nodes (%d kB) in %d ms.",
                     info.getCount(), currentSize / 1000L, info.getTime());
@@ -144,6 +142,13 @@ public final class RecapSessionImpl implements RecapSession {
                     LOGGER.debug("[onSave] thread interrupted.");
                 }
             }
+        }
+
+        @Override
+        public void onRemove(BatchRemoveInfo info) {
+            super.onRemove(info);
+            ++totalNodes;
+            trackPath(RecapProgressListener.PathAction.DELETE, info.getPath());
         }
     }
 
@@ -273,10 +278,14 @@ public final class RecapSessionImpl implements RecapSession {
         }
     }
 
-    public void syncContent(String path) throws RecapSessionException {
+    private void sanityCheck() throws RecapSessionException {
         if (this.finished) {
             throw new RecapSessionException("RecapSession already finished.");
         }
+    }
+
+    public void syncContent(String path) throws RecapSessionException {
+        sanityCheck();
 
         trackMessage("Sync %s %s http://%s:%d/", path, this.options.isReverse() ? "to" : "from", this.address.getHostname(), this.address.getPort());
 
@@ -317,41 +326,61 @@ public final class RecapSessionImpl implements RecapSession {
     }
 
     public void delete(String path) throws RecapSessionException {
-        if (this.finished) {
-            throw new RecapSessionException("RecapSession already finished.");
+        sanityCheck();
+
+        if (this.options.isReverse()) {
+            trackMessage("Deleting %s from http://%s:%d/", path,
+                    this.address.getHostname(), this.address.getPort());
+        } else {
+            trackMessage("Deleting %s from local repository", path);
+        }
+
+        try {
+            getTargetSession().removeItem(path);
+        } catch (PathNotFoundException e) {
+            LOGGER.debug("PathNotFoundException while removing path: {}. Message: {}", path, e.getMessage());
+            trackError(path, e);
+        } catch (RepositoryException e) {
+            LOGGER.error("RepositoryException while removing path: {}. Message: {}", path, e.getMessage());
+            trackFailure(path, e);
+            this.interrupted = true;
+            this.finish();
+            throw new RecapSessionException("RepositoryException while removing path: " + path, e);
         }
     }
 
     public void finish() throws RecapSessionException {
-        this.finished = true;
-        RecapSessionException exception = null;
-        if (!this.interrupted) {
-            try {
-                getTargetSession().commit();
-                trackMessage("Done.");
-            } catch (RepositoryException e) {
-                LOGGER.error("[finish] Failed to save remaining changes.", e);
-                trackMessage("Failed to save remaining changes. %s", e.getMessage());
-                this.interrupted = true;
-                exception = new RecapSessionException("Failed to save remaining changes.", e);
+        if (!this.finished) {
+            this.finished = true;
+            RecapSessionException exception = null;
+            if (!this.interrupted) {
+                try {
+                    getTargetSession().commit();
+                    trackMessage("Done.");
+                } catch (RepositoryException e) {
+                    LOGGER.error("[finish] Failed to save remaining changes.", e);
+                    trackMessage("Failed to save remaining changes. %s", e.getMessage());
+                    this.interrupted = true;
+                    exception = new RecapSessionException("Failed to save remaining changes.", e);
+                }
             }
-        }
 
-        this.end = System.currentTimeMillis();
-        this.logout();
+            this.end = System.currentTimeMillis();
+            this.logout();
 
-        if (this.getTotalNodes() > 0) {
+            if (this.getTotalNodes() > 0) {
 
-            trackMessage("Copy %s. %d nodes in %dms. %d bytes",
-                    (this.interrupted ? "interrupted" : "completed"),
-                    this.getTotalNodes(), this.getTotalTimeMillis(), this.getTotalSize());
+                trackMessage("Copy %s. %d nodes in %dms. %d bytes",
+                        (this.interrupted ? "interrupted" : "completed"),
+                        this.getTotalNodes(), this.getTotalTimeMillis(), this.getTotalSize());
 
-            trackMessage("%d root paths added or updated successfully. Last successful path: %s",
-                    this.getTotalSyncPaths(), this.getLastSuccessfulSyncPath());
-        }
+                trackMessage("%d root paths added or updated successfully. Last successful path: %s",
+                        this.getTotalSyncPaths(), this.getLastSuccessfulSyncPath());
+            }
 
-        if (exception != null) {
-            throw exception;
+            if (exception != null) {
+                throw exception;
+            }
         }
     }
 

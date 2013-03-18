@@ -28,25 +28,29 @@
 package net.adamcin.recap.batchsession;
 
 /**
- * Listener interface used by the BatchManagerImpl to notify clients when their
- * JCR session has been saved automatically
- *
- * @author madamcin
- *
+ * Simple interface used by the {@link BatchSession} to communicate progress of a recursive remove operation to an
+ * {@link BatchSessionListener}
  */
-public interface BatchSessionListener {
+public interface BatchRemoveInfo {
 
     /**
-     * Called by the {@link BatchSession} after a *successful* call to the
-     * underlying JCR Session's save() method
-     * @param info the {@link BatchSaveInfo} describing the save operation
+     * @return the path that was explicitly removed.
      */
-    void onSave(BatchSaveInfo info);
+    String getRootPath();
 
     /**
-     * Called by the {@link BatchSession} after a *successful* call to {@code Node.remove()},
-     * but *before* an auto-save commits the change
-     * @param info the {@link BatchRemoveInfo} describing the remove operation
+     * @return the path that was just removed
      */
-    void onRemove(BatchRemoveInfo info);
+    String getPath();
+
+    /**
+     * @return the depth of the removed node below the root path, which has a depth of 0
+     */
+    int getDepth();
+
+    /**
+     * @return the number of {@link javax.jcr.version.Version} nodes that will be purged
+     * along with the removal of this node upon session save.
+     */
+    int getPurgedVersionCount();
 }

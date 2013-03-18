@@ -50,4 +50,10 @@ public interface BatchSaveInfo {
      * @return the time in milliseconds the underlying JCR session took to commit the save.
      */
     long getTime();
+
+    /**
+     * @return the number of {@link javax.jcr.version.Version} nodes that were purged
+     * immediately after the save operation.
+     */
+    int getPurgedVersionCount();
 }

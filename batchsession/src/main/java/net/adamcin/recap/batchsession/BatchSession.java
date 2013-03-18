@@ -127,9 +127,11 @@ public interface BatchSession extends Session {
     void commit() throws RepositoryException;
 
     /**
-     * Recursively deletes the subgraph and related versionhistory starting at path, by traversing
-     * depth-first to the leaves and deleting each node on the way up.
-     * @param path the top of the subgraph
+     * Recursively removes the subgraph of Nodes and related {@link javax.jcr.version.Version} Nodes,
+     * descending from {@code path}, by traversing depth-first to the leaves and removing each node
+     * on the way up. Versions are marked for removal, but are only removed after a session save because
+     * version modifications are workspace-write operations, not session-write operations.
+     * @param path the node at the top of the subgraph
      * @throws javax.jcr.RepositoryException if anything goes wrong
      */
     void purge(String path) throws RepositoryException;

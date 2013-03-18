@@ -62,7 +62,7 @@
             <item name="Wiki" href="http://wiki.github.com/adamcin/net.adamcin.recap/"/>
             <item name="FAQ" href="http://wiki.github.com/adamcin/net.adamcin.recap/frequently-asked-questions"/>
         </links>
-        <menu name="Overview" inherit="top">
+        <menu name="Overview">
             <item name="Introduction" href="index.html" />
             <item name="JavaDocs" href="apidocs/index.html" />
         </menu>

@@ -25,40 +25,32 @@
  * For more information, please refer to <http://unlicense.org/>
  */
 
-package net.adamcin.recap.remotecontrol.impl;
-
-import net.adamcin.recap.remotecontrol.RecapRemoteException;
-import net.adamcin.recap.remotecontrol.RecapStrategy;
-import org.apache.felix.scr.annotations.Component;
-import org.apache.sling.api.SlingHttpServletRequest;
-import org.apache.sling.api.resource.Resource;
-
-import javax.jcr.Node;
-import java.util.Arrays;
-import java.util.Iterator;
+package net.adamcin.commons.jcr.batch;
 
 /**
- * @author madamcin
- * @version $Id: SinglePathRecapStrategy.java$
+ * Simple interface used by the {@link BatchSession} to communicate progress of a recursive remove operation to an
+ * {@link BatchSessionListener}
  */
-@Component(factory = "net.adamcin.recap.RecapStrategy/single",
-        metatype = true,
-        label = "Single Path",
-        description = "Recursively copy a single path from a remote CRX repository to this one.")
-public class SinglePathRecapStrategy implements RecapStrategy {
+public interface BatchRemoveInfo {
 
-    public Iterator<Node> listNodes(SlingHttpServletRequest recapRequest)
-            throws RecapRemoteException {
+    /**
+     * @return the path that was explicitly removed.
+     */
+    String getRootPath();
 
-        Resource resource = recapRequest.getResourceResolver().
-                getResource(recapRequest.getRequestPathInfo().getSuffix());
+    /**
+     * @return the path that was just removed
+     */
+    String getPath();
 
-        if (resource != null) {
-            Node resourceNode = resource.adaptTo(Node.class);
-            if (resourceNode != null) {
-                return Arrays.asList(new Node[]{resourceNode}).iterator();
-            }
-        }
-        return null;
-    }
+    /**
+     * @return the depth of the removed node below the root path, which has a depth of 0
+     */
+    int getDepth();
+
+    /**
+     * @return the number of {@link javax.jcr.version.Version} nodes that will be purged
+     * along with the removal of this node upon session save.
+     */
+    int getPurgedVersionCount();
 }

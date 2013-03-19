@@ -36,15 +36,15 @@
     </parent>
 
     <groupId>net.adamcin.recap</groupId>
-    <artifactId>net.adamcin.recap.parent</artifactId>
+    <artifactId>parent</artifactId>
     <version>0.7.0-SNAPSHOT</version>
     <packaging>pom</packaging>
 
-    <url>http://adamcin.net/net.adamcin.recap/${project.artifactId}</url>
+    <url>http://adamcin.net/net.adamcin.recap/parent</url>
 
     <inceptionYear>2012</inceptionYear>
-    <name>Recap - Parent</name>
-    <description>Parent POM for Recap project</description>
+    <name>Recap</name>
+    <description>Rsync for Adobe Granite!</description>
 
     <properties>
         <encoding>UTF-8</encoding>
@@ -85,6 +85,15 @@
             </roles>
         </developer>
     </developers>
+
+    <profiles>
+        <profile>
+            <id>itests</id>
+            <properties>
+                <vltpack.deploy>true</vltpack.deploy>
+            </properties>
+        </profile>
+    </profiles>
 
     <build>
         <pluginManagement>
@@ -152,7 +161,7 @@
                 <plugin>
                     <groupId>net.adamcin</groupId>
                     <artifactId>vltpack-maven-plugin</artifactId>
-                    <version>0.6.6</version>
+                    <version>0.8.0</version>
                     <configuration>
                         <bundleInstallPath>/libs/recap/install</bundleInstallPath>
                     </configuration>

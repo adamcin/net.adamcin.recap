@@ -25,7 +25,7 @@
  * For more information, please refer to <http://unlicense.org/>
  */
 
-package net.adamcin.recap.batchsession;
+package net.adamcin.commons.jcr.batch;
 
 import org.apache.jackrabbit.JcrConstants;
 import org.apache.jackrabbit.core.TransientRepository;
@@ -36,9 +36,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.jcr.*;
-import javax.jcr.version.Version;
 import javax.jcr.version.VersionHistory;
-import javax.jcr.version.VersionIterator;
 import javax.jcr.version.VersionManager;
 import java.io.File;
 import java.util.HashSet;

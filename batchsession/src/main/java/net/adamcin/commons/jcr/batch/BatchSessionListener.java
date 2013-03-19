@@ -25,53 +25,28 @@
  * For more information, please refer to <http://unlicense.org/>
  */
 
-package net.adamcin.recap.remotecontrol.impl;
-
-import net.adamcin.recap.remotecontrol.RecapRequest;
-import org.apache.commons.httpclient.NameValuePair;
-
-import java.util.List;
+package net.adamcin.commons.jcr.batch;
 
 /**
+ * Listener interface used by the BatchManagerImpl to notify clients when their
+ * JCR session has been saved automatically
+ *
  * @author madamcin
- * @version $Id: RecapRequestImpl.java$
+ *
  */
-public class RecapRequestImpl implements RecapRequest {
+public interface BatchSessionListener {
 
-    String strategy;
-    List<String> selectors;
-    String suffix;
-    List<NameValuePair> parameters;
+    /**
+     * Called by the {@link BatchSession} after a *successful* call to the
+     * underlying JCR Session's save() method
+     * @param info the {@link BatchSaveInfo} describing the save operation
+     */
+    void onSave(BatchSaveInfo info);
 
-    public String getStrategy() {
-        return strategy;
-    }
-
-    public void setStrategy(String strategy) {
-        this.strategy = strategy;
-    }
-
-    public List<String> getSelectors() {
-        return selectors;
-    }
-
-    public void setSelectors(List<String> selectors) {
-        this.selectors = selectors;
-    }
-
-    public String getSuffix() {
-        return suffix;
-    }
-
-    public void setSuffix(String suffix) {
-        this.suffix = suffix;
-    }
-
-    public List<NameValuePair> getParameters() {
-        return parameters;
-    }
-
-    public void setParameters(List<NameValuePair> parameters) {
-        this.parameters = parameters;
-    }
+    /**
+     * Called by the {@link BatchSession} after a *successful* call to {@code Node.remove()},
+     * but *before* an auto-save commits the change
+     * @param info the {@link BatchRemoveInfo} describing the remove operation
+     */
+    void onRemove(BatchRemoveInfo info);
 }

@@ -25,19 +25,15 @@
  * For more information, please refer to <http://unlicense.org/>
  */
 
-package net.adamcin.recap.remotecontrol;
-
-import org.apache.sling.api.SlingHttpServletRequest;
-
-import javax.jcr.Node;
-import java.util.Iterator;
+package net.adamcin.commons.jcr.batch;
 
 /**
+ * Basic implementation of {@link BatchSessionListener}
  * @author madamcin
- * @version $Id: RecapStrategy.java$
  */
-public interface RecapStrategy {
+public class DefaultBatchSessionListener implements BatchSessionListener {
 
-    Iterator<Node> listNodes(SlingHttpServletRequest recapRequest)
-            throws RecapRemoteException;
+    public void onSave(BatchSaveInfo info) { /* do nothing */ }
+
+    public void onRemove(BatchRemoveInfo info) { /* do nothing */ }
 }

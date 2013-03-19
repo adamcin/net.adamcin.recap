@@ -25,7 +25,7 @@
  * For more information, please refer to <http://unlicense.org/>
  */
 
-package net.adamcin.recap.batchsession;
+package net.adamcin.commons.jcr.batch;
 
 import org.junit.Assert;
 

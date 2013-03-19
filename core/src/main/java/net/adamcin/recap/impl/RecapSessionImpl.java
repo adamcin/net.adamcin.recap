@@ -27,9 +27,8 @@
 
 package net.adamcin.recap.impl;
 
+import net.adamcin.commons.jcr.batch.*;
 import net.adamcin.recap.api.*;
-import net.adamcin.recap.batchsession.*;
-import net.adamcin.recap.util.DefaultRecapOptions;
 import org.apache.commons.lang.StringUtils;
 import org.apache.jackrabbit.JcrConstants;
 import org.apache.jackrabbit.util.Text;
@@ -43,7 +42,7 @@ import javax.jcr.nodetype.NodeType;
 import java.util.*;
 
 /**
- * Implementation of {@link RecapSession} using a {@link BatchSession} to manage auto-saves
+ * Implementation of {@link RecapSession} using a {@link net.adamcin.commons.jcr.batch.BatchSession} to manage auto-saves
  */
 public final class RecapSessionImpl implements RecapSession {
 

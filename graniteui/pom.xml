@@ -63,7 +63,7 @@
                         <dependency>net.adamcin.commons.slingjunit</dependency>
                     </packageDependencies>
                     <embedBundles>
-                        <bundle>net.adamcin.recap.batchsession</bundle>
+                        <bundle>net.adamcin.commons.jcr</bundle>
                         <bundle>net.adamcin.recap.core</bundle>
                         <bundle>net.adamcin.recap.addressbook</bundle>
                         <bundle>net.adamcin.recap.replication</bundle>
@@ -98,24 +98,20 @@
 
     <dependencies>
         <dependency>
-            <groupId>net.adamcin.recap</groupId>
-            <artifactId>net.adamcin.recap.batchsession</artifactId>
-            <version>${project.version}</version>
+            <groupId>net.adamcin.commons</groupId>
+            <artifactId>net.adamcin.commons.jcr</artifactId>
         </dependency>
         <dependency>
             <groupId>net.adamcin.recap</groupId>
             <artifactId>net.adamcin.recap.core</artifactId>
-            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>net.adamcin.recap</groupId>
             <artifactId>net.adamcin.recap.addressbook</artifactId>
-            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>net.adamcin.recap</groupId>
             <artifactId>net.adamcin.recap.replication</artifactId>
-            <version>${project.version}</version>
         </dependency>
 
         <dependency>

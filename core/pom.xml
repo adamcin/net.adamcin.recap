@@ -92,9 +92,8 @@
 
     <dependencies>
         <dependency>
-            <groupId>net.adamcin.recap</groupId>
-            <artifactId>net.adamcin.recap.batchsession</artifactId>
-            <version>${project.version}</version>
+            <groupId>net.adamcin.commons</groupId>
+            <artifactId>net.adamcin.commons.jcr</artifactId>
         </dependency>
         <dependency>
             <groupId>javax.jcr</groupId>
@@ -178,6 +177,11 @@
             <groupId>org.apache.jackrabbit</groupId>
             <artifactId>jackrabbit-jcr-tests</artifactId>
             <version>${jackrabbit.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>net.adamcin.commons</groupId>
+            <artifactId>net.adamcin.commons.testing</artifactId>
             <scope>test</scope>
         </dependency>
 

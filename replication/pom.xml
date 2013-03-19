@@ -89,7 +89,7 @@
         <dependency>
             <groupId>net.adamcin.recap</groupId>
             <artifactId>net.adamcin.recap.core</artifactId>
-            <version>${project.version}</version>
+            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>javax.jcr</groupId>

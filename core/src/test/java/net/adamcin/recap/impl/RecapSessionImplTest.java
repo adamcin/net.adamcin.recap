@@ -28,6 +28,7 @@
 package net.adamcin.recap.impl;
 
 
+import net.adamcin.commons.testing.junit.TestBody;
 import net.adamcin.recap.api.RecapAddress;
 import net.adamcin.recap.api.RecapProgressListener;
 import org.apache.jackrabbit.JcrConstants;
@@ -79,34 +80,14 @@ public class RecapSessionImplTest {
         remoteRepo.shutdown();
     }
 
-    protected void executeTestBody(RecapTestBody body) {
-        Session localSession = null;
-        Session remoteSession = null;
-
-        try {
-            localSession = localRepo.login(DEFAULT_CREDENTIALS);
-            remoteSession = remoteRepo.login(DEFAULT_CREDENTIALS);
-
-            body.execute(localSession, remoteSession);
-
-        } catch (Exception e) {
-            LOGGER.error("Exception: {}", e);
-            TestUtil.sprintFail(e);
-        } finally {
-            if (localSession != null && localSession.isLive()) {
-                localSession.logout();
-            }
-            if (remoteSession != null && remoteSession.isLive()) {
-                remoteSession.logout();
-            }
-        }
-    }
-
     @Test
     public void testCreateRecapSession() {
         // check that appropriate exceptions are thrown by constructor
-        executeTestBody(new RecapTestBody() {
-            public void execute(Session localSession, Session remoteSession) throws Exception {
+        TestBody.test(new RecapTestBody() {
+            @Override protected void execute() throws Exception {
+                localSession = localRepo.login(DEFAULT_CREDENTIALS);
+                remoteSession = remoteRepo.login(DEFAULT_CREDENTIALS);
+
                 boolean npeThrown = false;
                 try {
                     new RecapSessionImpl(null, null, null, null, null);
@@ -216,8 +197,11 @@ public class RecapSessionImplTest {
 
     @Test
     public void testBasicSync() {
-        executeTestBody(new RecapTestBody() {
-            public void execute(Session localSession, Session remoteSession) throws Exception {
+        TestBody.test(new RecapTestBody() {
+            @Override protected void execute() throws Exception {
+                localSession = localRepo.login(DEFAULT_CREDENTIALS);
+                remoteSession = remoteRepo.login(DEFAULT_CREDENTIALS);
+
                 Node lastNode = remoteSession.getRootNode();
                 for (int i = 0; i < 10; i++) {
                     lastNode = lastNode.addNode("basicSync" + i, JcrConstants.NT_UNSTRUCTURED);
@@ -252,8 +236,11 @@ public class RecapSessionImplTest {
 
     @Test
     public void testBasicDelete() {
-        executeTestBody(new RecapTestBody() {
-            public void execute(Session localSession, Session remoteSession) throws Exception {
+        TestBody.test(new RecapTestBody() {
+            @Override protected void execute() throws Exception {
+                localSession = localRepo.login(DEFAULT_CREDENTIALS);
+                remoteSession = remoteRepo.login(DEFAULT_CREDENTIALS);
+
                 Node lastNode = remoteSession.getRootNode();
                 for (int i = 0; i < 10; i++) {
                     lastNode = lastNode.addNode("basicDelete" + i, JcrConstants.NT_UNSTRUCTURED);
@@ -315,6 +302,21 @@ public class RecapSessionImplTest {
                 // ignored
             }
             this.interrupted = true;
+        }
+    }
+
+    abstract class RecapTestBody extends TestBody {
+        Session localSession;
+        Session remoteSession;
+
+        @Override
+        protected void cleanUp() {
+            if (localSession != null && localSession.isLive()) {
+                localSession.logout();
+            }
+            if (remoteSession != null && remoteSession.isLive()) {
+                remoteSession.logout();
+            }
         }
     }
 

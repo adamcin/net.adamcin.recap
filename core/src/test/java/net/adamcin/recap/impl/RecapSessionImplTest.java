@@ -45,6 +45,7 @@ import javax.jcr.SimpleCredentials;
 import java.io.File;
 
 import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 public class RecapSessionImplTest {
     private static final Logger LOGGER = LoggerFactory.getLogger(RecapSessionImplTest.class);
@@ -103,7 +104,7 @@ public class RecapSessionImplTest {
 
     @Test
     public void testCreateRecapSession() {
-        // check that an NPE is thrown for a null interrupter
+        // check that appropriate exceptions are thrown by constructor
         executeTestBody(new RecapTestBody() {
             public void execute(Session localSession, Session remoteSession) throws Exception {
                 boolean npeThrown = false;
@@ -175,17 +176,51 @@ public class RecapSessionImplTest {
                         fail("Unexpected NPE thrown");
                     }
                 }
+
+                boolean iaeThrown = false;
+
+                try {
+                    new RecapSessionImpl(interrupter, DEFAULT_ADDRESS, options, localSession, localSession);
+                } catch (IllegalArgumentException e) {
+                    iaeThrown = true;
+                } finally {
+                    if (!iaeThrown) {
+                        fail("IAE not thrown for same session");
+                    }
+                    iaeThrown = false;
+                }
+
+                try {
+                    new RecapSessionImpl(interrupter, DEFAULT_ADDRESS, options, remoteSession, remoteSession);
+                } catch (IllegalArgumentException e) {
+                    iaeThrown = true;
+                } finally {
+                    if (!iaeThrown) {
+                        fail("IAE not thrown for same session");
+                    }
+                    iaeThrown = false;
+                }
+
+                try {
+                    new RecapSessionImpl(interrupter, DEFAULT_ADDRESS, options, localSession, remoteSession);
+                } catch (IllegalArgumentException e) {
+                    iaeThrown = true;
+                } finally {
+                    if (iaeThrown) {
+                        fail("IAE thrown for different sessions");
+                    }
+                }
             }
         });
     }
 
     @Test
-    public void testSyncPath() {
+    public void testBasicSync() {
         executeTestBody(new RecapTestBody() {
             public void execute(Session localSession, Session remoteSession) throws Exception {
                 Node lastNode = remoteSession.getRootNode();
                 for (int i = 0; i < 10; i++) {
-                    lastNode = lastNode.addNode("level" + i, JcrConstants.NT_UNSTRUCTURED);
+                    lastNode = lastNode.addNode("basicSync" + i, JcrConstants.NT_UNSTRUCTURED);
                 }
                 lastNode.getSession().save();
 
@@ -201,9 +236,53 @@ public class RecapSessionImplTest {
 
                 session.setProgressListener(tracker);
 
-                session.sync("/level0");
+                String lastPath = "";
+                int totalNodes = 0;
+                for (int i = 0; i < 10; i++) {
+                    lastPath = lastPath + "/basicSync" + i;
+                    totalNodes += (10 - i);
+                    session.sync(lastPath);
+                    assertEquals("number of synced paths should be", i + 1, session.getTotalSyncPaths());
+                    assertEquals("total number of nodes should be", totalNodes, session.getTotalNodes());
+                    assertEquals("last synced path should be", lastPath, session.getLastSuccessfulSyncPath());
+                }
+            }
+        });
+    }
 
-                assertEquals("last synced path should be", "/level0", session.getLastSuccessfulSyncPath());
+    @Test
+    public void testBasicDelete() {
+        executeTestBody(new RecapTestBody() {
+            public void execute(Session localSession, Session remoteSession) throws Exception {
+                Node lastNode = remoteSession.getRootNode();
+                for (int i = 0; i < 10; i++) {
+                    lastNode = lastNode.addNode("basicDelete" + i, JcrConstants.NT_UNSTRUCTURED);
+                }
+                lastNode.getSession().save();
+
+                TestProgressTracker tracker = new TestProgressTracker();
+
+                RecapSessionInterrupter interrupter = new TestInterrupter();
+                RecapOptionsImpl options = new RecapOptionsImpl();
+                RecapSessionImpl session = new RecapSessionImpl(interrupter,
+                        DEFAULT_ADDRESS,
+                        options,
+                        localSession,
+                        remoteSession);
+
+                session.setProgressListener(tracker);
+
+                session.sync("/basicDelete0");
+
+                assertEquals("number of synced paths should be", 1, session.getTotalSyncPaths());
+                assertEquals("total number of nodes should be", 10, session.getTotalNodes());
+                assertEquals("last synced path should be", "/basicDelete0", session.getLastSuccessfulSyncPath());
+
+                session.delete("/basicDelete0");
+
+                assertEquals("number of synced paths should be", 1, session.getTotalSyncPaths());
+                assertEquals("total number of nodes should be", 20, session.getTotalNodes());
+                assertEquals("last synced path should be", "/basicDelete0", session.getLastSuccessfulSyncPath());
             }
         });
     }
@@ -276,32 +355,24 @@ public class RecapSessionImplTest {
         }
 
         public void onMessage(String fmt, Object... args) {
-           if (LOGGER.isDebugEnabled()) {
-               LOGGER.debug("[tracker#onMessage] M={}", String.format(fmt, args));
-           }
+            LOGGER.info("[tracker#onMessage] M={}", String.format(fmt, args));
         }
 
         public void onError(String path, Exception ex) {
-            if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("[tracker#onError] path={}, ex={}", path, ex);
-            }
+            LOGGER.info("[tracker#onError] path={}, ex={}", path, ex);
             this.lastErrorPath = path;
             this.lastError = ex;
         }
 
         public void onFailure(String path, Exception ex) {
-            if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("[tracker#onFailure] path={}, ex={}", path, ex);
-            }
+            LOGGER.info("[tracker#onFailure] path={}, ex={}", path, ex);
             this.lastFailurePath = path;
             this.lastFailure = ex;
         }
 
         public void onPath(PathAction action, int count, String path) {
-            if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("[tracker#onPath] action={}, count={}, path={}",
-                        new Object[]{ action, count, path });
-            }
+            LOGGER.info("[tracker#onPath] action={}, count={}, path={}",
+                    new Object[]{action, count, path});
             ++pathCount;
         }
     }

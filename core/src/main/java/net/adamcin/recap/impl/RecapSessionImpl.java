@@ -48,6 +48,9 @@ import java.util.*;
 public final class RecapSessionImpl implements RecapSession {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RecapSessionImpl.class);
+
+    private static final int DEFAULT_BATCH_SIZE = 1024;
+    private static final long DEFAULT_THROTTLE = 0L;
     private static final RecapFilter DEFAULT_FILTER = new RecapFilter() {
         public boolean includesPath(String path) {
             return true;
@@ -97,6 +100,10 @@ public final class RecapSessionImpl implements RecapSession {
         }
         if (remoteSession == null) {
             throw new NullPointerException("remoteSession");
+        }
+        if (localSession.getRepository().equals(remoteSession.getRepository())
+                && localSession.getWorkspace().equals(remoteSession.getWorkspace())) {
+            throw new IllegalArgumentException("localSession and remoteSession must not be on the same repository and workspace");
         }
 
         this.interrupter = interrupter;
@@ -162,7 +169,7 @@ public final class RecapSessionImpl implements RecapSession {
         @Override
         public void onRemove(BatchRemoveInfo info) {
             super.onRemove(info);
-            ++totalNodes;
+            totalNodes++;
             trackPath(RecapProgressListener.PathAction.DELETE, info.getPath());
         }
     }
@@ -187,7 +194,9 @@ public final class RecapSessionImpl implements RecapSession {
             getTargetSession().checkPermission(path, Session.ACTION_READ);
             getTargetSession().checkPermission(path, Session.ACTION_ADD_NODE);
             getTargetSession().checkPermission(path, Session.ACTION_SET_PROPERTY);
-            getTargetSession().checkPermission(path, Session.ACTION_REMOVE);
+            if (!options.isNoDelete()) {
+                getTargetSession().checkPermission(path, Session.ACTION_REMOVE);
+            }
         } catch (RepositoryException e) {
             trackError(path, e);
         }
@@ -559,7 +568,6 @@ public final class RecapSessionImpl implements RecapSession {
                     for (String name : names) {
                         try {
                             Node cNode = dst.getNode(name);
-                            trackPath(RecapProgressListener.PathAction.DELETE, cNode.getPath());
                             cNode.remove();
                         } catch (RepositoryException e) {
                             LOGGER.warn("[copy] failed to delete existing node in dst that does not exist in src", e);
@@ -711,8 +719,9 @@ public final class RecapSessionImpl implements RecapSession {
         public Integer getBatchSize() {
             Integer unsafeBatchSize = unsafe.getBatchSize();
             if (unsafeBatchSize == null) {
-                LOGGER.warn("[OptionsShield#getBatchSize] null value for batchSize; using hard coded default of 1024");
-                return 1024;
+                LOGGER.debug("[OptionsShield#getBatchSize] null value for batchSize; using hard coded default of {}",
+                        DEFAULT_BATCH_SIZE);
+                return DEFAULT_BATCH_SIZE;
             } else {
                 return unsafeBatchSize;
             }
@@ -721,8 +730,9 @@ public final class RecapSessionImpl implements RecapSession {
         public Long getThrottle() {
             Long unsafeThrottle = unsafe.getThrottle();
             if (unsafeThrottle == null) {
-                LOGGER.warn("[OptionsShield#getBatchSize] null value for throttle; using hard coded default of 0L");
-                return 0L;
+                LOGGER.debug("[OptionsShield#getBatchSize] null value for throttle; using hard coded default of {}",
+                        DEFAULT_THROTTLE);
+                return DEFAULT_THROTTLE;
             } else {
                 return unsafeThrottle;
             }
@@ -731,44 +741,20 @@ public final class RecapSessionImpl implements RecapSession {
         public RecapFilter getFilter() {
             RecapFilter unsafeFilter = unsafe.getFilter();
             if (unsafeFilter == null) {
-                LOGGER.warn("[OptionsShield#getFilter] null value for filter; using hard coded default filter");
+                LOGGER.debug("[OptionsShield#getFilter] null value for filter; using hard coded default filter");
                 return DEFAULT_FILTER;
             } else {
                 return unsafeFilter;
             }
         }
 
-        public String getLastModifiedProperty() {
-            return unsafe.getLastModifiedProperty();
-        }
-
-        public RequestDepthConfig getRequestDepthConfig() {
-            return unsafe.getRequestDepthConfig();
-        }
-
-        public boolean isOnlyNewer() {
-            return unsafe.isOnlyNewer();
-        }
-
-        public boolean isUpdate() {
-            return unsafe.isUpdate();
-        }
-
-        public boolean isReverse() {
-            return unsafe.isReverse();
-        }
-
-        public boolean isNoRecurse() {
-            return unsafe.isNoRecurse();
-        }
-
-        public boolean isNoDelete() {
-            return unsafe.isNoDelete();
-        }
-
-        @Override
-        public String toString() {
-            return unsafe.toString();
-        }
+        public String getLastModifiedProperty() { return unsafe.getLastModifiedProperty(); }
+        public RequestDepthConfig getRequestDepthConfig() { return unsafe.getRequestDepthConfig(); }
+        public boolean isOnlyNewer() { return unsafe.isOnlyNewer(); }
+        public boolean isUpdate() { return unsafe.isUpdate(); }
+        public boolean isReverse() { return unsafe.isReverse(); }
+        public boolean isNoRecurse() { return unsafe.isNoRecurse(); }
+        public boolean isNoDelete() { return unsafe.isNoDelete(); }
+        @Override public String toString() { return unsafe.toString(); }
     }
 }

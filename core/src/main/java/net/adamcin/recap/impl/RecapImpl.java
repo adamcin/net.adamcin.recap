@@ -54,15 +54,9 @@ import java.util.Map;
  */
 @Component(label = "Recap Service", metatype = true)
 @Service
-public class RecapImpl implements Recap {
+public class RecapImpl implements Recap, RecapSessionInterrupter {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RecapImpl.class);
-
-    private static final RecapFilter DEFAULT_FILTER = new RecapFilter() {
-        public boolean includesPath(String path) {
-            return true;
-        }
-    };
 
     @Property(label = "Default Remote Port", intValue = RecapConstants.DEFAULT_DEFAULT_PORT)
     protected static final String OSGI_DEFAULT_PORT = "default.port";
@@ -125,6 +119,10 @@ public class RecapImpl implements Recap {
         defaultBatchSize = 0;
         defaultRequestDepthConfig = null;
         defaultLastModifiedProperty = null;
+    }
+
+    public boolean isInterrupted() {
+        return this.sessionsInterrupted;
     }
 
     public int getDefaultPort() {
@@ -247,7 +245,6 @@ public class RecapImpl implements Recap {
         dOptions.setBatchSize(defaultBatchSize);
         dOptions.setLastModifiedProperty(defaultLastModifiedProperty);
         dOptions.setRequestDepthConfig(DefaultRequestDepthConfig.parseParameterValue(defaultRequestDepthConfig));
-        dOptions.setFilter(DEFAULT_FILTER);
 
         if (options != null) {
             dOptions.setUpdate(options.isUpdate());

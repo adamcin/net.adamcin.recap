@@ -29,6 +29,7 @@ package net.adamcin.recap.impl;
 
 import net.adamcin.recap.api.*;
 import net.adamcin.recap.batchsession.*;
+import net.adamcin.recap.util.DefaultRecapOptions;
 import org.apache.commons.lang.StringUtils;
 import org.apache.jackrabbit.JcrConstants;
 import org.apache.jackrabbit.util.Text;
@@ -47,8 +48,13 @@ import java.util.*;
 public final class RecapSessionImpl implements RecapSession {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RecapSessionImpl.class);
+    private static final RecapFilter DEFAULT_FILTER = new RecapFilter() {
+        public boolean includesPath(String path) {
+            return true;
+        }
+    };
 
-    private final RecapImpl recap;
+    private final RecapSessionInterrupter interrupter;
     private final RecapAddress address;
     private final RecapOptions options;
     private final Session localSession;
@@ -71,12 +77,21 @@ public final class RecapSessionImpl implements RecapSession {
     private boolean finished = false;
 
 
-    public RecapSessionImpl(RecapImpl recap,
+    public RecapSessionImpl(RecapSessionInterrupter interrupter,
                             RecapAddress address,
                             RecapOptions options,
                             Session localSession,
                             Session remoteSession) {
 
+        if (interrupter == null) {
+            throw new NullPointerException("interrupter");
+        }
+        if (address == null) {
+            throw new NullPointerException("address");
+        }
+        if (options == null) {
+            throw new NullPointerException("options");
+        }
         if (localSession == null) {
             throw new NullPointerException("localSession");
         }
@@ -84,9 +99,9 @@ public final class RecapSessionImpl implements RecapSession {
             throw new NullPointerException("remoteSession");
         }
 
-        this.recap = recap;
+        this.interrupter = interrupter;
         this.address = address;
-        this.options = options;
+        this.options = new OptionsShield(options);
         this.localSession = localSession;
         this.remoteSession = remoteSession;
 
@@ -396,7 +411,7 @@ public final class RecapSessionImpl implements RecapSession {
     private void copy(Node src, Node dstParent, String dstName, boolean recursive)
             throws RecapSessionException, RepositoryException {
 
-        if (recap.sessionsInterrupted) {
+        if (interrupter.isInterrupted()) {
             throw new RecapSessionException("RecapSession interrupted.");
         }
 
@@ -681,5 +696,89 @@ public final class RecapSessionImpl implements RecapSession {
 
     public long getTotalTimeMillis() {
         return this.end - this.start;
+    }
+
+    static class OptionsShield extends DefaultRecapOptions {
+        final RecapOptions unsafe;
+
+        OptionsShield(RecapOptions unsafe) {
+            if (unsafe == null) {
+                throw new NullPointerException("unsafe");
+            }
+            this.unsafe = unsafe;
+        }
+
+        @Override
+        public Integer getBatchSize() {
+            Integer unsafeBatchSize = unsafe.getBatchSize();
+            if (unsafeBatchSize == null) {
+                LOGGER.warn("[OptionsShield#getBatchSize] null value for batchSize; using hard coded default of 1024");
+                return 1024;
+            } else {
+                return unsafeBatchSize;
+            }
+        }
+
+        @Override
+        public Long getThrottle() {
+            Long unsafeThrottle = unsafe.getThrottle();
+            if (unsafeThrottle == null) {
+                LOGGER.warn("[OptionsShield#getBatchSize] null value for throttle; using hard coded default of 0L");
+                return 0L;
+            } else {
+                return unsafeThrottle;
+            }
+        }
+
+        @Override
+        public RecapFilter getFilter() {
+            RecapFilter unsafeFilter = unsafe.getFilter();
+            if (unsafeFilter == null) {
+                LOGGER.warn("[OptionsShield#getFilter] null value for filter; using hard coded default filter");
+                return DEFAULT_FILTER;
+            } else {
+                return unsafeFilter;
+            }
+        }
+
+        @Override
+        public String getLastModifiedProperty() {
+            return unsafe.getLastModifiedProperty();
+        }
+
+        @Override
+        public RequestDepthConfig getRequestDepthConfig() {
+            return unsafe.getRequestDepthConfig();
+        }
+
+        @Override
+        public boolean isOnlyNewer() {
+            return unsafe.isOnlyNewer();
+        }
+
+        @Override
+        public boolean isUpdate() {
+            return unsafe.isUpdate();
+        }
+
+        @Override
+        public boolean isReverse() {
+            return unsafe.isReverse();
+        }
+
+        @Override
+        public boolean isNoRecurse() {
+            return unsafe.isNoRecurse();
+        }
+
+        @Override
+        public boolean isNoDelete() {
+            return unsafe.isNoDelete();
+        }
+
+        @Override
+        public String toString() {
+            return unsafe.toString();
+        }
     }
 }

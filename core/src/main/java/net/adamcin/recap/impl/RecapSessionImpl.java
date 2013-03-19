@@ -698,7 +698,7 @@ public final class RecapSessionImpl implements RecapSession {
         return this.end - this.start;
     }
 
-    static class OptionsShield extends DefaultRecapOptions {
+    static class OptionsShield implements RecapOptions {
         final RecapOptions unsafe;
 
         OptionsShield(RecapOptions unsafe) {
@@ -708,7 +708,6 @@ public final class RecapSessionImpl implements RecapSession {
             this.unsafe = unsafe;
         }
 
-        @Override
         public Integer getBatchSize() {
             Integer unsafeBatchSize = unsafe.getBatchSize();
             if (unsafeBatchSize == null) {
@@ -719,7 +718,6 @@ public final class RecapSessionImpl implements RecapSession {
             }
         }
 
-        @Override
         public Long getThrottle() {
             Long unsafeThrottle = unsafe.getThrottle();
             if (unsafeThrottle == null) {
@@ -730,7 +728,6 @@ public final class RecapSessionImpl implements RecapSession {
             }
         }
 
-        @Override
         public RecapFilter getFilter() {
             RecapFilter unsafeFilter = unsafe.getFilter();
             if (unsafeFilter == null) {
@@ -741,37 +738,30 @@ public final class RecapSessionImpl implements RecapSession {
             }
         }
 
-        @Override
         public String getLastModifiedProperty() {
             return unsafe.getLastModifiedProperty();
         }
 
-        @Override
         public RequestDepthConfig getRequestDepthConfig() {
             return unsafe.getRequestDepthConfig();
         }
 
-        @Override
         public boolean isOnlyNewer() {
             return unsafe.isOnlyNewer();
         }
 
-        @Override
         public boolean isUpdate() {
             return unsafe.isUpdate();
         }
 
-        @Override
         public boolean isReverse() {
             return unsafe.isReverse();
         }
 
-        @Override
         public boolean isNoRecurse() {
             return unsafe.isNoRecurse();
         }
 
-        @Override
         public boolean isNoDelete() {
             return unsafe.isNoDelete();
         }

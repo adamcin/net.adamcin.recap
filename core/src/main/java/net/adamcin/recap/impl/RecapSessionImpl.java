@@ -42,7 +42,8 @@ import javax.jcr.nodetype.NodeType;
 import java.util.*;
 
 /**
- * Implementation of {@link RecapSession} using a {@link net.adamcin.commons.jcr.batch.BatchSession} to manage auto-saves
+ * Implementation of {@link RecapSession} using a
+ * {@link net.adamcin.commons.jcr.batch.BatchSession} to manage auto-saves
  */
 public final class RecapSessionImpl implements RecapSession {
 

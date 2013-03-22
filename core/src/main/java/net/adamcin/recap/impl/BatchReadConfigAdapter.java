@@ -34,8 +34,10 @@ import org.apache.jackrabbit.spi2davex.BatchReadConfig;
 
 import javax.jcr.NamespaceException;
 
-
-public class BatchReadConfigAdapter implements BatchReadConfig {
+/**
+ * Adapts the {@link RequestDepthConfig} interface to the DavEx {@link BatchReadConfig} interface
+ */
+final class BatchReadConfigAdapter implements BatchReadConfig {
 
     private final RequestDepthConfig config;
 

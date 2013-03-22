@@ -61,36 +61,35 @@ public class AddressImpl extends DefaultRecapAddress implements Address {
         return properties.get("jcr:title", String.class);
     }
 
-    public String getHostname() {
+    @Override public String getHostname() {
         return properties.get(AddressBookConstants.PROP_HOSTNAME, String.class);
     }
 
-    public Integer getPort() {
+    @Override public Integer getPort() {
         return properties.get(AddressBookConstants.PROP_PORT, Integer.class);
     }
 
-    public boolean isHttps() {
+    @Override public boolean isHttps() {
         return properties.get(AddressBookConstants.PROP_IS_HTTPS, false);
     }
 
-    public String getUsername() {
+    @Override public String getUsername() {
         return properties.get(AddressBookConstants.PROP_USERNAME, String.class);
     }
 
-    public String getPassword() {
+    @Override public String getPassword() {
         return properties.get(AddressBookConstants.PROP_PASSWORD, String.class);
     }
 
-    public String getContextPath() {
+    @Override public String getContextPath() {
         return properties.get(AddressBookConstants.PROP_CONTEXT_PATH, String.class);
     }
 
-    public String getPrefix() {
+    @Override public String getPrefix() {
         return properties.get(AddressBookConstants.PROP_PREFIX, String.class);
     }
 
-    @Override
-    public String toString() {
+    @Override public String toString() {
         return recap.getDisplayableUrl(this);
     }
 }

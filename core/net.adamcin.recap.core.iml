@@ -7,11 +7,11 @@
           <property key="Bundle-Description" value="Recap core API and implementation" />
           <property key="Export-Package" value="net.adamcin.recap.api.*;version=0.7.0-SNAPSHOT,net.adamcin.recap.util.*;version=0.7.0-SNAPSHOT" />
           <property key="Private-Package" value="net.adamcin.recap.impl.*" />
-          <property key="Embed-Dependency" value="jackrabbit-jcr-client;inline=false,jackrabbit-jcr2spi;inline=false,jackrabbit-spi2dav;inline=false" />
+          <property key="Embed-Dependency" value="net.adamcin.commons.jcr,jackrabbit-jcr-client;inline=false,jackrabbit-jcr2spi;inline=false,jackrabbit-spi2dav;inline=false" />
           <property key="Bundle-Name" value="Recap - Core" />
-          <property key="Bundle-ClassPath" value=".,jackrabbit-jcr-client-2.4.0.jar,jackrabbit-jcr2spi-2.4.0.jar,jackrabbit-spi2dav-2.4.0.jar" />
-          <property key="Include-Resource" value="jackrabbit-jcr-client-2.4.0.jar=$MAVEN_REPOSITORY$/org/apache/jackrabbit/jackrabbit-jcr-client/2.4.0/jackrabbit-jcr-client-2.4.0.jar,jackrabbit-jcr2spi-2.4.0.jar=$MAVEN_REPOSITORY$/org/apache/jackrabbit/jackrabbit-jcr2spi/2.4.0/jackrabbit-jcr2spi-2.4.0.jar,jackrabbit-spi2dav-2.4.0.jar=$MAVEN_REPOSITORY$/org/apache/jackrabbit/jackrabbit-spi2dav/2.4.0/jackrabbit-spi2dav-2.4.0.jar" />
-          <property key="Embedded-Artifacts" value="jackrabbit-jcr-client-2.4.0.jar;g=&quot;org.apache.jackrabbit&quot;;a=&quot;jackrabbit-jcr-client&quot;;v=&quot;2.4.0&quot;,jackrabbit-jcr2spi-2.4.0.jar;g=&quot;org.apache.jackrabbit&quot;;a=&quot;jackrabbit-jcr2spi&quot;;v=&quot;2.4.0&quot;,jackrabbit-spi2dav-2.4.0.jar;g=&quot;org.apache.jackrabbit&quot;;a=&quot;jackrabbit-spi2dav&quot;;v=&quot;2.4.0&quot;" />
+          <property key="Bundle-ClassPath" value=".,net.adamcin.commons.jcr-0.6.0.jar,jackrabbit-jcr-client-2.4.0.jar,jackrabbit-jcr2spi-2.4.0.jar,jackrabbit-spi2dav-2.4.0.jar" />
+          <property key="Include-Resource" value="net.adamcin.commons.jcr-0.6.0.jar=$MAVEN_REPOSITORY$/net/adamcin/commons/net.adamcin.commons.jcr/0.6.0/net.adamcin.commons.jcr-0.6.0.jar,jackrabbit-jcr-client-2.4.0.jar=$MAVEN_REPOSITORY$/org/apache/jackrabbit/jackrabbit-jcr-client/2.4.0/jackrabbit-jcr-client-2.4.0.jar,jackrabbit-jcr2spi-2.4.0.jar=$MAVEN_REPOSITORY$/org/apache/jackrabbit/jackrabbit-jcr2spi/2.4.0/jackrabbit-jcr2spi-2.4.0.jar,jackrabbit-spi2dav-2.4.0.jar=$MAVEN_REPOSITORY$/org/apache/jackrabbit/jackrabbit-spi2dav/2.4.0/jackrabbit-spi2dav-2.4.0.jar" />
+          <property key="Embedded-Artifacts" value="net.adamcin.commons.jcr-0.6.0.jar;g=&quot;net.adamcin.commons&quot;;a=&quot;net.adamcin.commons.jcr&quot;;v=&quot;0.6.0&quot;,jackrabbit-jcr-client-2.4.0.jar;g=&quot;org.apache.jackrabbit&quot;;a=&quot;jackrabbit-jcr-client&quot;;v=&quot;2.4.0&quot;,jackrabbit-jcr2spi-2.4.0.jar;g=&quot;org.apache.jackrabbit&quot;;a=&quot;jackrabbit-jcr2spi&quot;;v=&quot;2.4.0&quot;,jackrabbit-spi2dav-2.4.0.jar;g=&quot;org.apache.jackrabbit&quot;;a=&quot;jackrabbit-spi2dav&quot;;v=&quot;2.4.0&quot;" />
         </additionalProperties>
         <additionalJARContents />
       </configuration>

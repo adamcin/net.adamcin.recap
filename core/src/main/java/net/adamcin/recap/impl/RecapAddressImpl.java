@@ -30,8 +30,7 @@ package net.adamcin.recap.impl;
 import net.adamcin.recap.util.DefaultRecapAddress;
 
 /**
- * @author madamcin
- * @version $Id: RecapRequestImpl.java$
+ * Standard bean implementation of RecapAddress for use within the impl namespace
  */
 public class RecapAddressImpl extends DefaultRecapAddress {
 

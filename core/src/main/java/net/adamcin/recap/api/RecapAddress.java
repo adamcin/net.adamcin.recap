@@ -40,43 +40,36 @@ package net.adamcin.recap.api;
 public interface RecapAddress {
 
     /**
-     *
      * @return whether to use HTTPS (SSL) instead of HTTP
      */
     boolean isHttps();
 
     /**
-     *
      * @return the hostname of the address
      */
     String getHostname();
 
     /**
-     *
      * @return the TCP port of the address
      */
     Integer getPort();
 
     /**
-     *
      * @return the username for the remote session
      */
     String getUsername();
 
     /**
-     *
      * @return the password for the remote session
      */
     String getPassword();
 
     /**
-     *
      * @return the remote servlet context path
      */
     String getContextPath();
 
     /**
-     *
      * @return the remote DavEx endpoint prefix
      */
     String getPrefix();

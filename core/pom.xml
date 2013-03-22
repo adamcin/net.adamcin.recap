@@ -58,6 +58,7 @@
                             net.adamcin.recap.impl.*
                         </Private-Package>
                         <Embed-Dependency>
+                            net.adamcin.commons.jcr,
                             jackrabbit-jcr-client;inline=false,
                             jackrabbit-jcr2spi;inline=false,
                             jackrabbit-spi2dav;inline=false

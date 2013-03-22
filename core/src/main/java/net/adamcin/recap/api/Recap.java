@@ -68,19 +68,43 @@ public interface Recap {
     // expose default recap parameters
     // -----------------------------------------
 
+    /**
+     * @return the default address port
+     */
     int getDefaultPort();
 
+    /**
+     * @return the default context path
+     */
     String getDefaultContextPath();
 
+    /**
+     * @return the default servlet prefix
+     */
     String getDefaultPrefix();
 
+    /**
+     * @return the default address username
+     */
     String getDefaultUsername();
 
+    /**
+     * @return the default address password
+     */
     String getDefaultPassword();
 
+    /**
+     * @return the default batch size
+     */
     int getDefaultBatchSize();
 
+    /**
+     * @return the default request depth config
+     */
     String getDefaultRequestDepthConfig();
 
+    /**
+     * @return the default lastModified property
+     */
     String getDefaultLastModifiedProperty();
 }

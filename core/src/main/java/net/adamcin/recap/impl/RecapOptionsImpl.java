@@ -32,8 +32,8 @@ import net.adamcin.recap.api.RequestDepthConfig;
 import net.adamcin.recap.util.DefaultRecapOptions;
 
 /**
- * @author madamcin
- * @version $Id: RecapOptionsImpl.java$
+ * Standard bean implementation of the {@link net.adamcin.recap.api.RecapOptions} interface
+ * for use within the impl namespace
  */
 public class RecapOptionsImpl extends DefaultRecapOptions {
 

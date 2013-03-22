@@ -51,8 +51,7 @@ public class NewAddressResourceDecorator implements ResourceDecorator {
             Resource parent = resource.getParent();
             if (parent != null && parent.adaptTo(AddressBook.class) != null) {
                 return new ResourceWrapper(resource) {
-                    @Override
-                    public String getResourceType() {
+                    @Override public String getResourceType() {
                         return AddressBookConstants.RT_ADDRESS;
                     }
                 };

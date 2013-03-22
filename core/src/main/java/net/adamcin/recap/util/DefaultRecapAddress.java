@@ -29,33 +29,17 @@ package net.adamcin.recap.util;
 
 import net.adamcin.recap.api.RecapAddress;
 
+/**
+ * Default {@link RecapAddress} implementation that is intended
+ * to be overridden
+ */
 public class DefaultRecapAddress implements RecapAddress {
 
-    public boolean isHttps() {
-        return false;
-    }
-
-    public String getHostname() {
-        return null;
-    }
-
-    public Integer getPort() {
-        return null;
-    }
-
-    public String getUsername() {
-        return null;
-    }
-
-    public String getPassword() {
-        return null;
-    }
-
-    public String getContextPath() {
-        return null;
-    }
-
-    public String getPrefix() {
-        return null;
-    }
+    public boolean isHttps() { return false; }
+    public String getHostname() { return null; }
+    public Integer getPort() { return null; }
+    public String getUsername() { return null; }
+    public String getPassword() { return null; }
+    public String getContextPath() { return null; }
+    public String getPrefix() { return null; }
 }

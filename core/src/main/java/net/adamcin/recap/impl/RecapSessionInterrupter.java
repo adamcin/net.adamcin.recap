@@ -28,7 +28,9 @@
 package net.adamcin.recap.impl;
 
 /**
- * Internal interface that exposes an interrupt method for
+ * Internal interface that exposes an interrupt method for a
+ * {@link net.adamcin.recap.api.RecapSession} to check in case a long running sync needs to be
+ * ended for service deactivation or reconfiguration
  */
 public interface RecapSessionInterrupter {
 

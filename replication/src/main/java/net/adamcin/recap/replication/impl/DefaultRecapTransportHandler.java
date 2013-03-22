@@ -97,9 +97,9 @@ public class DefaultRecapTransportHandler implements TransportHandler {
 
             RecapOptions options = new DefaultRecapOptions() {
                 // Return true for these options
-                public boolean isOnlyNewer() { return true; }
-                public boolean isUpdate() { return true; }
-                public boolean isReverse() { return true; }
+                @Override public boolean isOnlyNewer() { return true; }
+                @Override public boolean isUpdate() { return true; }
+                @Override public boolean isReverse() { return true; }
             };
 
             RecapSession session = recap.initSession(resolver.adaptTo(Session.class), address, options);

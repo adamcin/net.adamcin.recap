@@ -49,8 +49,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * @author madamcin
- * @version $Id: RecapImpl.java$
+ * {@link Recap} service implementation, responsible for creating remote {@link Session}s and constructing
+ * {@link RecapSession}s. It also serves as the main configuration point for {@link RecapOptions} and
+ * {@link RecapAddress} defaults.
  */
 @Component(label = "Recap Service", metatype = true)
 @Service

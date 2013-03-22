@@ -82,12 +82,13 @@ public final class RecapReplicationUtil {
             final String prefix = StringUtils.isEmpty(parsed.getPath()) ? null : parsed.getPath();
 
             return new DefaultRecapAddress() {
-                public boolean isHttps() { return https; }
-                public String getHostname() { return host; }
-                public Integer getPort() { return port; }
-                public String getUsername() { return user; }
-                public String getPassword() { return pass; }
-                public String getPrefix() { return prefix; }
+                @Override public boolean isHttps() { return https; }
+                @Override public String getHostname() { return host; }
+                @Override public Integer getPort() { return port; }
+                @Override public String getUsername() { return user; }
+                @Override public String getPassword() { return pass; }
+                @Override public String getContextPath() { return ""; }
+                @Override public String getPrefix() { return prefix; }
             };
         } catch (URISyntaxException e) {
             throw new ReplicationException(e);

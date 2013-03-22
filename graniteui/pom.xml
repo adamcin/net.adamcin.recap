@@ -63,7 +63,6 @@
                         <dependency>net.adamcin.commons.slingjunit</dependency>
                     </packageDependencies>
                     <embedBundles>
-                        <bundle>net.adamcin.commons.jcr</bundle>
                         <bundle>net.adamcin.recap.core</bundle>
                         <bundle>net.adamcin.recap.addressbook</bundle>
                         <bundle>net.adamcin.recap.replication</bundle>
@@ -97,10 +96,6 @@
     </build>
 
     <dependencies>
-        <dependency>
-            <groupId>net.adamcin.commons</groupId>
-            <artifactId>net.adamcin.commons.jcr</artifactId>
-        </dependency>
         <dependency>
             <groupId>net.adamcin.recap</groupId>
             <artifactId>net.adamcin.recap.core</artifactId>

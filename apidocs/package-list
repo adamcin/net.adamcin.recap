@@ -1,0 +1,10 @@
+net.adamcin.recap.addressbook
+net.adamcin.recap.addressbook.impl
+net.adamcin.recap.addressbook.impl.servlet
+net.adamcin.recap.api
+net.adamcin.recap.impl
+net.adamcin.recap.impl.servlet
+net.adamcin.recap.replication
+net.adamcin.recap.replication.impl
+net.adamcin.recap.testing.bundles.addressbook
+net.adamcin.recap.util

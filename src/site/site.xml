@@ -66,6 +66,8 @@
             <item name="Introduction" href="index.html" />
             <item name="JavaDocs" href="apidocs/index.html" />
         </menu>
+        <menu ref="modules" inherit="bottom"/>
+        <menu ref="reports" inherit="bottom"/>
         <menu name="Projects @ adamcin.net">
             <item name="Scala Mojo Maven Plugin" href="http://adamcin.net/scalamojo-maven-plugin"/>
             <item name="VLT Pack Maven Plugin" href="http://adamcin.net/vltpack-maven-plugin"/>

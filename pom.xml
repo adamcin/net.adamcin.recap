@@ -31,22 +31,28 @@
 	<modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>net.adamcin.recap</groupId>
-        <artifactId>parent</artifactId>
-        <version>0.7.0-SNAPSHOT</version>
-        <relativePath>parent</relativePath>
+        <groupId>org.sonatype.oss</groupId>
+        <artifactId>oss-parent</artifactId>
+        <version>7</version>
     </parent>
 
+    <groupId>net.adamcin.recap</groupId>
+    <artifactId>recap</artifactId>
+    <version>0.7.0-SNAPSHOT</version>
+    <packaging>pom</packaging>
+
+    <inceptionYear>2012</inceptionYear>
+    <name>Recap</name>
+    <description>Rsync for Adobe Granite!</description>
     <url>http://adamcin.net/net.adamcin.recap</url>
-	<artifactId>recap-builder</artifactId>
 
-    <name>Recap - Builder</name>
-    <description>Root Recap Reactor</description>
-
-	<packaging>pom</packaging>
+    <scm>
+        <url>https://github.com/adamcin/${project.groupId}</url>
+        <developerConnection>scm:git:git@github.com:adamcin/${project.groupId}.git</developerConnection>
+        <connection>scm:git://github.com/adamcin/${project.groupId}.git</connection>
+    </scm>
 
 	<modules>
-		<module>parent</module>
 		<module>core</module>
         <module>addressbook</module>
         <module>replication</module>
@@ -54,14 +60,289 @@
 		<module>graniteui</module>
 	</modules>
 
+    <properties>
+        <encoding>UTF-8</encoding>
+        <maven.compiler.source>1.5</maven.compiler.source>
+        <maven.compiler.target>1.5</maven.compiler.target>
+        <slf4j.version>1.6.1</slf4j.version>
+        <junit.version>4.8.2</junit.version>
+        <mockito.version>1.8.4</mockito.version>
+        <maven.bundle.plugin.version>2.3.7</maven.bundle.plugin.version>
+        <maven.scr.plugin.version>1.9.0</maven.scr.plugin.version>
+        <scr.annotations.version>1.7.0</scr.annotations.version>
+        <scr.generator.version>1.3.0</scr.generator.version>
+        <jackrabbit.version>2.4.0</jackrabbit.version>
+    </properties>
+
+    <issueManagement>
+        <system>github</system>
+        <url>http://github.com/adamcin/${project.groupId}/issues/</url>
+    </issueManagement>
+
+    <developers>
+        <developer>
+            <id>madamcin</id>
+            <name>Mark Adamcin</name>
+            <email>adamcin@gmail.com</email>
+            <url>http://adamcin.net</url>
+            <organization>Acquity Group</organization>
+            <organizationUrl>http://www.acquitygroup.com</organizationUrl>
+            <roles>
+                <role>architect</role>
+                <role>developer</role>
+            </roles>
+        </developer>
+    </developers>
+
     <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-site-plugin</artifactId>
-                <version>3.0</version>
-            </plugin>
-        </plugins>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <artifactId>maven-clean-plugin</artifactId>
+                    <version>2.4.1</version>
+                </plugin>
+                <plugin>
+                    <artifactId>maven-resources-plugin</artifactId>
+                    <version>2.4.3</version>
+                </plugin>
+                <plugin>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>2.3.1</version>
+                </plugin>
+                <plugin>
+                    <artifactId>maven-jar-plugin</artifactId>
+                    <version>2.3.1</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.felix</groupId>
+                    <artifactId>maven-bundle-plugin</artifactId>
+                    <version>${maven.bundle.plugin.version}</version>
+                    <configuration>
+                        <obrRepository>false</obrRepository>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.felix</groupId>
+                    <artifactId>maven-scr-plugin</artifactId>
+                    <version>${maven.scr.plugin.version}</version>
+                    <dependencies>
+                        <dependency>
+                            <groupId>org.apache.felix</groupId>
+                            <artifactId>org.apache.felix.scr.annotations</artifactId>
+                            <version>${scr.annotations.version}</version>
+                        </dependency>
+                        <dependency>
+                            <groupId>org.apache.felix</groupId>
+                            <artifactId>org.apache.felix.scr.generator</artifactId>
+                            <version>${scr.generator.version}</version>
+                        </dependency>
+                        <dependency>
+                            <groupId>org.slf4j</groupId>
+                            <artifactId>slf4j-simple</artifactId>
+                            <version>${slf4j.version}</version>
+                        </dependency>
+                    </dependencies>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-surefire-plugin</artifactId>
+                    <version>2.7.2</version>
+                </plugin>
+                <plugin>
+                    <artifactId>maven-install-plugin</artifactId>
+                    <version>2.3.1</version>
+                </plugin>
+                <plugin>
+                    <artifactId>maven-javadoc-plugin</artifactId>
+                    <version>2.9</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-failsafe-plugin</artifactId>
+                    <version>2.14</version>
+                </plugin>
+                <plugin>
+                    <groupId>net.adamcin</groupId>
+                    <artifactId>vltpack-maven-plugin</artifactId>
+                    <version>1.0.0</version>
+                    <configuration>
+                        <bundleInstallPath>/libs/recap/install</bundleInstallPath>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-site-plugin</artifactId>
+                    <version>3.0</version>
+                </plugin>
+            </plugins>
+        </pluginManagement>
     </build>
 
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>net.adamcin.recap</groupId>
+                <artifactId>net.adamcin.recap.core</artifactId>
+                <version>${project.version}</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>net.adamcin.recap</groupId>
+                <artifactId>net.adamcin.recap.addressbook</artifactId>
+                <version>${project.version}</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>net.adamcin.recap</groupId>
+                <artifactId>net.adamcin.recap.replication</artifactId>
+                <version>${project.version}</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>net.adamcin.recap</groupId>
+                <artifactId>recap-graniteit</artifactId>
+                <version>${project.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>net.adamcin.recap</groupId>
+                <artifactId>recap-graniteui</artifactId>
+                <version>${project.version}</version>
+                <scope>provided</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.sling</groupId>
+                <artifactId>org.apache.sling.junit.core</artifactId>
+                <version>1.0.8</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.sling</groupId>
+                <artifactId>org.apache.sling.junit.remote</artifactId>
+                <version>1.0.8</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.sling</groupId>
+                <artifactId>org.apache.sling.junit.scriptable</artifactId>
+                <version>1.0.8</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.sling</groupId>
+                <artifactId>org.apache.sling.testing.tools</artifactId>
+                <version>1.0.6</version>
+                <scope>provided</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>net.adamcin.commons</groupId>
+                <artifactId>net.adamcin.commons.jcr</artifactId>
+                <version>0.6.0</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>javax.jcr</groupId>
+                <artifactId>jcr</artifactId>
+                <version>2.0</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-api</artifactId>
+                <version>${slf4j.version}</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.sling</groupId>
+                <artifactId>org.apache.sling.commons.json</artifactId>
+                <version>2.0.6</version>
+                <scope>provided</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>commons-lang</groupId>
+                <artifactId>commons-lang</artifactId>
+                <version>2.5</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>commons-io</groupId>
+                <artifactId>commons-io</artifactId>
+                <version>1.4</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>commons-collections</groupId>
+                <artifactId>commons-collections</artifactId>
+                <version>3.2.1</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.sling</groupId>
+                <artifactId>org.apache.sling.commons.osgi</artifactId>
+                <version>2.0.6</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.sling</groupId>
+                <artifactId>org.apache.sling.api</artifactId>
+                <version>2.2.0</version>
+                <scope>provided</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>javax.servlet</groupId>
+                <artifactId>servlet-api</artifactId>
+                <version>2.5</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>javax.servlet</groupId>
+                <artifactId>jsp-api</artifactId>
+                <version>2.0</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.osgi</groupId>
+                <artifactId>org.osgi.core</artifactId>
+                <version>4.2.0</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.osgi</groupId>
+                <artifactId>org.osgi.compendium</artifactId>
+                <version>4.2.0</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>org.apache.felix.scr.annotations</artifactId>
+                <version>${scr.annotations.version}</version>
+                <scope>provided</scope>
+            </dependency>
+
+            <!-- unit test dependencies -->
+            <dependency>
+                <groupId>junit</groupId>
+                <artifactId>junit</artifactId>
+                <version>${junit.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-simple</artifactId>
+                <version>${slf4j.version}</version>
+                <scope>test</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>net.adamcin.commons</groupId>
+                <artifactId>net.adamcin.commons.testing</artifactId>
+                <version>0.6.0</version>
+                <scope>test</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 </project>

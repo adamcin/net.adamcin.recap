@@ -39,7 +39,7 @@
     <orderEntry type="library" scope="PROVIDED" name="Maven: javax.servlet:servlet-api:2.5" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: com.adobe.granite:com.adobe.granite.ui.commons:5.5.14" level="project" />
     <orderEntry type="module" module-name="recap-graniteit" scope="TEST" />
-    <orderEntry type="library" scope="TEST" name="Maven: net.adamcin.commons:net.adamcin.commons.testing:0.5.0-SNAPSHOT" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: net.adamcin.commons:net.adamcin.commons.testing:0.6.0" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.apache.sling:org.apache.sling.testing.tools:1.0.6" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.apache.commons:commons-exec:1.1" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.apache.httpcomponents:httpcore:4.1" level="project" />

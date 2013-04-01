@@ -10,9 +10,9 @@
           <property key="Sling-Test-Regexp" value=".*Test" />
           <property key="Embed-Dependency" value="net.adamcin.commons.testing" />
           <property key="Bundle-Name" value="Recap - Granite IT" />
-          <property key="Bundle-ClassPath" value=".,net.adamcin.commons.testing-0.5.0-SNAPSHOT.jar" />
-          <property key="Include-Resource" value="net.adamcin.commons.testing-0.5.0-SNAPSHOT.jar=$MAVEN_REPOSITORY$/net/adamcin/commons/net.adamcin.commons.testing/0.5.0-SNAPSHOT/net.adamcin.commons.testing-0.5.0-SNAPSHOT.jar" />
-          <property key="Embedded-Artifacts" value="net.adamcin.commons.testing-0.5.0-SNAPSHOT.jar;g=&quot;net.adamcin.commons&quot;;a=&quot;net.adamcin.commons.testing&quot;;v=&quot;0.5.0-SNAPSHOT&quot;" />
+          <property key="Bundle-ClassPath" value=".,net.adamcin.commons.testing-0.6.0.jar" />
+          <property key="Include-Resource" value="net.adamcin.commons.testing-0.6.0.jar=$MAVEN_REPOSITORY$/net/adamcin/commons/net.adamcin.commons.testing/0.6.0/net.adamcin.commons.testing-0.6.0.jar" />
+          <property key="Embedded-Artifacts" value="net.adamcin.commons.testing-0.6.0.jar;g=&quot;net.adamcin.commons&quot;;a=&quot;net.adamcin.commons.testing&quot;;v=&quot;0.6.0&quot;" />
         </additionalProperties>
         <additionalJARContents />
       </configuration>
@@ -53,7 +53,7 @@
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.apache.httpcomponents:httpclient:4.1" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: commons-logging:commons-logging:1.1.1" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.apache.httpcomponents:httpmime:4.1" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Maven: net.adamcin.commons:net.adamcin.commons.testing:0.5.0-SNAPSHOT" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: net.adamcin.commons:net.adamcin.commons.testing:0.6.0" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: javax.servlet:servlet-api:2.5" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.apache.sling:org.apache.sling.api:2.2.0" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.apache.sling:org.apache.sling.junit.scriptable:1.0.8" level="project" />

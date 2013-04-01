@@ -9,7 +9,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="Date-Revision-yyyymmdd" content="20130401" />
     <meta http-equiv="Content-Language" content="en" />
-    <title>About</title>
+    <title>
+        About Recap - rsync for Adobe Granite</title>
     <link rel="stylesheet" href="./css/apache-maven-fluido-1.3.0.min.css" />
     <link rel="stylesheet" href="./css/site.css" />
     <link rel="stylesheet" href="./css/print.css" media="print" />
@@ -42,7 +43,7 @@
           <div id="banner">
         <div class="pull-left">
                                                   <a href="index.html" id="bannerLeft">
-                <h2>Recap - rsync for Adobe Granite</h2>
+                                                                                                <img src="recap-graniteui/images/recap_package_thumbnail.png"  alt="Recap - rsync for Adobe Granite"/>
                 </a>
                       </div>
         <div class="pull-right">  </div>
@@ -53,7 +54,7 @@
         <ul class="breadcrumb">
                 
                     
-                  <li id="publishDate">Last Published: 2013-04-01 12:00</li>
+                  <li id="publishDate">Last Published: 2013-04-01 13:06</li>
                   <li class="divider">|</li> <li id="projectVersion">Version: 0.9.0-SNAPSHOT</li>
                       
                 
@@ -86,13 +87,6 @@
     
             <a href="#"><i class="none"></i>Introduction</a>
           </li>
-                  
-      <li>
-    
-                          <a href="apidocs/index.html" title="JavaDocs">
-          <i class="none"></i>
-        JavaDocs</a>
-            </li>
                               <li class="nav-header">Modules</li>
                                 
       <li>
@@ -297,7 +291,106 @@
                 
         <div id="bodyColumn"  class="span9" >
                                   
-            <div class="section"><h2>About Recap<a name="About_Recap"></a></h2><a name="About_Recap"></a><p>Rsync for Adobe Granite!</p></div>
+            <!-- ~ This is free and unencumbered software released into the public domain.
+  ~
+  ~ Anyone is free to copy, modify, publish, use, compile, sell, or
+  ~ distribute this software, either in source code form or as a compiled
+  ~ binary, for any purpose, commercial or non-commercial, and by any
+  ~ means.
+  ~
+  ~ In jurisdictions that recognize copyright laws, the author or authors
+  ~ of this software dedicate any and all copyright interest in the
+  ~ software to the public domain. We make this dedication for the benefit
+  ~ of the public at large and to the detriment of our heirs and
+  ~ successors. We intend this dedication to be an overt act of
+  ~ relinquishment in perpetuity of all present and future rights to this
+  ~ software under copyright law.
+  ~
+  ~ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+  ~ EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+  ~ MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+  ~ IN NO EVENT SHALL THE AUTHORS BE LIABLE FOR ANY CLAIM, DAMAGES OR
+  ~ OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
+  ~ ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+  ~ OTHER DEALINGS IN THE SOFTWARE.
+  ~
+  ~ For more information, please refer to <http://unlicense.org/> -->
+    
+        <div class="section"><h2>About Recap<a name="About_Recap"></a></h2>
+            <p>
+                rsync for CRX! Recap is based on the 'vlt rcp' command, but focuses on providing a simple web interface for
+                syncing content between CRX instances, using a browser instead of the command-line.
+            </p>
+            <p>
+                The primary motivation for the development of this application (besides the possibility of winning a
+                MacBook Pro) was to enable a team of CQ developers in a shared testing environment to work more easily
+                with content creators and QA testers to troubleshoot bugs and other issues on their local machines without
+                having to waste as much time as they currently do with the overhead of creating packages specific to the
+                problem, downloading those packages, and installing them locally.
+            </p>
+            <p>
+                The core Recap API is also designed to be extensible and applicable to remote JCR content sync challenges of
+                all kinds. A <tt>Recap</tt> service is available to other OSGi services that provides a method to create
+                a <tt>RecapSession</tt>, which encapsulates a single JCR sync session between the local JCR repository and
+                a remote repository identified by a <tt>RecapAddress</tt>. The recap interfaces fully encapsulate the
+                undlerlying implementation based on <a class="externalLink" href="http://wiki.apache.org/jackrabbit/RemoteAccess">JCR DavEX</a>
+                similar to the way the VLT tool's <tt>rcp</tt> command is implemented.
+            </p>
+            <p>
+                The source for the application is very instructive in terms of how to structure a modular maven build to assemble
+                a package for the CQ/Granite UI while retaining API and library compatibility with Apache Sling so that
+                many utilitarian elements of the functionality can be reused between projects. The recap modules,
+                <a href="net.adamcin.recap.core">net.adamcin.recap.core</a> and
+                <a href="net.adamcin.recap.addressbook">net.adamcin.recap.addressbook</a> are dependent only on non-proprietary
+                Sling and Jackrabbit packages, while the <a href="net.adamcin.recap.replication">net.adamcin.recap.replication</a>
+                and <a href="recap-graniteui">recap-graniteui</a> modules provide the CQ-specific configuration, functionality,
+                and user interface elements.
+            </p>
+            <p>
+                In addition, the Recap project also makes some use of the
+                <a class="externalLink" href="http://sling.apache.org/site/sling-testing-tools.html">Sling Junit / Testing Tools Framework</a>
+                to demonstrate how the framework can be used with the vltpack-maven-plugin in the context of a continuous
+                integration process with a central integration CQ instance.
+            </p>
+        </div>
+        <div class="section"><h2>Some Screenshots<a name="Some_Screenshots"></a></h2>
+            <p>
+                <img src="recap-graniteui/images/screenshots/welcome.png" title="Console Welcome Page" alt="" />
+                <img src="recap-graniteui/images/screenshots/edit-address.png" title="Edit Address" alt="" />
+                <img src="recap-graniteui/images/screenshots/sync-form.png" title="Sync Form" alt="" />
+                <img src="recap-graniteui/images/screenshots/sync-console.png" title="Sync Console" alt="" />
+            </p>
+        </div>
+        <div class="section"><h2>How to Install Recap<a name="How_to_Install_Recap"></a></h2>
+            <ol style="list-style-type: decimal">
+                <li>Start CQ</li>
+                <li>Run <tt>mvn net.adamcin:vltpack-maven-plugin:1.0.0:upload-from-repo -Dcoords=net.adamcin.recap:recap-graniteui:zip:0.8.0</tt></li>
+                <li>Go to <a class="externalLink" href="http://localhost:4502/recap">http://localhost:4502/recap</a> and get started!</li>
+            </ol>
+            <p>
+                This expects your local instance to be accessible at localhost on port 4502 with default admin credentials.
+
+                To install it on a different server, you can use the User Properties listed on the
+                <a class="externalLink" href="http://adamcin.net/vltpack-maven-plugin/upload-from-repo-mojo.html">vltpack-maven-plugin:upload-from-repo</a> goal documentation.
+            </p>
+        </div>
+        <div class="section"><h2>Adobe CQ Package Share Contest<a name="Adobe_CQ_Package_Share_Contest"></a></h2>
+            <p>
+                Recap was one of five winning entries in the
+                <a class="externalLink" href="http://experiencedelivers.adobe.com/cemblog/en/experiencedelivers/2013/02/adobe_cq_packagesharecontestannouncingthewinnersandlookingclosel.html">
+                    2013 Adobe CQ Package Share Contest
+                </a>!
+            </p>
+        </div>
+        <div class="section"><h2>Requirements<a name="Requirements"></a></h2>
+            <ul>
+                <li>Maven 3.0</li>
+                <li>JDK 1.6</li>
+                <li>Adobe Granite (CQ5.5/5.6)</li>
+            </ul>
+        </div>
+    
+
                   </div>
             </div>
           </div>

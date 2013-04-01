@@ -40,7 +40,6 @@
 
     <name>Recap - Core</name>
     <description>Recap core API and implementation</description>
-    <url>http://adamcin.net/net.adamcin.recap/core</url>
 
     <scm>
         <url>https://github.com/adamcin/${project.groupId}</url>
@@ -97,6 +96,27 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>com.github.github</groupId>
+                <artifactId>site-maven-plugin</artifactId>
+                <version>0.6</version>
+                <configuration>
+                    <message>Creating site for ${project.artifactId} ${project.version}</message>
+                    <noJekyll>true</noJekyll>
+                    <repositoryOwner>adamcin</repositoryOwner>
+                    <repositoryName>${project.groupId}</repositoryName>
+                    <path>${project.artifactId}</path>
+                    <merge>true</merge>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>site</goal>
+                        </goals>
+                        <phase>site</phase>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>

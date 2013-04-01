@@ -2,10 +2,10 @@
 <module org.jetbrains.idea.maven.project.MavenProjectsManager.isMavenModule="true" type="JAVA_MODULE" version="4">
   <component name="FacetManager">
     <facet type="Osmorc" name="OSGi">
-      <configuration manifestGenerationMode="OsmorcControlled" manifestLocation="" jarfileLocation="net.adamcin.recap.replication-0.7.0-SNAPSHOT.jar" outputPathType="CompilerOutputPath" bndFileLocation="" bundlorFileLocation="" bundleActivator="" bundleSymbolicName="net.adamcin.recap.net.adamcin.recap.replication" bundleVersion="0.7.0.SNAPSHOT" ignoreFilePattern="" useProjectDefaultManifestFileLocation="true" alwaysRebuildBundleJAR="false" doNotSynchronizeWithMaven="false">
+      <configuration manifestGenerationMode="OsmorcControlled" manifestLocation="" jarfileLocation="net.adamcin.recap.replication-0.9.0-SNAPSHOT.jar" outputPathType="CompilerOutputPath" bndFileLocation="" bundlorFileLocation="" bundleActivator="" bundleSymbolicName="net.adamcin.recap.net.adamcin.recap.replication" bundleVersion="0.9.0.SNAPSHOT" ignoreFilePattern="" useProjectDefaultManifestFileLocation="true" alwaysRebuildBundleJAR="false" doNotSynchronizeWithMaven="false">
         <additionalProperties>
           <property key="Bundle-Description" value="Recap-based implementation of Adobe Granite Replication services,like ContentBuilder and TransportHandler" />
-          <property key="Export-Package" value="net.adamcin.recap.replication;version=0.7.0-SNAPSHOT" />
+          <property key="Export-Package" value="net.adamcin.recap.replication;version=0.9.0-SNAPSHOT" />
           <property key="Private-Package" value="net.adamcin.recap.replication.impl.*" />
           <property key="Bundle-Name" value="Recap - Replication" />
         </additionalProperties>

@@ -38,15 +38,10 @@
     </parent>
 
     <url>http://adamcin.net/net.adamcin.recap</url>
-
 	<artifactId>recap-builder</artifactId>
 
     <name>Recap - Builder</name>
     <description>Root Recap Reactor</description>
-
-    <properties>
-        <site.root></site.root>
-    </properties>
 
 	<packaging>pom</packaging>
 
@@ -55,19 +50,16 @@
 		<module>core</module>
         <module>addressbook</module>
         <module>replication</module>
+        <module>graniteit</module>
 		<module>graniteui</module>
-        <module>testing</module>
 	</modules>
 
     <build>
         <plugins>
             <plugin>
-                <groupId>com.github.github</groupId>
-                <artifactId>site-maven-plugin</artifactId>
-                <configuration>
-                    <message>Creating site for ${project.artifactId} ${project.version}</message>
-                    <path>${site.root}</path>
-                </configuration>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-site-plugin</artifactId>
+                <version>3.0</version>
             </plugin>
         </plugins>
     </build>

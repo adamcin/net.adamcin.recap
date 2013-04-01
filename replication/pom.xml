@@ -40,8 +40,10 @@
     <packaging>bundle</packaging>
 
     <name>Recap - Replication</name>
-    <description>Recap-based implementation of Adobe Granite Replication services,
-        like ContentBuilder and TransportHandler</description>
+    <description>
+        Recap-based implementation of Adobe Granite Replication services,
+        like ContentBuilder and TransportHandler
+    </description>
 
     <build>
         <plugins>
@@ -77,10 +79,14 @@
                 <executions>
                     <execution>
                         <goals>
-                            <goal>put-bundle</goal>
+                            <goal>IT-put-bundle</goal>
                         </goals>
                     </execution>
                 </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
             </plugin>
         </plugins>
     </build>

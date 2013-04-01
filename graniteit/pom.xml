@@ -36,11 +36,12 @@
         <relativePath>../parent</relativePath>
     </parent>
 
-    <artifactId>net.adamcin.recap.core</artifactId>
+    <artifactId>recap-graniteit</artifactId>
     <packaging>bundle</packaging>
 
-    <name>Recap - Core</name>
-    <description>Recap core API and implementation</description>
+    <name>Recap - Granite IT</name>
+    <description>Sling Server-side Junit Tests for Recap on Granite</description>
+    <url>http://adamcin.net/net.adamcin.recap/graniteit</url>
 
     <build>
         <plugins>
@@ -50,19 +51,14 @@
                 <extensions>true</extensions>
                 <configuration>
                     <instructions>
-                        <Export-Package>
-                            net.adamcin.recap.api.*;version=${project.version},
-                            net.adamcin.recap.util.*;version=${project.version}
-                        </Export-Package>
                         <Private-Package>
-                            net.adamcin.recap.impl.*
+                            net.adamcin.recap.graniteit.remote.addressbook.*
                         </Private-Package>
-                        <Embed-Dependency>
-                            net.adamcin.commons.jcr,
-                            jackrabbit-jcr-client;inline=false,
-                            jackrabbit-jcr2spi;inline=false,
-                            jackrabbit-spi2dav;inline=false
-                        </Embed-Dependency>
+                        <Import-Package>
+                            *;resolution:=optional
+                        </Import-Package>
+                        <Sling-Test-Regexp>.*Test</Sling-Test-Regexp>
+                        <Embed-Dependency>net.adamcin.commons.testing</Embed-Dependency>
                     </instructions>
                 </configuration>
             </plugin>
@@ -97,17 +93,24 @@
 
     <dependencies>
         <dependency>
+            <groupId>net.adamcin.recap</groupId>
+            <artifactId>net.adamcin.recap.addressbook</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.sling</groupId>
+            <artifactId>org.apache.sling.junit.remote</artifactId>
+        </dependency>
+        <dependency>
             <groupId>net.adamcin.commons</groupId>
-            <artifactId>net.adamcin.commons.jcr</artifactId>
+            <artifactId>net.adamcin.commons.testing</artifactId>
+            <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>javax.jcr</groupId>
-            <artifactId>jcr</artifactId>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>provided</scope>
         </dependency>
-        <dependency>
-            <groupId>javax.servlet</groupId>
-            <artifactId>servlet-api</artifactId>
-        </dependency>
+
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
@@ -122,24 +125,8 @@
         </dependency>
 
         <dependency>
-            <groupId>commons-lang</groupId>
-            <artifactId>commons-lang</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>commons-io</groupId>
-            <artifactId>commons-io</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>commons-collections</groupId>
-            <artifactId>commons-collections</artifactId>
-        </dependency>
-        <dependency>
             <groupId>org.apache.felix</groupId>
             <artifactId>org.apache.felix.scr.annotations</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.sling</groupId>
-            <artifactId>org.apache.sling.commons.osgi</artifactId>
         </dependency>
         <dependency>
             <groupId>org.apache.sling</groupId>
@@ -147,49 +134,10 @@
         </dependency>
 
         <dependency>
-            <groupId>org.apache.jackrabbit</groupId>
-            <artifactId>jackrabbit-jcr-client</artifactId>
-            <version>${jackrabbit.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.jackrabbit</groupId>
-            <artifactId>jackrabbit-spi2dav</artifactId>
-            <version>${jackrabbit.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.jackrabbit</groupId>
-            <artifactId>jackrabbit-jcr2spi</artifactId>
-            <version>${jackrabbit.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-simple</artifactId>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>org.apache.jackrabbit</groupId>
-            <artifactId>jackrabbit-core</artifactId>
-            <version>${jackrabbit.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.jackrabbit</groupId>
-            <artifactId>jackrabbit-jcr-tests</artifactId>
-            <version>${jackrabbit.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>net.adamcin.commons</groupId>
-            <artifactId>net.adamcin.commons.testing</artifactId>
-            <scope>test</scope>
-        </dependency>
-
 
     </dependencies>
 </project>

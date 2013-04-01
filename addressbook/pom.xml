@@ -76,7 +76,7 @@
                 <executions>
                     <execution>
                         <goals>
-                            <goal>put-bundle</goal>
+                            <goal>IT-put-bundle</goal>
                         </goals>
                     </execution>
                 </executions>

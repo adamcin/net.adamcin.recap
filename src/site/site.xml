@@ -26,5 +26,50 @@
   ~ For more information, please refer to <http://unlicense.org/>
   -->
 
-<project>
+<project name="Recap">
+    <skin>
+        <groupId>org.apache.maven.skins</groupId>
+        <artifactId>maven-fluido-skin</artifactId>
+        <version>1.3.0</version>
+    </skin>
+    <googleAnalyticsAccountId>UA-37073514-1</googleAnalyticsAccountId>
+    <custom>
+        <fluidoSkin>
+            <facebookLike />
+            <googlePlusOne />
+            <!--
+            <gitHub>
+                <projectId>adamcin/scalamojo-maven-plugin</projectId>
+                <ribbonColor>black</ribbonColor>
+            </gitHub>
+            -->
+        </fluidoSkin>
+    </custom>
+
+    <bannerLeft>
+        <name>Recap - rsync for Adobe Granite</name>
+        <href>http://adamcin.net/net.adamcin.recap/index.html</href>
+    </bannerLeft>
+
+    <publishDate position="left" format="yyyy-MM-dd HH:mm" />
+    <version position="left"/>
+    <poweredBy>
+        <logo name="Build with Maven" href="http://maven.apache.org" img="http://maven.apache.org/images/logos/maven-feather.png" />
+    </poweredBy>
+
+    <body>
+        <links>
+            <item name="Wiki" href="http://wiki.github.com/adamcin/net.adamcin.recap/"/>
+            <item name="FAQ" href="http://wiki.github.com/adamcin/net.adamcin.recap/frequently-asked-questions"/>
+        </links>
+        <menu name="Overview">
+            <item name="Introduction" href="index.html" />
+            <item name="JavaDocs" href="apidocs/index.html" />
+        </menu>
+        <menu name="Projects @ adamcin.net">
+            <item name="Scala Mojo Maven Plugin" href="http://adamcin.net/scalamojo-maven-plugin"/>
+            <item name="VLT Pack Maven Plugin" href="http://adamcin.net/vltpack-maven-plugin"/>
+            <item name="Snag Jar Maven Plugin" href="http://adamcin.net/snagjar-maven-plugin"/>
+        </menu>
+    </body>
 </project>

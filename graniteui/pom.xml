@@ -59,9 +59,6 @@
                 <artifactId>vltpack-maven-plugin</artifactId>
                 <extensions>true</extensions>
                 <configuration>
-                    <packageDependencies>
-                        <dependency>net.adamcin.commons.slingjunit</dependency>
-                    </packageDependencies>
                     <embedBundles>
                         <bundle>net.adamcin.recap.core</bundle>
                         <bundle>net.adamcin.recap.addressbook</bundle>
@@ -95,6 +92,47 @@
         </plugins>
     </build>
 
+    <profiles>
+        <profile>
+            <id>itests</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>net.adamcin</groupId>
+                        <artifactId>vltpack-maven-plugin</artifactId>
+                        <configuration>
+                            <supportITs>true</supportITs>
+                            <testPackages>
+                                <package>net.adamcin.commons.slingjunit</package>
+                            </testPackages>
+                            <testBundles>
+                                <bundle>recap-graniteit</bundle>
+                            </testBundles>
+                        </configuration>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-failsafe-plugin</artifactId>
+                        <version>2.14</version>
+                        <configuration>
+                            <includes>
+                                <include> **/**Test.java </include>
+                            </includes>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <goals>
+                                    <goal>integration-test</goal>
+                                    <goal>verify</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+
     <dependencies>
         <dependency>
             <groupId>net.adamcin.recap</groupId>
@@ -108,6 +146,7 @@
             <groupId>net.adamcin.recap</groupId>
             <artifactId>net.adamcin.recap.replication</artifactId>
         </dependency>
+
 
         <dependency>
             <groupId>javax.jcr</groupId>
@@ -137,6 +176,26 @@
             <artifactId>com.adobe.granite.ui.commons</artifactId>
             <version>5.5.14</version>
             <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>net.adamcin.commons</groupId>
+            <artifactId>net.adamcin.commons.slingjunit</artifactId>
+            <type>zip</type>
+            <version>0.8.0</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>net.adamcin.recap</groupId>
+            <artifactId>recap-graniteit</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>net.adamcin.commons</groupId>
+            <artifactId>net.adamcin.commons.testing</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-simple</artifactId>
         </dependency>
     </dependencies>
 </project>

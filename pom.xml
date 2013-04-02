@@ -197,6 +197,7 @@
                 <configuration>
                     <message>Creating site for ${project.artifactId} ${project.version}</message>
                     <noJekyll>true</noJekyll>
+                    <merge>true</merge>
                     <repositoryOwner>adamcin</repositoryOwner>
                     <repositoryName>${project.groupId}</repositoryName>
                 </configuration>

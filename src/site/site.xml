@@ -70,6 +70,10 @@
             <item name="Introduction" href="index.html" />
         </menu>
         <menu ref="modules" inherit="bottom"/>
+        <menu name="Resources @ Github" inherit="bottom">
+            <item name="Get the Source" href="https://github.com/adamcin/net.adamcin.recap"/>
+            <item name="Report Issues" href="https://github.com/adamcin/net.adamcin.recap/issues"/>
+        </menu>
         <menu ref="reports" inherit="bottom"/>
         <menu name="Projects @ adamcin.net" inherit="bottom">
             <item name="Scala Mojo Maven Plugin" href="http://adamcin.net/scalamojo-maven-plugin"/>

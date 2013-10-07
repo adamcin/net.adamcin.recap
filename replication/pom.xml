@@ -163,7 +163,7 @@
         <dependency>
             <groupId>com.adobe.granite</groupId>
             <artifactId>com.adobe.granite.replication.core</artifactId>
-            <version>5.5.18</version>
+            <version>5.5.16</version>
         </dependency>
 
         <dependency>

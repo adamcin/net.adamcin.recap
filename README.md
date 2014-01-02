@@ -19,3 +19,4 @@ Adobe Vault package for installation on CRX that deploys the core and addressboo
 jQuery Mobile-based UI that integrates with the out-of-the-box Adobe Granite chrome. This module is responsible for
 producing the Recap package on Adobe Package Share.
 
+[![Analytics](https://ga-beacon.appspot.com/UA-37073514-2/net.adamcin.recap/blob/master/README.md)](https://github.com/igrigorik/ga-beacon)

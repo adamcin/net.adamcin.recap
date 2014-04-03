@@ -56,6 +56,21 @@
             */
         }
     %>
+    <script>
+    
+    $(document).on("change", "#uri", function(){
+    	var baseHREF = $.mobile.path.parseUrl($('#create-address').attr('href')).hrefNoSearch;
+    	var addressToCreate = $.mobile.path.parseUrl($('#uri').val());
+    	if (addressToCreate.domain !== ""){
+    		var addressProtocol = addressToCreate.protocol;
+    		var addressHostname = addressToCreate.hostname;
+    		var addressPort = addressToCreate.port;
+    		$('#create-address').attr('href', baseHREF + '?host=' + addressHostname + '&protocol=' + addressProtocol + '&port=' + addressPort);
+    	}
+    	else {alert("Please enter a valid URL!");}
+	});
+	</script>
+    
 </head>
 <body>
     <div class="ui-recapheader" data-role="globalheader" data-title="Recap" data-theme="a"></div>
@@ -74,8 +89,11 @@
     </div>
 
     <textarea id="g-recap-address-book-tpl" style="display:none;">
+		<li style="background:transparent;border-color:transparent;">
+	    	<input data-theme="a" data-role="none" data-mini="false" type="text" id="uri" placeholder="Paste URI of system to copy to/from here" style="padding: 5px; border: 1px solid #d4d4d4; width:100%; margin-top: 8px; border-radius: 5px; line-height: 2.1em;"/>
+	    </li>
         <li style="background:transparent;border-color:transparent;">
-            <a x-cq-linkchecker="skip" data-role="button" data-theme="a" data-panel="main" href="${request.contextPath}{_g.recap.context.addressBookPath}/*.edit.html">
+            <a x-cq-linkchecker="skip" data-role="button" data-theme="a" data-panel="main" id="create-address" href="${request.contextPath}{_g.recap.context.addressBookPath}/*.edit.html">
                 Create Address
             </a>
         </li>

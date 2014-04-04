@@ -1,3 +1,4 @@
+<%@page import="net.adamcin.recap.addressbook.AddressBookConstants"%>
 <%@ page import="com.day.cq.widget.HtmlLibraryManager" %>
 <%@ page import="net.adamcin.recap.addressbook.AddressBook" %>
 <%--
@@ -62,10 +63,18 @@
     	var baseHREF = $.mobile.path.parseUrl($('#create-address').attr('href')).hrefNoSearch;
     	var addressToCreate = $.mobile.path.parseUrl($('#uri').val());
     	if (addressToCreate.domain !== ""){
-    		var addressProtocol = addressToCreate.protocol;
+    		var addressProtocol = addressToCreate.protocol == "https:";
     		var addressHostname = addressToCreate.hostname;
     		var addressPort = addressToCreate.port;
-    		$('#create-address').attr('href', baseHREF + '?host=' + addressHostname + '&protocol=' + addressProtocol + '&port=' + addressPort);
+    		if (!addressPort) {
+    			if (addressToCreate.protocol == "http:") {
+    				addressPort = "80";
+    			} else if (addressToCreate.protocol == "https:"){
+    				addressPort = "443";
+    			}
+    				
+    		}
+    		$('#create-address').attr('href', baseHREF + '?<%=AddressBookConstants.PROP_HOSTNAME %>=' + addressHostname + '&<%=AddressBookConstants.PROP_IS_HTTPS %>=' + addressProtocol + '&<%=AddressBookConstants.PROP_PORT %>=' + addressPort);
     	}
     	else {alert("Please enter a valid URL!");}
 	});

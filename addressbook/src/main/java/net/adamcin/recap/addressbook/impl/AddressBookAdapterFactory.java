@@ -27,11 +27,18 @@
 
 package net.adamcin.recap.addressbook.impl;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.jcr.Node;
+import javax.jcr.RepositoryException;
+
 import net.adamcin.recap.addressbook.Address;
 import net.adamcin.recap.addressbook.AddressBook;
 import net.adamcin.recap.addressbook.AddressBookConstants;
 import net.adamcin.recap.api.Recap;
 import net.adamcin.recap.api.RecapAddress;
+
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Properties;
 import org.apache.felix.scr.annotations.Property;
@@ -39,15 +46,15 @@ import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
 import org.apache.jackrabbit.api.security.user.User;
 import org.apache.sling.api.SlingConstants;
+import org.apache.sling.api.SlingHttpServletRequest;
 import org.apache.sling.api.adapter.AdapterFactory;
 import org.apache.sling.api.resource.Resource;
 import org.apache.sling.api.resource.ResourceResolver;
 import org.apache.sling.api.resource.ResourceUtil;
+import org.apache.sling.api.resource.ValueMap;
+import org.apache.sling.api.wrappers.ValueMapDecorator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.jcr.Node;
-import javax.jcr.RepositoryException;
 
 
 /**
@@ -60,7 +67,8 @@ import javax.jcr.RepositoryException;
         @Property(name = SlingConstants.PROPERTY_ADAPTABLE_CLASSES,
                 classValue = {
                         Resource.class,
-                        ResourceResolver.class
+                        ResourceResolver.class,
+                        SlingHttpServletRequest.class
                 }
         ),
         @Property(name = SlingConstants.PROPERTY_ADAPTER_CLASSES,
@@ -82,6 +90,8 @@ public class AddressBookAdapterFactory implements AdapterFactory {
             return getAdapter((Resource) adaptable, type);
         } else if (adaptable instanceof ResourceResolver) {
             return getAdapter((ResourceResolver) adaptable, type);
+        } else if (adaptable instanceof SlingHttpServletRequest) {
+            return getAdapter((SlingHttpServletRequest) adaptable, type);
         }
         return null;
     }
@@ -92,6 +102,16 @@ public class AddressBookAdapterFactory implements AdapterFactory {
             return (AdapterType) getAddressResource(adaptable);
         } else if (type == AddressBook.class) {
             return (AdapterType) getAddressBook(adaptable);
+        }
+        return null;
+    }
+    
+    @SuppressWarnings("unchecked")
+    public <AdapterType> AdapterType getAdapter(SlingHttpServletRequest adaptable, Class<AdapterType> type) {
+        if (type == RecapAddress.class || type == Address.class) {
+            return (AdapterType) getAddressRequest(adaptable);
+        } else if (type == AddressBook.class) {
+            return (AdapterType) getAddressBook(adaptable.getResource());
         }
         return null;
     }
@@ -116,6 +136,34 @@ public class AddressBookAdapterFactory implements AdapterFactory {
             return new AddressImpl(resource, recap);
         }
         return null;
+    }
+
+    public Address getAddressRequest(SlingHttpServletRequest request) {
+        
+    	if (request != null) {
+    		Resource resource = request.getResource();
+	    	if (resource != null && ResourceUtil.isStarResource(resource) 
+	    			&& ResourceUtil.isA(resource, AddressBookConstants.RT_ADDRESS)) {
+	    		Map<String, Object> props = new HashMap<String, Object>();
+	    		
+	    		if (request.getParameter(AddressBookConstants.PROP_HOSTNAME) != null) {
+	    			props.put(AddressBookConstants.PROP_HOSTNAME, request.getParameter(AddressBookConstants.PROP_HOSTNAME));	    			
+	    		}
+	    		
+	    		if (request.getParameter(AddressBookConstants.PROP_PORT) != null) {
+	    			props.put(AddressBookConstants.PROP_PORT, request.getParameter(AddressBookConstants.PROP_PORT));	    			
+	    		}
+	    		
+	    		if (request.getParameter(AddressBookConstants.PROP_IS_HTTPS) != null) {
+	    			props.put(AddressBookConstants.PROP_IS_HTTPS, request.getParameter(AddressBookConstants.PROP_IS_HTTPS));	    			
+	    		}
+	    		
+	    		ValueMap properties = new ValueMapDecorator(props);
+	            return new AddressImpl(resource, recap, properties);
+	        }
+	        return getAddressResource(resource);
+    	}
+    	return null;
     }
 
     public AddressBook getAddressBook(ResourceResolver resolver) {

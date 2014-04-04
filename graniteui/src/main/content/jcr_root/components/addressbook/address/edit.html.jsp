@@ -47,7 +47,7 @@
         pageContext.setAttribute("defaultPrefix", recap.getDefaultPrefix());
     }
 
-    Address address = resource.adaptTo(Address.class);
+    Address address = slingRequest.adaptTo(Address.class);
     String title = "Edit Address";
 
     String name = resource.getName();
@@ -63,8 +63,10 @@
     pageContext.setAttribute("pageId", pageId);
 
     if (address != null) {
-        pageContext.setAttribute("address", address);
+        log.error("Address is not null");
+    	pageContext.setAttribute("address", address);
     } else {
+    	log.error("Address is null");
         pageContext.setAttribute("address", new HashMap<String, Object>());
     }
 %><!doctype html>

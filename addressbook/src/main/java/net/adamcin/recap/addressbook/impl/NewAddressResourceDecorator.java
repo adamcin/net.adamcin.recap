@@ -27,16 +27,21 @@
 
 package net.adamcin.recap.addressbook.impl;
 
+import java.util.Collections;
+
+import javax.servlet.http.HttpServletRequest;
+
 import net.adamcin.recap.addressbook.AddressBook;
 import net.adamcin.recap.addressbook.AddressBookConstants;
+
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Service;
 import org.apache.sling.api.resource.Resource;
 import org.apache.sling.api.resource.ResourceDecorator;
 import org.apache.sling.api.resource.ResourceUtil;
 import org.apache.sling.api.resource.ResourceWrapper;
-
-import javax.servlet.http.HttpServletRequest;
+import org.apache.sling.api.resource.ValueMap;
+import org.apache.sling.api.wrappers.ValueMapDecorator;
 
 /**
  * @author madamcin
@@ -53,6 +58,20 @@ public class NewAddressResourceDecorator implements ResourceDecorator {
                 return new ResourceWrapper(resource) {
                     @Override public String getResourceType() {
                         return AddressBookConstants.RT_ADDRESS;
+                    }
+                    @SuppressWarnings("unchecked")
+                    @Override
+                    public <AdapterType> AdapterType adaptTo(
+                    		Class<AdapterType> type) {
+                    	if (type == ValueMap.class) {
+                    		ValueMap props = super.adaptTo(ValueMap.class);
+                    		if (props == null) {
+                            	return (AdapterType) new ValueMapDecorator(Collections.<String, Object>emptyMap());
+                            } else {
+                            	return (AdapterType) props;
+                            }
+                    	}
+                    	return super.adaptTo(type);
                     }
                 };
             }

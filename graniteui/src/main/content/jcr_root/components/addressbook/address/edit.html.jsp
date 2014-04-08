@@ -63,10 +63,8 @@
     pageContext.setAttribute("pageId", pageId);
 
     if (address != null) {
-        log.error("Address is not null");
     	pageContext.setAttribute("address", address);
     } else {
-    	log.error("Address is null");
         pageContext.setAttribute("address", new HashMap<String, Object>());
     }
 %><!doctype html>

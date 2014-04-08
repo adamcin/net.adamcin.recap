@@ -59,13 +59,16 @@
     %>
     <script>
     
-    $(document).on("change", "#uri", function(){
+    $(document).on("change", "#uri", function() {
     	var baseHREF = $.mobile.path.parseUrl($('#create-address').attr('href')).hrefNoSearch;
     	var addressToCreate = $.mobile.path.parseUrl($('#uri').val());
-    	if (addressToCreate.domain !== ""){
+    	if (addressToCreate.domain !== "") {
     		var addressProtocol = addressToCreate.protocol == "https:";
     		var addressHostname = addressToCreate.hostname;
     		var addressPort = addressToCreate.port;
+    		var addressPath = addressToCreate.pathname;
+    		var addressHash = addressToCreate.hash;
+    		var parsedPath;
     		if (!addressPort) {
     			if (addressToCreate.protocol == "http:") {
     				addressPort = "80";
@@ -74,7 +77,13 @@
     			}
     				
     		}
-    		$('#create-address').attr('href', baseHREF + '?<%=AddressBookConstants.PROP_HOSTNAME %>=' + addressHostname + '&<%=AddressBookConstants.PROP_IS_HTTPS %>=' + addressProtocol + '&<%=AddressBookConstants.PROP_PORT %>=' + addressPort);
+    		if (addressHash.match('^#/')) {
+    			parsedPath = addressHash.substr(1); // check arguments
+    		} else {
+    			parsedPath = addressPath;
+    		}
+    		parsedPath = parsedPath.replace(/[.?#].*$/, "")
+    		$('#create-address').attr('href', baseHREF + '?<%=AddressBookConstants.PROP_HOSTNAME %>=' + addressHostname + '&<%=AddressBookConstants.PROP_IS_HTTPS %>=' + addressProtocol + '&<%=AddressBookConstants.PROP_PORT %>=' + addressPort + '&<%=AddressBookConstants.RP_PATHS %>=' + parsedPath);
     	}
     	else {alert("Please enter a valid URL!");}
 	});
@@ -96,16 +105,20 @@
 
         </div>
     </div>
-
+	
     <textarea id="g-recap-address-book-tpl" style="display:none;">
-		<li style="background:transparent;border-color:transparent;">
-	    	<input data-theme="a" data-role="none" data-mini="false" type="text" id="uri" placeholder="Paste URI of system to copy to/from here" style="padding: 5px; border: 1px solid #d4d4d4; width:100%; margin-top: 8px; border-radius: 5px; line-height: 2.1em;"/>
-	    </li>
-        <li style="background:transparent;border-color:transparent;">
-            <a x-cq-linkchecker="skip" data-role="button" data-theme="a" data-panel="main" id="create-address" href="${request.contextPath}{_g.recap.context.addressBookPath}/*.edit.html">
-                Create Address
-            </a>
-        </li>
+		<div class="ui-grid-a" >
+			<div class="ui-block-a" style="width:70%;">
+				<label for="create-address" class="ui-hidden-accessible">Quick Recap URL</label>
+				<input name="uri" data-theme="a" type="text" id="uri" placeholder="Paste URI" style="line-height: 2.7em; border-radius: 5px; width: 98%; margin: 6px 2px 7px; padding-left: 6px;" />
+	    	</div>
+	    	<div class="ui-block-b" style="width:30%;">
+		    	<a x-cq-linkchecker="skip" data-role="button" data-theme="a" data-panel="main" id="create-address" href="${request.contextPath}{_g.recap.context.addressBookPath}/*.edit.html">
+			    	Quick Recap
+			    </a>
+			</div>
+	    </div>
+	    <li data-role="list-divider"></li>
         {#foreach $T as address}
         <li>
             <a x-cq-linkchecker="skip" href="${request.contextPath}{$T.address.path}.html" data-panel="main">
@@ -115,6 +128,11 @@
             <a x-cq-linkchecker="skip" href="${request.contextPath}{$T.address.path}.edit.html" data-panel="main">Edit</a>
         </li>
         {#/for}
+        <li style="background:transparent;border-color:transparent;position: absolute; bottom: 0; width: 100%;;">
+            <a x-cq-linkchecker="skip" data-role="button" data-theme="a" data-panel="main" class="create-button" href="${request.contextPath}{_g.recap.context.addressBookPath}/*.edit.html">
+                Create Address
+            </a>
+        </li>
     </textarea>
 
     <div data-role="panel" data-id="main" id="g-recap-main">

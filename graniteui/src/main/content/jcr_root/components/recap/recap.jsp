@@ -109,7 +109,7 @@
     <textarea id="g-recap-address-book-tpl" style="display:none;">
 		<div class="ui-grid-a" >
 			<div class="ui-block-a" style="width:70%;">
-				<label for="create-address" class="ui-hidden-accessible">Quick Recap URL</label>
+				<label for="create-address" class="ui-hidden-accessible">Quick Recap URI</label>
 				<input name="uri" data-theme="a" type="text" id="uri" placeholder="Paste URI" style="line-height: 2.7em; border-radius: 5px; width: 98%; margin: 6px 2px 7px; padding-left: 6px;" />
 	    	</div>
 	    	<div class="ui-block-b" style="width:30%;">

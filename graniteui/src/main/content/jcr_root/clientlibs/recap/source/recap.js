@@ -47,7 +47,9 @@ _g.recap = (function() {
     });
 
     var recapContext = contextReq.status == 200 ? _g.$.parseJSON(contextReq.responseText) : {};
-
+    
+    var addressBook = false;
+    
     var executeSyncToConsole = function(form) {
         _g.$(form).submit();
 
@@ -56,10 +58,11 @@ _g.recap = (function() {
 
     var reloadAddressBook = function() {
         var url = contextPath + _g.recap.context.addressBookPath + ".list.json";
-
+        
         _g.$.getJSON(url, function(data) {
+        	addressBook = data;
             var listEl = _g.$("#address-list");
-
+            
             listEl.setTemplateElement("g-recap-address-book-tpl");
             listEl.processTemplate(data);
             _g.$(":jqmData(role='button')", listEl )
@@ -69,6 +72,10 @@ _g.recap = (function() {
             listEl.show();
         });
     };
+    
+    var getAddressBook = function() {
+        return addressBook;
+    }
 
     var deleteAddress = function(address) {
         var data = {":applyTo": address, ":operation": "delete"};
@@ -89,6 +96,7 @@ _g.recap = (function() {
         context: recapContext,
         executeSyncToConsole: executeSyncToConsole,
         reloadAddressBook: reloadAddressBook,
+        getAddressBook: getAddressBook,
         deleteAddress: deleteAddress
     };
 })();

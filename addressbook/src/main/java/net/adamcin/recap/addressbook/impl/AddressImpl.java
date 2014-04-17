@@ -27,12 +27,16 @@
 
 package net.adamcin.recap.addressbook.impl;
 
+import java.util.Collections;
+
 import net.adamcin.recap.addressbook.Address;
 import net.adamcin.recap.addressbook.AddressBookConstants;
 import net.adamcin.recap.api.Recap;
 import net.adamcin.recap.util.DefaultRecapAddress;
+
 import org.apache.sling.api.resource.Resource;
 import org.apache.sling.api.resource.ValueMap;
+import org.apache.sling.api.wrappers.ValueMapDecorator;
 
 /**
  * @author madamcin
@@ -40,25 +44,34 @@ import org.apache.sling.api.resource.ValueMap;
  */
 public class AddressImpl extends DefaultRecapAddress implements Address {
 
+	public static final String PROP_TITLE = "jcr:title";
     private final Resource resource;
     private final ValueMap properties;
     private final Recap recap;
 
-    public AddressImpl(Resource resource, Recap recap) {
+    public AddressImpl(Resource resource, Recap recap, ValueMap properties) {
         if (resource == null) {
             throw new NullPointerException("resource");
         }
         this.resource = resource;
-        this.properties = resource.adaptTo(ValueMap.class);
+        if (properties == null) {
+        	this.properties = new ValueMapDecorator(Collections.<String, Object>emptyMap());
+        } else {
+        	this.properties = properties;
+        }
         this.recap = recap;
     }
-
+    
+    public AddressImpl(Resource resource, Recap recap) {
+		this(resource, recap, resource.adaptTo(ValueMap.class));
+	}
+    
     public Resource getResource() {
         return resource;
     }
 
     public String getTitle() {
-        return properties.get("jcr:title", String.class);
+        return properties.get(PROP_TITLE, String.class);
     }
 
     @Override public String getHostname() {

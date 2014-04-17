@@ -35,7 +35,14 @@
 --%><%
 %><%@page session="false" %><%
 %><%@taglib prefix="sling" uri="http://sling.apache.org/taglibs/sling/1.0" %><%
-%><sling:defineObjects /><%
+%><sling:defineObjects /><%!
+	public static String getConnectionKey(Address address) {
+		if (address != null) {
+			return String.format("%s://%s:%d", address.isHttps() ? "https"
+					: "http", address.getHostname(), address.getPort());
+		} 
+		return null;
+	} 
 %><%
 
     Recap recap = sling.getService(Recap.class);
@@ -59,7 +66,7 @@
                     writer.key("path").value(path);
                     writer.key("title").value(address.getTitle());
                     writer.key("url").value(recap.getDisplayableUrl(address));
-
+					writer.key("connectionKey").value(getConnectionKey(address));
                     writer.endObject();
                 }
             }

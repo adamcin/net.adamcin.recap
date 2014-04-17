@@ -1,3 +1,6 @@
+<%@page import="java.net.URLEncoder"%>
+<%@page import="java.util.ArrayList"%>
+<%@page import="java.util.List"%>
 <%@ page import="net.adamcin.recap.addressbook.Address" %>
 <%@ page import="net.adamcin.recap.addressbook.AddressBookConstants" %>
 <%@ page import="net.adamcin.recap.api.Recap" %>
@@ -49,6 +52,29 @@
     pageContext.setAttribute("title", title);
     String pageId = "g-recap-address-sync-" + resource.getName();
     pageContext.setAttribute("pageId", pageId);
+    
+    List<String> paths = new ArrayList<String>();
+    String[] rpPaths = request.getParameterValues(AddressBookConstants.RP_PATHS);
+
+    if (rpPaths != null) {
+        for (String path : rpPaths) {
+            if (path.indexOf('\n') >= 0) {
+                String[] _paths = StringUtils.split(path, '\n');
+                for (String _path : _paths) {
+                    paths.add(_path.trim());
+                }
+            } else {
+                paths.add(path.trim());
+            }
+        }
+    }
+    
+    if (!paths.isEmpty()) {
+    	String pathsString = StringUtils.join(paths, "\n");
+    	//pathsString = URLEncoder.encode(pathsString, "UTF-8");
+    	pageContext.setAttribute("rpPaths", pathsString);
+    }
+   
 
 %><!doctype html>
 <html>
@@ -68,7 +94,7 @@
                 <div data-role="fieldcontain">
                     <label for="${pageId}-paths">Paths *</label>
                     <textarea id="${pageId}-paths" type="text" required="required"
-                           name="<%=AddressBookConstants.RP_PATHS%>" cols="40" rows="8"></textarea>
+                           name="<%=AddressBookConstants.RP_PATHS%>" cols="40" rows="8">${rpPaths}</textarea>
                     <p class="ui-input-desc" data-for="${pageId}-paths">Specify root paths to sync, one per line.</p>
                 </div>
                 <div data-role="fieldcontain">

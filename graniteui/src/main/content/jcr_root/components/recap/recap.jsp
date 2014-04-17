@@ -58,9 +58,15 @@
         }
     %>
     <script>
+    function goToPath(uriPath, addressResourcePath) {
+    	$('#quick-recap').attr('href', "${request.contextPath}" + addressResourcePath + ".html" + '?<%=AddressBookConstants.RP_PATHS %>=' + uriPath);
+    }
     
+    function goToAddress(baseHREF, protocol, hostname, port, uriPath) {
+    	$('#quick-recap').attr('href', baseHREF + '?<%=AddressBookConstants.PROP_HOSTNAME %>=' + hostname + '&<%=AddressBookConstants.PROP_IS_HTTPS %>=' + protocol + '&<%=AddressBookConstants.PROP_PORT %>=' + port + '&<%=AddressBookConstants.RP_PATHS %>=' + uriPath);
+    }
     $(document).on("change", "#uri", function() {
-    	var baseHREF = $.mobile.path.parseUrl($('#create-address').attr('href')).hrefNoSearch;
+    	var baseHREF = $("#create-address").attr("href");
     	var addressToCreate = $.mobile.path.parseUrl($('#uri').val());
     	if (addressToCreate.domain !== "") {
     		var addressProtocol = addressToCreate.protocol == "https:";
@@ -83,9 +89,29 @@
     			parsedPath = addressPath;
     		}
     		parsedPath = parsedPath.replace(/[.?#].*$/, "")
-    		$('#create-address').attr('href', baseHREF + '?<%=AddressBookConstants.PROP_HOSTNAME %>=' + addressHostname + '&<%=AddressBookConstants.PROP_IS_HTTPS %>=' + addressProtocol + '&<%=AddressBookConstants.PROP_PORT %>=' + addressPort + '&<%=AddressBookConstants.RP_PATHS %>=' + parsedPath);
+    		
+    		var matched = false;
+    		var addressResourcePath;
+    		if (_g.recap.getAddressBook()) {
+    			var addressBook = _g.recap.getAddressBook();
+	    		for (var addressKey in addressBook) {
+	    			if (addressBook.hasOwnProperty(addressKey)) {
+	    				var address = addressBook[addressKey];
+	    				if (address.connectionKey && address.connectionKey == addressToCreate.protocol + "//"+ addressHostname + ":" + addressPort) {
+		    				matched = true;
+		    				addressResourcePath = address.path;
+		    				break;
+	    				}
+	    			} 
+	    		}   
+    		}	
+    		if (matched) {
+    			goToPath(parsedPath, addressResourcePath);
+    		} else {
+				goToAddress(baseHREF, addressProtocol, addressHostname, addressPort, parsedPath)
+			}
     	}
-    	else {alert("Please enter a valid URL!");}
+    	else {alert("Please enter a valid URI!");}
 	});
 	</script>
     
@@ -108,12 +134,12 @@
 	
     <textarea id="g-recap-address-book-tpl" style="display:none;">
 		<div class="ui-grid-a" >
-			<div class="ui-block-a" style="width:70%;">
-				<label for="create-address" class="ui-hidden-accessible">Quick Recap URI</label>
-				<input name="uri" data-theme="a" type="text" id="uri" placeholder="Paste URI" style="line-height: 2.7em; border-radius: 5px; width: 98%; margin: 6px 2px 7px; padding-left: 6px;" />
+			<div class="ui-block-a" data-role="fieldcontain" style="width:70%;">
+				<label for="uri" class="ui-hidden-accessible">Quick Recap URI</label>
+				<input class="ui-input-text ui-body-d ui-corner-all ui-shadow-inset" name="uri" data-theme="a" type="text" id="uri" placeholder="Paste URI" style="line-height: 37px; margin: 6px 2px 7px; padding: 0px 0px 2px 10px;" />
 	    	</div>
 	    	<div class="ui-block-b" style="width:30%;">
-		    	<a x-cq-linkchecker="skip" data-role="button" data-theme="a" data-panel="main" id="create-address" href="${request.contextPath}{_g.recap.context.addressBookPath}/*.edit.html">
+		    	<a x-cq-linkchecker="skip" data-role="button" data-theme="a" data-panel="main" id="quick-recap" href="${request.contextPath}{_g.recap.context.addressBookPath}/*.edit.html">
 			    	Quick Recap
 			    </a>
 			</div>
@@ -129,7 +155,7 @@
         </li>
         {#/for}
         <li style="background:transparent;border-color:transparent;position: absolute; bottom: 0; width: 100%;;">
-            <a x-cq-linkchecker="skip" data-role="button" data-theme="a" data-panel="main" class="create-button" href="${request.contextPath}{_g.recap.context.addressBookPath}/*.edit.html">
+            <a x-cq-linkchecker="skip" data-role="button" data-theme="a" data-panel="main" id="create-address" href="${request.contextPath}{_g.recap.context.addressBookPath}/*.edit.html">
                 Create Address
             </a>
         </li>

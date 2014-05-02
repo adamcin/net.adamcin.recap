@@ -49,6 +49,7 @@ _g.recap = (function() {
     var recapContext = contextReq.status == 200 ? _g.$.parseJSON(contextReq.responseText) : {};
     
     var addressBook = false;
+    var quickPaths = "";
     
     var executeSyncToConsole = function(form) {
         _g.$(form).submit();
@@ -91,12 +92,22 @@ _g.recap = (function() {
             });
     };
 
+    var getQuickPaths = function() {
+        return quickPaths;
+    }
+
+    var setQuickPaths = function(value) {
+        quickPaths = value;
+    }
+
     return {
         path: recapPath,
         context: recapContext,
         executeSyncToConsole: executeSyncToConsole,
         reloadAddressBook: reloadAddressBook,
         getAddressBook: getAddressBook,
-        deleteAddress: deleteAddress
+        deleteAddress: deleteAddress,
+        getQuickPaths: getQuickPaths,
+        setQuickPaths: setQuickPaths
     };
 })();

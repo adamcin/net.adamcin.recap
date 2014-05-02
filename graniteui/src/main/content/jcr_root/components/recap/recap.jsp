@@ -59,10 +59,12 @@
     %>
     <script>
     function goToPath(uriPath, addressResourcePath) {
+        _g.recap.setQuickPaths(uriPath);
     	$('#quick-recap').attr('href', "${request.contextPath}" + addressResourcePath + ".html" + '?<%=AddressBookConstants.RP_PATHS %>=' + uriPath);
     }
     
     function goToAddress(baseHREF, protocol, hostname, port, uriPath) {
+        _g.recap.setQuickPaths(uriPath);
     	$('#quick-recap').attr('href', baseHREF + '?<%=AddressBookConstants.PROP_HOSTNAME %>=' + hostname + '&<%=AddressBookConstants.PROP_IS_HTTPS %>=' + protocol + '&<%=AddressBookConstants.PROP_PORT %>=' + port + '&<%=AddressBookConstants.RP_PATHS %>=' + uriPath);
     }
     $(document).on("change", "#uri", function() {

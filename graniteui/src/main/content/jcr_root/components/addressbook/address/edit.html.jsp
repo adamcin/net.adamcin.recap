@@ -67,6 +67,7 @@
     } else {
         pageContext.setAttribute("address", new HashMap<String, Object>());
     }
+
 %><!doctype html>
 <html>
 <head>
@@ -188,14 +189,18 @@
 
     <script type="text/javascript">
         _g.$('#<%=pageId%> .done').click(function() {
+            var qs = "";
+            if (_g.recap.getQuickPaths().length > 0) {
+                qs = "?<%=AddressBookConstants.RP_PATHS%>=" + _g.recap.getQuickPaths();
+            }
             var form = _g.$('#<%=pageId%> form');
             var action = form.attr("action");
             var data = form.serialize();
             _g.$.ajax({url: action, data: data, type: "POST"}).done(function(respData, status, xhr){
                 if (xhr.status == 201) {
-                    _g.$.mobile.changePage(xhr.getResponseHeader("location")+".html", {pageContainer:_g.$('#g-recap-main')});
+                    _g.$.mobile.changePage(xhr.getResponseHeader("location")+".html" + qs, {pageContainer:_g.$('#g-recap-main')});
                 } else {
-                    _g.$.mobile.changePage("${slingRequest.contextPath}${resource.path}.html", {pageContainer:_g.$('#g-recap-main')});
+                    _g.$.mobile.changePage("${slingRequest.contextPath}${resource.path}.html" + qs, {pageContainer:_g.$('#g-recap-main')});
                 }
                 _g.recap.reloadAddressBook();
             }).fail(function(resp){

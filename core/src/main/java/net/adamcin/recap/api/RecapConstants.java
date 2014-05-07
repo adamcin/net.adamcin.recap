@@ -47,8 +47,7 @@ public final class RecapConstants {
     // Default Default Config Values
     // ------------------------------------------------
     public static final int DEFAULT_DEFAULT_PORT = 8080;
-    public static final String DEFAULT_DEFAULT_CONTEXT_PATH = "";
-    public static final String DEFAULT_DEFAULT_PREFIX = "/server";
+    public static final String DEFAULT_DEFAULT_SERVLET_PATH = "/server";
     public static final String DEFAULT_DEFAULT_USERNAME = "anonymous";
     public static final String DEFAULT_DEFAULT_PASSWORD = "anonymous";
     public static final int DEFAULT_DEFAULT_BATCH_SIZE = 1024;
@@ -63,8 +62,7 @@ public final class RecapConstants {
     public static final String RP_IS_HTTPS = ":is_https";
     public static final String RP_USERNAME = ":user";
     public static final String RP_PASSWORD = ":pass";
-    public static final String RP_CONTEXT_PATH = ":context_path";
-    public static final String RP_PREFIX = ":prefix";
+    public static final String RP_SERVLET_PATH = ":servlet_path";
 
     // ------------------------------------------------
     // Request Parameters related to RecapOptions

@@ -43,8 +43,7 @@
         pageContext.setAttribute("defaultPort", recap.getDefaultPort());
         pageContext.setAttribute("defaultUsername", recap.getDefaultUsername());
         pageContext.setAttribute("defaultPassword", defaultPassword.replaceAll(".", "*"));
-        pageContext.setAttribute("defaultContextPath", recap.getDefaultContextPath());
-        pageContext.setAttribute("defaultPrefix", recap.getDefaultPrefix());
+        pageContext.setAttribute("defaultServletPath", recap.getDefaultServletPath());
     }
 
     Address address = slingRequest.adaptTo(Address.class);
@@ -158,22 +157,12 @@
                 </fieldset>
             </div>
             <div data-role="fieldcontain">
-                <label for="${pageId}-contextPath">Servlet Context Path</label>
-                <input id="${pageId}-contextPath" type="text" placeholder="default: ${defaultContextPath}"
-                       name="./<%=AddressBookConstants.PROP_CONTEXT_PATH%>"
-                       value="${address.contextPath}"/>
-                <p class="ui-input-desc" data-for="${pageId}-contextPath">
-                    If the remote CRX server is hosted at a different servlet context path than the default, make sure to specify it here.
-                </p>
-            </div>
-            <div data-role="fieldcontain">
-                <label for="${pageId}-prefix">Servlet Prefix</label>
-                <input id="${pageId}-prefix" type="text" placeholder="default: ${defaultPrefix}"
-                       name="./<%=AddressBookConstants.PROP_PREFIX %>"
-                       value="${address.prefix}"/>
-                <p class="ui-input-desc" data-for="${pageId}-prefix">
-                    If the remote repository DAVex servlet is hosted at a different servlet path than the default (for instance, if it is not a CRX repository), make sure to specify it here.
-                </p>
+                <label for="${pageId}-servletPath">DavEx Servlet Path</label>
+                <input id="${pageId}-servletPath" type="text" placeholder="default: ${defaultServletPath}"
+                       name="./<%=AddressBookConstants.PROP_SERVLET_PATH%>"
+                       value="${address.servletPath}"/>
+                <p class="ui-input-desc" data-for="${pageId}-servletPath">
+                    If the remote repository DAVex servlet is hosted at a different servlet path than the default (for instance, if it is not a CRX repository), make sure to specify it here.                </p>
             </div>
         </form>
     </div>

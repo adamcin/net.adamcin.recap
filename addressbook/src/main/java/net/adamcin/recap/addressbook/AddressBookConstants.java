@@ -45,6 +45,5 @@ public class AddressBookConstants {
     public static final String PROP_IS_HTTPS = "isHttps";
     public static final String PROP_USERNAME = "username";
     public static final String PROP_PASSWORD = "password";
-    public static final String PROP_CONTEXT_PATH = "contextPath";
-    public static final String PROP_PREFIX = "prefix";
+    public static final String PROP_SERVLET_PATH = "servletPath";
 }

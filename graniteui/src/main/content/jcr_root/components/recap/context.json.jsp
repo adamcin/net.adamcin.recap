@@ -60,7 +60,7 @@
             writer.key("port").value(recap.getDefaultPort());
             writer.key("username").value(recap.getDefaultUsername());
             writer.key("password").value(recap.getDefaultPassword());
-            writer.key("contextPath").value(recap.getDefaultContextPath());
+            writer.key("servletPath").value(recap.getDefaultServletPath());
             writer.key("batchSize").value(recap.getDefaultBatchSize());
             writer.key("lastModifiedProperty").value(recap.getDefaultLastModifiedProperty());
             writer.endObject();

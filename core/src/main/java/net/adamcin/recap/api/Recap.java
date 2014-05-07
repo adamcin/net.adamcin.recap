@@ -74,14 +74,9 @@ public interface Recap {
     int getDefaultPort();
 
     /**
-     * @return the default context path
+     * @return the default DavEx Servlet path
      */
-    String getDefaultContextPath();
-
-    /**
-     * @return the default servlet prefix
-     */
-    String getDefaultPrefix();
+    String getDefaultServletPath();
 
     /**
      * @return the default address username

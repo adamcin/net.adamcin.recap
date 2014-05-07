@@ -65,12 +65,8 @@ public interface RecapAddress {
     String getPassword();
 
     /**
-     * @return the remote servlet context path
+     * @since 1.0
+     * @return the remote DavEx Servlet Path
      */
-    String getContextPath();
-
-    /**
-     * @return the remote DavEx endpoint prefix
-     */
-    String getPrefix();
+    String getServletPath();
 }

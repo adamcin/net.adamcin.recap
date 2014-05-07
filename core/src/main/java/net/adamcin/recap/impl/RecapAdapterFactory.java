@@ -145,8 +145,7 @@ public class RecapAdapterFactory implements AdapterFactory {
 
             address.setUsername(request.getParameter(RecapConstants.RP_USERNAME));
             address.setPassword(request.getParameter(RecapConstants.RP_PASSWORD));
-            address.setContextPath(request.getParameter(RecapConstants.RP_CONTEXT_PATH));
-            address.setPrefix(request.getParameter(RecapConstants.RP_PREFIX));
+            address.setServletPath(request.getParameter(RecapConstants.RP_SERVLET_PATH));
 
             return address;
         }

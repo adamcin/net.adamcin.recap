@@ -87,8 +87,7 @@ public final class RecapReplicationUtil {
                 @Override public Integer getPort() { return port; }
                 @Override public String getUsername() { return user; }
                 @Override public String getPassword() { return pass; }
-                @Override public String getContextPath() { return ""; }
-                @Override public String getPrefix() { return prefix; }
+                @Override public String getServletPath() { return prefix; }
             };
         } catch (URISyntaxException e) {
             throw new ReplicationException(e);

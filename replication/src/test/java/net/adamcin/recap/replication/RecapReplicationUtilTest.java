@@ -48,7 +48,7 @@ public class RecapReplicationUtilTest {
             assertEquals("port should be 80", 80, (int) agentAddress.getPort());
             assertEquals("user should be admin", "admin", agentAddress.getUsername());
             assertEquals("pass should be adminadmin", "adminadmin", agentAddress.getPassword());
-            assertEquals("prefix should be /", "/", agentAddress.getPrefix());
+            assertEquals("servletPath should be /", "/", agentAddress.getServletPath());
 
         } catch (Exception e) {
             fail("threw an exception: " + e);

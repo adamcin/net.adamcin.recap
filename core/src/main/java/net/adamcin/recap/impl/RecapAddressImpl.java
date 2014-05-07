@@ -39,7 +39,7 @@ public class RecapAddressImpl extends DefaultRecapAddress {
     boolean https;
     String username;
     String password;
-    String contextPath;
+    String servletPath;
     String prefix;
 
     public String getHostname() {
@@ -74,12 +74,12 @@ public class RecapAddressImpl extends DefaultRecapAddress {
         this.password = password;
     }
 
-    public String getContextPath() {
-        return contextPath;
+    public String getServletPath() {
+        return servletPath;
     }
 
-    public void setContextPath(String contextPath) {
-        this.contextPath = contextPath;
+    public void setServletPath(String servletPath) {
+        this.servletPath = servletPath;
     }
 
     public boolean isHttps() {
@@ -88,13 +88,5 @@ public class RecapAddressImpl extends DefaultRecapAddress {
 
     public void setHttps(boolean https) {
         this.https = https;
-    }
-
-    public String getPrefix() {
-        return prefix;
-    }
-
-    public void setPrefix(String prefix) {
-        this.prefix = prefix;
     }
 }

@@ -68,11 +68,8 @@ public class RecapImpl implements Recap, RecapSessionInterrupter {
     @Property(label = "Default Remote Password", value = RecapConstants.DEFAULT_DEFAULT_PASSWORD)
     protected static final String OSGI_DEFAULT_PASSWORD = "default.password";
 
-    @Property(label = "Default Remote Context Path", value = RecapConstants.DEFAULT_DEFAULT_CONTEXT_PATH)
-    protected static final String OSGI_DEFAULT_CONTEXT_PATH = "default.contextPath";
-
-    @Property(label = "Default Remote Prefix", value = RecapConstants.DEFAULT_DEFAULT_PREFIX)
-    protected static final String OSGI_DEFAULT_PREFIX = "default.prefix";
+    @Property(label = "Default Remote DavEx Servlet Path", value = RecapConstants.DEFAULT_DEFAULT_SERVLET_PATH)
+    protected static final String OSGI_DEFAULT_SERVLET_PATH = "default.servletPath";
 
     @Property(label = "Default Batch Size", intValue = RecapConstants.DEFAULT_DEFAULT_BATCH_SIZE)
     protected static final String OSGI_DEFAULT_BATCH_SIZE = "default.batchSize";
@@ -84,8 +81,7 @@ public class RecapImpl implements Recap, RecapSessionInterrupter {
     protected static final String OSGI_DEFAULT_LAST_MODIFIED_PROPERTY = "default.lastModifiedProperty";
 
     private int defaultPort;
-    private String defaultContextPath;
-    private String defaultPrefix;
+    private String defaultServletPath;
     private String defaultUsername;
     private String defaultPassword;
     private int defaultBatchSize;
@@ -100,8 +96,7 @@ public class RecapImpl implements Recap, RecapSessionInterrupter {
 
         LOGGER.debug("[activate] props={}", props);
         defaultPort = OsgiUtil.toInteger(props.get(OSGI_DEFAULT_PORT), RecapConstants.DEFAULT_DEFAULT_PORT);
-        defaultContextPath = OsgiUtil.toString(props.get(OSGI_DEFAULT_CONTEXT_PATH), RecapConstants.DEFAULT_DEFAULT_CONTEXT_PATH);
-        defaultPrefix = OsgiUtil.toString(props.get(OSGI_DEFAULT_PREFIX), RecapConstants.DEFAULT_DEFAULT_PREFIX);
+        defaultServletPath = OsgiUtil.toString(props.get(OSGI_DEFAULT_SERVLET_PATH), RecapConstants.DEFAULT_DEFAULT_SERVLET_PATH);
         defaultUsername = OsgiUtil.toString(props.get(OSGI_DEFAULT_USERNAME), RecapConstants.DEFAULT_DEFAULT_USERNAME);
         defaultPassword = OsgiUtil.toString(props.get(OSGI_DEFAULT_PASSWORD), RecapConstants.DEFAULT_DEFAULT_PASSWORD);
         defaultBatchSize = OsgiUtil.toInteger(props.get(OSGI_DEFAULT_BATCH_SIZE), RecapConstants.DEFAULT_DEFAULT_BATCH_SIZE);
@@ -113,8 +108,7 @@ public class RecapImpl implements Recap, RecapSessionInterrupter {
     protected void deactivate(ComponentContext ctx) {
         this.sessionsInterrupted = true;
         defaultPort = 0;
-        defaultContextPath = null;
-        defaultPrefix = null;
+        defaultServletPath = null;
         defaultUsername = null;
         defaultPassword = null;
         defaultBatchSize = 0;
@@ -151,11 +145,15 @@ public class RecapImpl implements Recap, RecapSessionInterrupter {
     }
 
     public String getDefaultContextPath() {
-        return defaultContextPath;
+        return null;
     }
 
     public String getDefaultPrefix() {
-        return defaultPrefix;
+        return null;
+    }
+
+    public String getDefaultServletPath() {
+        return defaultServletPath;
     }
 
     public RecapSession initSession(Session localJcrSession,
@@ -212,8 +210,7 @@ public class RecapImpl implements Recap, RecapSessionInterrupter {
         dAddress.setPort(defaultPort);
         dAddress.setUsername(defaultUsername);
         dAddress.setPassword(defaultPassword);
-        dAddress.setContextPath(defaultContextPath);
-        dAddress.setPrefix(defaultPrefix);
+        dAddress.setServletPath(defaultServletPath);
 
         if (address != null) {
 
@@ -229,11 +226,8 @@ public class RecapImpl implements Recap, RecapSessionInterrupter {
             if (address.getPassword() != null) {
                 dAddress.setPassword(address.getPassword());
             }
-            if (address.getContextPath() != null) {
-                dAddress.setContextPath(address.getContextPath());
-            }
-            if (address.getPrefix() != null) {
-                dAddress.setPrefix(address.getPrefix());
+            if (address.getServletPath() != null) {
+                dAddress.setServletPath(address.getServletPath());
             }
         }
 
@@ -284,9 +278,10 @@ public class RecapImpl implements Recap, RecapSessionInterrupter {
                     !(recapAddress.isHttps() && recapAddress.getPort() == 443)) {
                 addressBuilder.append(":").append(recapAddress.getPort());
             }
-            if (StringUtils.isNotEmpty(recapAddress.getContextPath()) &&
-                    !"/".equals(recapAddress.getContextPath())) {
-                addressBuilder.append(recapAddress.getContextPath());
+            if (StringUtils.isNotEmpty(recapAddress.getServletPath())) {
+                addressBuilder.append(recapAddress.getServletPath());
+            } else {
+                addressBuilder.append("/");
             }
         }
         return addressBuilder.toString();
@@ -296,11 +291,7 @@ public class RecapImpl implements Recap, RecapSessionInterrupter {
         RecapAddress recapAddress = applyAddressDefaults(address);
         String base = getDisplayableUrl(recapAddress);
         if (StringUtils.isNotEmpty(base)) {
-            if (recapAddress.getPrefix() != null) {
-                return getDisplayableUrl(recapAddress) + recapAddress.getPrefix();
-            } else {
-                return getDisplayableUrl(recapAddress) + "/";
-            }
+            return base;
         } else {
             return null;
         }

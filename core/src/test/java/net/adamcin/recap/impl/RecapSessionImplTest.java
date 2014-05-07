@@ -58,8 +58,7 @@ public class RecapSessionImplTest {
         public Integer getPort() { return 4502; }
         public String getUsername() { return "admin"; }
         public String getPassword() { return "admin"; }
-        public String getContextPath() { return null; }
-        public String getPrefix() { return null; }
+        public String getServletPath() { return null; }
     };
 
     private TransientRepository localRepo;

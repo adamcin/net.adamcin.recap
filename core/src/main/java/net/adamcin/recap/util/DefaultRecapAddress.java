@@ -40,6 +40,5 @@ public class DefaultRecapAddress implements RecapAddress {
     public Integer getPort() { return null; }
     public String getUsername() { return null; }
     public String getPassword() { return null; }
-    public String getContextPath() { return null; }
-    public String getPrefix() { return null; }
+    public String getServletPath() { return null; }
 }

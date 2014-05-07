@@ -50,22 +50,22 @@ public class RecapImplTest {
         address.setHostname("localhost");
         address.setPort(-1);
 
-        assertEquals("basic displayable url default port 999", "http://localhost:999", recap.getDisplayableUrl(address));
+        assertEquals("basic displayable url default port 999", "http://localhost:999/server", recap.getDisplayableUrl(address));
 
         address.setHttps(true);
-        assertEquals("https url default port 999", "https://localhost:999", recap.getDisplayableUrl(address));
+        assertEquals("https url default port 999", "https://localhost:999/server", recap.getDisplayableUrl(address));
 
         address.setPort(443);
-        assertEquals("https url port 443", "https://localhost", recap.getDisplayableUrl(address));
+        assertEquals("https url port 443", "https://localhost/server", recap.getDisplayableUrl(address));
 
         address.setPort(80);
-        assertEquals("https url port 80", "https://localhost:80", recap.getDisplayableUrl(address));
+        assertEquals("https url port 80", "https://localhost:80/server", recap.getDisplayableUrl(address));
 
         address.setHttps(false);
-        assertEquals("http url port 80", "http://localhost", recap.getDisplayableUrl(address));
+        assertEquals("http url port 80", "http://localhost/server", recap.getDisplayableUrl(address));
 
         address.setPort(443);
-        assertEquals("http url port 443", "http://localhost:443", recap.getDisplayableUrl(address));
+        assertEquals("http url port 443", "http://localhost:443/server", recap.getDisplayableUrl(address));
     }
 
     @Test
@@ -74,7 +74,7 @@ public class RecapImplTest {
         RecapImpl recap = new RecapImpl();
         Map<String, Object> props = new HashMap<String, Object>();
         props.put(RecapImpl.OSGI_DEFAULT_PORT, 999);
-        props.put(RecapImpl.OSGI_DEFAULT_PREFIX, "/test/prefix");
+        props.put(RecapImpl.OSGI_DEFAULT_SERVLET_PATH, "/test/prefix");
         recap.activate(null, props);
 
         RecapAddressImpl address = new RecapAddressImpl();
@@ -99,7 +99,13 @@ public class RecapImplTest {
         address.setPort(443);
         assertEquals("http url port 443", "http://localhost:443/test/prefix", recap.getRepositoryUrl(address));
 
-        address.setContextPath("/someOtherContext");
-        assertEquals("http url port 443", "http://localhost:443/someOtherContext/test/prefix", recap.getRepositoryUrl(address));
+        address.setServletPath("/someOtherContext");
+        assertEquals("http url port 443", "http://localhost:443/someOtherContext", recap.getRepositoryUrl(address));
+
+        address.setServletPath("/");
+        assertEquals("http url port 443", "http://localhost:443/", recap.getRepositoryUrl(address));
+
+        address.setServletPath("");
+        assertEquals("http url port 443", "http://localhost:443/", recap.getRepositoryUrl(address));
     }
 }

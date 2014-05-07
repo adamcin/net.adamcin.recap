@@ -30,6 +30,7 @@
     <orderEntry type="module" module-name="net.adamcin.recap.replication" scope="PROVIDED" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: com.adobe.granite:com.adobe.granite.replication.core:5.5.16" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: com.adobe.granite:com.adobe.granite.crypto:0.0.6" level="project" />
+    <orderEntry type="library" name="Maven: org.json:json:20080701" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: javax.jcr:jcr:2.0" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: commons-lang:commons-lang:2.5" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.apache.sling:org.apache.sling.api:2.2.0" level="project" />

@@ -94,12 +94,8 @@ public class AddressImpl extends DefaultRecapAddress implements Address {
         return properties.get(AddressBookConstants.PROP_PASSWORD, String.class);
     }
 
-    @Override public String getContextPath() {
-        return properties.get(AddressBookConstants.PROP_CONTEXT_PATH, String.class);
-    }
-
-    @Override public String getPrefix() {
-        return properties.get(AddressBookConstants.PROP_PREFIX, String.class);
+    @Override public String getServletPath() {
+        return properties.get(AddressBookConstants.PROP_SERVLET_PATH, String.class);
     }
 
     @Override public String toString() {

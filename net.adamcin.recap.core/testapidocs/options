@@ -15,10 +15,12 @@
 -docencoding
 'UTF-8'
 -doctitle
-'Recap - Core 1.0.0 Test API'
+'Recap - Core 1.0.1 Test API'
 -link
 'http://java.sun.com/javase/6/docs/api'
+-linkoffline
+'http://adamcin.net/net.adamcin.recap/net.adamcin.recap.replication/apidocs' '/Users/madamcin/git/net.adamcin.recap/target/checkout/replication/target/site/testapidocs'
 -use
 -version
 -windowtitle
-'Recap - Core 1.0.0 Test API'
+'Recap - Core 1.0.1 Test API'

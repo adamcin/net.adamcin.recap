@@ -15,12 +15,14 @@
 -docencoding
 'UTF-8'
 -doctitle
-'Recap - Core 1.0.0 API'
+'Recap - Core 1.0.1 API'
 -link
 'http://java.sun.com/javase/6/docs/api'
 -linkoffline
 'http://adamcin.net/net.adamcin.recap/net.adamcin.recap.addressbook/apidocs' '/Users/madamcin/git/net.adamcin.recap/target/checkout/addressbook/target/site/apidocs'
+-linkoffline
+'http://adamcin.net/net.adamcin.recap/net.adamcin.recap.replication/apidocs' '/Users/madamcin/git/net.adamcin.recap/target/checkout/replication/target/site/apidocs'
 -use
 -version
 -windowtitle
-'Recap - Core 1.0.0 API'
+'Recap - Core 1.0.1 API'

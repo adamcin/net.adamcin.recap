@@ -247,6 +247,7 @@ public class RecapImpl implements Recap, RecapSessionInterrupter {
             dOptions.setReverse(options.isReverse());
             dOptions.setNoRecurse(options.isNoRecurse());
             dOptions.setNoDelete(options.isNoDelete());
+            dOptions.setKeepOrder(options.isKeepOrder());
             if (options.getThrottle() != null) {
                 dOptions.setThrottle(options.getThrottle());
             }

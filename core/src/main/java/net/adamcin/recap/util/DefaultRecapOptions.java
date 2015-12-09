@@ -72,4 +72,8 @@ public class DefaultRecapOptions implements RecapOptions {
     public boolean isNoDelete() {
         return false;
     }
+
+    public boolean isKeepOrder() {
+        return false;
+    }
 }

@@ -176,6 +176,10 @@ public class RecapAdapterFactory implements AdapterFactory {
             options.setNoDelete(true);
         }
 
+        if ("true".equals(request.getParameter(RecapConstants.RP_KEEP_ORDER))) {
+            options.setKeepOrder(true);
+        }
+
         String rpBatchSize = request.getParameter(RecapConstants.RP_BATCH_SIZE);
         if (StringUtils.isNotBlank(rpBatchSize)) {
             try {

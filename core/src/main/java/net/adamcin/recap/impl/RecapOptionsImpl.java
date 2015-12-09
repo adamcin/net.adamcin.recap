@@ -47,6 +47,7 @@ public class RecapOptionsImpl extends DefaultRecapOptions {
     private boolean reverse;
     private boolean noRecurse;
     private boolean noDelete;
+    private boolean keepOrder;
 
     public String getLastModifiedProperty() {
         return lastModifiedProperty;
@@ -128,6 +129,14 @@ public class RecapOptionsImpl extends DefaultRecapOptions {
         this.noDelete = noDelete;
     }
 
+    public boolean isKeepOrder() {
+        return keepOrder;
+    }
+
+    public void setKeepOrder(boolean keepOrder) {
+        this.keepOrder = keepOrder;
+    }
+
     @Override
     public String toString() {
         return "RecapOptionsImpl{" +
@@ -136,6 +145,7 @@ public class RecapOptionsImpl extends DefaultRecapOptions {
                 ", throttle=" + throttle +
                 ", requestDepthConfig=" + requestDepthConfig +
                 ", onlyNewer=" + onlyNewer +
+                ", keepOrder=" + keepOrder +
                 ", update=" + update +
                 ", reverse=" + reverse +
                 ", noRecurse=" + noRecurse +

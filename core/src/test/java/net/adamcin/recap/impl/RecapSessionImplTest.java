@@ -311,8 +311,8 @@ public class RecapSessionImplTest {
                 session.setProgressListener(tracker);
                 session.sync("/" + BASIC_NODE_NAME);
 
-                NodeIterator remoteNi = REMOTE_ROOT.getNodes();
-                NodeIterator localNi = LOCAL_ROOT.getNodes();
+                NodeIterator remoteNi = remoteSession.getNode("/" + BASIC_NODE_NAME).getNodes();
+                NodeIterator localNi = localSession.getNode("/" + BASIC_NODE_NAME).getNodes();
                 while (remoteNi.hasNext()) {
                     assertTrue(remoteNi.nextNode().getName().equals(localNi.nextNode().getName()));
                 }

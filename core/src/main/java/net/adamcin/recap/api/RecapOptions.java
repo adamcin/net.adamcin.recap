@@ -52,4 +52,6 @@ public interface RecapOptions {
     boolean isNoRecurse();
 
     boolean isNoDelete();
+
+    boolean isKeepOrder();
 }

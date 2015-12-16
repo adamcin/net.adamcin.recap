@@ -69,6 +69,7 @@ public final class RecapConstants {
     // ------------------------------------------------
     public static final String RP_UPDATE = ":update";
     public static final String RP_ONLY_NEWER = ":only_newer";
+    public static final String RP_KEEP_ORDER = ":keep_order";
     public static final String RP_REVERSE = ":reverse";
     public static final String RP_NO_RECURSE = ":no_recurse";
     public static final String RP_NO_DELETE = ":no_delete";

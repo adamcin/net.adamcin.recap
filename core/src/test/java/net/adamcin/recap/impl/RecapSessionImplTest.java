@@ -39,10 +39,7 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.jcr.Credentials;
-import javax.jcr.Node;
-import javax.jcr.Session;
-import javax.jcr.SimpleCredentials;
+import javax.jcr.*;
 import java.io.File;
 
 import static org.junit.Assert.*;
@@ -269,6 +266,56 @@ public class RecapSessionImplTest {
                 assertEquals("number of synced paths should be", 1, session.getTotalSyncPaths());
                 assertEquals("total number of nodes should be", 20, session.getTotalNodes());
                 assertEquals("last synced path should be", "/basicDelete0", session.getLastSuccessfulSyncPath());
+            }
+        });
+    }
+
+    @Test
+    public void testNodeOrdering() {
+        TestBody.test(new RecapTestBody() {
+            @Override
+            protected void execute() throws Exception {
+                final String BASIC_NODE_NAME = "syncOrdered";
+                localSession = localRepo.login(DEFAULT_CREDENTIALS);
+                remoteSession = remoteRepo.login(DEFAULT_CREDENTIALS);
+
+                Node REMOTE_ROOT = remoteSession.getRootNode().addNode(BASIC_NODE_NAME, JcrConstants.NT_UNSTRUCTURED);
+                REMOTE_ROOT.addNode(BASIC_NODE_NAME + 1, JcrConstants.NT_UNSTRUCTURED);
+                REMOTE_ROOT.addNode(BASIC_NODE_NAME + 2, JcrConstants.NT_UNSTRUCTURED);
+                REMOTE_ROOT.addNode(BASIC_NODE_NAME + 3, JcrConstants.NT_UNSTRUCTURED);
+                REMOTE_ROOT.addNode(BASIC_NODE_NAME + 4, JcrConstants.NT_UNSTRUCTURED);
+                REMOTE_ROOT.addNode(BASIC_NODE_NAME + 5, JcrConstants.NT_UNSTRUCTURED);
+                REMOTE_ROOT.addNode(BASIC_NODE_NAME + 6, JcrConstants.NT_UNSTRUCTURED);
+                REMOTE_ROOT.getSession().save();
+
+                Node LOCAL_ROOT = localSession.getRootNode().addNode(BASIC_NODE_NAME, JcrConstants.NT_UNSTRUCTURED);
+                LOCAL_ROOT.addNode(BASIC_NODE_NAME + 1, JcrConstants.NT_UNSTRUCTURED);
+                LOCAL_ROOT.addNode(BASIC_NODE_NAME + 5, JcrConstants.NT_UNSTRUCTURED);
+                LOCAL_ROOT.addNode(BASIC_NODE_NAME + 2, JcrConstants.NT_UNSTRUCTURED);
+                LOCAL_ROOT.addNode(BASIC_NODE_NAME + 3, JcrConstants.NT_UNSTRUCTURED);
+                LOCAL_ROOT.addNode(BASIC_NODE_NAME + 4, JcrConstants.NT_UNSTRUCTURED);
+                LOCAL_ROOT.addNode(BASIC_NODE_NAME + 6, JcrConstants.NT_UNSTRUCTURED);
+                LOCAL_ROOT.getSession().save();
+
+                TestProgressTracker tracker = new TestProgressTracker();
+                RecapSessionInterrupter interrupter = new TestInterrupter();
+                RecapOptionsImpl options = new RecapOptionsImpl();
+                options.setOnlyNewer(true);
+                options.setKeepOrder(true);
+                options.setUpdate(true);
+                RecapSessionImpl session = new RecapSessionImpl(interrupter,
+                        DEFAULT_ADDRESS,
+                        options,
+                        localSession,
+                        remoteSession);
+                session.setProgressListener(tracker);
+                session.sync("/" + BASIC_NODE_NAME);
+
+                NodeIterator remoteNi = remoteSession.getNode("/" + BASIC_NODE_NAME).getNodes();
+                NodeIterator localNi = localSession.getNode("/" + BASIC_NODE_NAME).getNodes();
+                while (remoteNi.hasNext()) {
+                    assertTrue(remoteNi.nextNode().getName().equals(localNi.nextNode().getName()));
+                }
             }
         });
     }

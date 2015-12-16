@@ -42,7 +42,7 @@ public interface RecapProgressListener {
     void onPath(PathAction action, int count, String path);
 
     enum PathAction {
-        ADD("A"), UPDATE("U"), DELETE("D"), IGNORE("I"), NO_ACTION("-");
+        ADD("A"), UPDATE("U"), DELETE("D"), MOVE("M"), IGNORE("I"), NO_ACTION("-");
 
         String action;
         PathAction(String action) {

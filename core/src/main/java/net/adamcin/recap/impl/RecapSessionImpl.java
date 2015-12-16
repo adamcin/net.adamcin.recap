@@ -32,6 +32,7 @@ import net.adamcin.recap.api.*;
 import org.apache.commons.lang.StringUtils;
 import org.apache.jackrabbit.JcrConstants;
 import org.apache.jackrabbit.util.Text;
+import net.adamcin.recap.util.OrderableNodesList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.ContentHandler;
@@ -574,8 +575,38 @@ public final class RecapSessionImpl implements RecapSession {
                         }
                     }
                 }
+
+                if (options.isKeepOrder() && !isNew && supportsOrdering(src) && supportsOrdering(dst)) {
+                    OrderableNodesList srcChildren = new OrderableNodesList(src);
+                    OrderableNodesList dstChildren = new OrderableNodesList(dst);
+                    while(!ensureOrder(srcChildren, dstChildren)) {
+                        //reorder children
+                    }
+                }
             }
         }
+    }
+
+    private boolean supportsOrdering(Node node) throws RepositoryException {
+        return node.getPrimaryNodeType().hasOrderableChildNodes();
+    }
+
+    private boolean ensureOrder(OrderableNodesList srcChildren, OrderableNodesList dstChildren) throws RepositoryException {
+        Iterator<String> srcIter = srcChildren.iterator();
+        Iterator<String> dstIter = dstChildren.iterator();
+        while (srcIter.hasNext() && dstIter.hasNext()) {
+            String srcNodeName = srcIter.next();
+            String dstNodeName = dstIter.next();
+
+            if (!srcNodeName.equals(dstNodeName) && dstChildren.contains(srcNodeName)) {
+                int dstNodePos = srcChildren.getPos(dstNodeName);
+                dstChildren.moveExistingNode(dstNodeName, dstNodePos);
+                trackPath(RecapProgressListener.PathAction.MOVE, dstChildren.getRepositoryPath(dstNodeName));
+                return false;
+            }
+        }
+
+        return true;
     }
 
     private Node sysCopy(Node src, Node dstParent, String dstName)
@@ -755,6 +786,7 @@ public final class RecapSessionImpl implements RecapSession {
         public boolean isReverse() { return unsafe.isReverse(); }
         public boolean isNoRecurse() { return unsafe.isNoRecurse(); }
         public boolean isNoDelete() { return unsafe.isNoDelete(); }
+        public boolean isKeepOrder() { return unsafe.isKeepOrder(); }
         @Override public String toString() { return unsafe.toString(); }
     }
 }

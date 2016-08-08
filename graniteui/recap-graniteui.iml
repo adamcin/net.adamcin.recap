@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <module org.jetbrains.idea.maven.project.MavenProjectsManager.isMavenModule="true" type="JAVA_MODULE" version="4">
-  <component name="NewModuleRootManager" LANGUAGE_LEVEL="JDK_1_5" inherit-compiler-output="false">
+  <component name="NewModuleRootManager" LANGUAGE_LEVEL="JDK_1_8" inherit-compiler-output="false">
     <output url="file://$MODULE_DIR$/target/classes" />
     <output-test url="file://$MODULE_DIR$/target/test-classes" />
     <content url="file://$MODULE_DIR$">
@@ -24,16 +24,14 @@
     <orderEntry type="library" scope="PROVIDED" name="Maven: commons-collections:commons-collections:3.2.1" level="project" />
     <orderEntry type="module" module-name="net.adamcin.recap.addressbook" scope="PROVIDED" />
     <orderEntry type="module" module-name="net.adamcin.recap.replication" scope="PROVIDED" />
-    <orderEntry type="library" scope="PROVIDED" name="Maven: com.adobe.granite:com.adobe.granite.replication.core:5.5.16" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Maven: com.adobe.granite:com.adobe.granite.crypto:0.0.6" level="project" />
-    <orderEntry type="library" name="Maven: org.json:json:20080701" level="project" />
+    <orderEntry type="library" name="Maven: org.json:json:20160807" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: javax.jcr:jcr:2.0" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: commons-lang:commons-lang:2.5" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.apache.sling:org.apache.sling.api:2.2.0" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.apache.sling:org.apache.sling.commons.json:2.0.6" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.apache.sling:org.apache.sling.scripting.jsp.taglib:2.1.6" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: javax.servlet:jsp-api:2.0" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Maven: com.adobe.granite:com.adobe.granite.ui.commons:5.5.14" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: com.adobe.granite:com.adobe.granite.ui.commons:5.5.76" level="project" />
     <orderEntry type="module" module-name="recap-graniteit" scope="TEST" />
     <orderEntry type="library" scope="TEST" name="Maven: net.adamcin.commons:net.adamcin.commons.testing:0.6.0" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.slf4j:slf4j-api:1.6.1" level="project" />

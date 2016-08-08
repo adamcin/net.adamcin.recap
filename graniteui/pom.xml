@@ -138,7 +138,6 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-failsafe-plugin</artifactId>
-                        <version>2.14</version>
                         <configuration>
                             <includes>
                                 <include> **/**Test.java </include>
@@ -175,7 +174,7 @@
         <dependency>
             <groupId>org.json</groupId>
             <artifactId>json</artifactId>
-            <version>20080701</version>
+            <version>20160807</version>
         </dependency>
 
         <dependency>
@@ -204,7 +203,7 @@
         <dependency>
             <groupId>com.adobe.granite</groupId>
             <artifactId>com.adobe.granite.ui.commons</artifactId>
-            <version>5.5.14</version>
+            <version>5.5.76</version>
             <scope>provided</scope>
         </dependency>
 

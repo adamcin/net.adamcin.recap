@@ -134,4 +134,54 @@ public class MockTransportAgentConfig implements AgentConfig {
     public ValueMap getProperties() {
         throw new UnsupportedOperationException("getProperties not implemented");
     }
+
+    @Override
+    public String[] getAllTransportURIs() {
+        return new String[]{ getTransportURI() };
+    }
+
+    @Override
+    public boolean isBatchMode() {
+        return false;
+    }
+
+    @Override
+    public long getBatchWaitTime() {
+        return 0;
+    }
+
+    @Override
+    public long getBatchMaxSize() {
+        return 0;
+    }
+
+    @Override
+    public boolean isTriggeredOnReceive() {
+        return false;
+    }
+
+    @Override
+    public boolean isInMaintenanceMode() {
+        return false;
+    }
+
+    @Override
+    public boolean aliasUpdate() {
+        return false;
+    }
+
+    @Override
+    public String getSSLConfig() {
+        return null;
+    }
+
+    @Override
+    public boolean allowsExpiredCertificates() {
+        return false;
+    }
+
+    @Override
+    public boolean isOAuthEnabled() {
+        return false;
+    }
 }

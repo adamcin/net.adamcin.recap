@@ -160,10 +160,18 @@
             <artifactId>org.apache.sling.api</artifactId>
         </dependency>
         <dependency>
+            <groupId>com.adobe.aem</groupId>
+            <artifactId>aem-api</artifactId>
+            <version>6.0.0</version>
+            <scope>provided</scope>
+        </dependency>
+        <!--
+        <dependency>
             <groupId>com.adobe.granite</groupId>
             <artifactId>com.adobe.granite.replication.core</artifactId>
             <version>5.5.16</version>
         </dependency>
+        -->
 
         <dependency>
             <groupId>junit</groupId>

@@ -34,6 +34,7 @@ import org.apache.felix.scr.annotations.Property;
 import org.apache.felix.scr.annotations.Service;
 
 import javax.jcr.Session;
+import java.util.Map;
 
 /**
  * Recap content builder implementation to prevent serialization of content, since the recap service syncs content
@@ -51,6 +52,11 @@ public class RecapContentBuilder implements ContentBuilder {
 
     public ReplicationContent create(Session session, ReplicationAction action, ReplicationContentFactory factory)
             throws ReplicationException {
+        return ReplicationContent.VOID;
+    }
+
+    @Override
+    public ReplicationContent create(Session session, ReplicationAction replicationAction, ReplicationContentFactory replicationContentFactory, Map<String, Object> parameters) throws ReplicationException {
         return ReplicationContent.VOID;
     }
 

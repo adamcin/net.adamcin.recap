@@ -67,7 +67,7 @@
                     <embedBundles>
                         <bundle>net.adamcin.recap.core</bundle>
                         <bundle>net.adamcin.recap.addressbook</bundle>
-                        <bundle>net.adamcin.recap.replication</bundle>
+                        <!--<bundle>net.adamcin.recap.replication</bundle>-->
                     </embedBundles>
                     <jcrPath>/libs/recap</jcrPath>
                     <properties>
@@ -82,7 +82,7 @@
                         <providerName>Mark Adamcin</providerName>
                         <providerUrl>http://adamcin.net/</providerUrl>
                         <providerLink>http://adamcin.net/net.adamcin.recap</providerLink>
-                        <testedWith>CQ 5.5, CQ 5.6, AEM 6.0</testedWith>
+                        <testedWith>AEM 6.0</testedWith>
                     </definitionProperties>
                     <thumbnail>src/site/resources/images/recap_package_thumbnail.png</thumbnail>
                     <screenshots>
@@ -142,6 +142,9 @@
                             <includes>
                                 <include> **/**Test.java </include>
                             </includes>
+                            <systemPropertyVariables>
+                                <systemPropertyVariable>test.server.url</systemPropertyVariable>
+                            </systemPropertyVariables>
                         </configuration>
                         <executions>
                             <execution>

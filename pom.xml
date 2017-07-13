@@ -61,12 +61,12 @@
 
     <properties>
         <encoding>UTF-8</encoding>
-        <maven.compiler.source>1.7</maven.compiler.source>
-        <maven.compiler.target>1.7</maven.compiler.target>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
         <slf4j.version>1.6.1</slf4j.version>
         <junit.version>4.8.2</junit.version>
         <mockito.version>1.8.4</mockito.version>
-        <maven.bundle.plugin.version>2.3.7</maven.bundle.plugin.version>
+        <maven.bundle.plugin.version>2.5.3</maven.bundle.plugin.version>
         <maven.scr.plugin.version>1.22.0</maven.scr.plugin.version>
         <scr.annotations.version>1.9.0</scr.annotations.version>
         <scr.generator.version>1.14.0</scr.generator.version>
@@ -215,25 +215,28 @@
         </plugins>
     </build>
 
-    <profiles>
+<profiles>
+        <!-- ====================================================== -->
+        <!-- A D O B E   P U B L I C   P R O F I L E                -->
+        <!-- ====================================================== -->
         <profile>
             <id>adobe-public</id>
 
             <activation>
-                <activeByDefault>false</activeByDefault>
+                <activeByDefault>true</activeByDefault>
             </activation>
 
             <properties>
                 <releaseRepository-Id>adobe-public-releases</releaseRepository-Id>
                 <releaseRepository-Name>Adobe Public Releases</releaseRepository-Name>
-                <releaseRepository-URL>http://repo.adobe.com/nexus/content/groups/public</releaseRepository-URL>
+                <releaseRepository-URL>https://repo.adobe.com/nexus/content/groups/public</releaseRepository-URL>
             </properties>
 
             <repositories>
                 <repository>
                     <id>adobe-public-releases</id>
                     <name>Adobe Public Repository</name>
-                    <url>http://repo.adobe.com/nexus/content/groups/public</url>
+                    <url>https://repo.adobe.com/nexus/content/groups/public</url>
                     <releases>
                         <enabled>true</enabled>
                         <updatePolicy>never</updatePolicy>
@@ -248,7 +251,7 @@
                 <pluginRepository>
                     <id>adobe-public-releases</id>
                     <name>Adobe Public Repository</name>
-                    <url>http://repo.adobe.com/nexus/content/groups/public</url>
+                    <url>https://repo.adobe.com/nexus/content/groups/public</url>
                     <releases>
                         <enabled>true</enabled>
                         <updatePolicy>never</updatePolicy>
@@ -305,6 +308,15 @@
                 <groupId>net.adamcin.recap</groupId>
                 <artifactId>recap-graniteui</artifactId>
                 <version>${project.version}</version>
+                <scope>provided</scope>
+            </dependency>
+            
+            <!-- AEM6.1 dependency -->
+            <dependency>
+                <groupId>com.adobe.aem</groupId>
+                <artifactId>uber-jar</artifactId>
+                <version>6.1.0-SP2</version>                
+                <classifier>obfuscated-apis</classifier>
                 <scope>provided</scope>
             </dependency>
 

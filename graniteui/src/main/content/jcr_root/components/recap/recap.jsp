@@ -1,4 +1,4 @@
-<%@page import="net.adamcin.recap.addressbook.AddressBookConstants"%>
+<%@ page import="net.adamcin.recap.addressbook.AddressBookConstants" %>
 <%@ page import="com.day.cq.widget.HtmlLibraryManager" %>
 <%@ page import="net.adamcin.recap.addressbook.AddressBook" %>
 <%--
@@ -30,11 +30,11 @@
 
 <%--
   Recap Console component.
---%><%
-%><%@page session="false" %><%
-%><%@taglib prefix="sling" uri="http://sling.apache.org/taglibs/sling/1.0" %><%
-%><sling:defineObjects /><%
-%><%
+--%>
+<%@page session="false" %>
+<%@taglib prefix="sling" uri="http://sling.apache.org/taglibs/sling/1.0" %>
+<sling:defineObjects />
+<%
     AddressBook addressBook = resourceResolver.adaptTo(AddressBook.class);
     if (addressBook != null) {
         pageContext.setAttribute("addressBookPath", addressBook.getResource().getPath());
@@ -51,10 +51,6 @@
         HtmlLibraryManager htmlMgr = sling.getService(HtmlLibraryManager.class);
         if (htmlMgr != null) {
             htmlMgr.writeIncludes(slingRequest, out, "recap");
-            /*
-            if (htmlMgr.getLibraries().containsKey("granite.ui.legacy")) {
-            }
-            */
         }
     %>
     <script>

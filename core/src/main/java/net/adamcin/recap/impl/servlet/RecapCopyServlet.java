@@ -47,6 +47,7 @@ import java.io.IOException;
  */
 @SlingServlet(paths = {RecapConstants.SERVLET_COPY_PATH})
 public class RecapCopyServlet extends SlingAllMethodsServlet {
+    private static final long serialVersionUID = 1L;
     private static final Logger LOGGER = LoggerFactory.getLogger(RecapCopyServlet.class);
 
     @Override

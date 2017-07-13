@@ -67,7 +67,6 @@
                     <embedBundles>
                         <bundle>net.adamcin.recap.core</bundle>
                         <bundle>net.adamcin.recap.addressbook</bundle>
-                        <!--<bundle>net.adamcin.recap.replication</bundle>-->
                     </embedBundles>
                     <jcrPath>/libs/recap</jcrPath>
                     <properties>
@@ -82,7 +81,7 @@
                         <providerName>Mark Adamcin</providerName>
                         <providerUrl>http://adamcin.net/</providerUrl>
                         <providerLink>http://adamcin.net/net.adamcin.recap</providerLink>
-                        <testedWith>AEM 6.0</testedWith>
+                        <testedWith>AEM 6.1</testedWith>
                     </definitionProperties>
                     <thumbnail>src/site/resources/images/recap_package_thumbnail.png</thumbnail>
                     <screenshots>
@@ -202,13 +201,7 @@
             <artifactId>org.apache.sling.scripting.jsp.taglib</artifactId>
             <version>2.1.6</version>
             <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.adobe.granite</groupId>
-            <artifactId>com.adobe.granite.ui.commons</artifactId>
-            <version>5.5.76</version>
-            <scope>provided</scope>
-        </dependency>
+        </dependency>        
 
         <dependency>
             <groupId>net.adamcin.commons</groupId>

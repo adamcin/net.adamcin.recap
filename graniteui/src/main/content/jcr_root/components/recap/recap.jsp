@@ -1,5 +1,5 @@
 <%@page import="net.adamcin.recap.addressbook.AddressBookConstants"%>
-<%@ page import="com.day.cq.widget.HtmlLibraryManager" %>
+<%@ page import="com.adobe.granite.ui.clientlibs.HtmlLibraryManager" %>
 <%@ page import="net.adamcin.recap.addressbook.AddressBook" %>
 <%--
   ~ This is free and unencumbered software released into the public domain.

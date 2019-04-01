@@ -180,7 +180,7 @@ public class RecapImpl implements Recap, RecapSessionInterrupter {
             Repository srcRepo = this.getRepository(addr, new BatchReadConfigAdapter(opts.getRequestDepthConfig()));
             srcSession = srcRepo.login(
                     new SimpleCredentials(addr.getUsername(),
-                            addr.getPassword().toCharArray()));
+                            addr.getPassword().toCharArray()), "crx.default");
         } catch (Exception e) {
             throw new RecapSessionException("Failed to login to source repository.", e);
         } finally {

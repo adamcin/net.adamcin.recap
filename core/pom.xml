@@ -186,7 +186,14 @@
             <artifactId>jackrabbit-jcr2spi</artifactId>
             <version>${jackrabbit.version}</version>
         </dependency>
-
+        <dependency>
+            <artifactId>jackrabbit-jcr-commons</artifactId>
+            <groupId>org.apache.jackrabbit</groupId>
+        </dependency>
+        <dependency>
+            <artifactId>jackrabbit-webdav</artifactId>
+            <groupId>org.apache.jackrabbit</groupId>
+        </dependency>
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
